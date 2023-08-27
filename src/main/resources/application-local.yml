@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/devcourse
+    username: ENC(dNCKiAo9gisSxd5wvNLQuA==)
+    password: ENC(FD9/5E10ecBzLLohqizj6zhaV9z3l62Q)
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    open-in-view: false
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: create
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+    password: ${JASYPT_KEY:testKey}
