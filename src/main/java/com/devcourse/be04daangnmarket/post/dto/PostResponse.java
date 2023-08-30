@@ -5,6 +5,7 @@ import com.devcourse.be04daangnmarket.post.domain.TransactionType;
 
 public record PostResponse(
 
+	Long id,
 	String title,
 	int price,
 	int views,

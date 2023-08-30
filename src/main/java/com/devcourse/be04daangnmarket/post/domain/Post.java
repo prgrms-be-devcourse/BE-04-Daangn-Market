@@ -43,7 +43,7 @@ public class Post extends BaseEntity {
 	@Column(columnDefinition = "TIMESTAMP")
 	private LocalDateTime pullUpAt;
 
-	protected Post(){
+	protected Post() {
 	}
 
 	private Post(String title, String description, int price, int views, TransactionType transactionType,
@@ -91,6 +91,18 @@ public class Post extends BaseEntity {
 		return pullUpAt;
 	}
 
+	public void update(String title, String description, int price, int views,
+		TransactionType transactionType, Category category, Status status) {
+		this.title = title;
+		this.description = description;
+		this.price = price;
+		this.views = views;
+		this.transactionType = transactionType;
+		this.category = category;
+		this.status = status;
+
+	}
+
 	public static Builder builder() {
 		return new Builder();
 	}
@@ -105,50 +117,59 @@ public class Post extends BaseEntity {
 		private Status status;
 		private LocalDateTime pullUpAt;
 
-		private Builder(){
+		private Builder() {
 		}
-		public Builder title (String title) {
+
+		public Builder title(String title) {
 			this.title = title;
+
 			return this;
 		}
 
 		public Builder description(String description) {
 			this.description = description;
+
 			return this;
 		}
 
 		public Builder price(int price) {
 			this.price = price;
+
 			return this;
 		}
 
 		public Builder views(int views) {
 			this.views = views;
+
 			return this;
 		}
 
 		public Builder transactionType(TransactionType transactionType) {
 			this.transactionType = transactionType;
+
 			return this;
 		}
 
 		public Builder category(Category category) {
 			this.category = category;
+
 			return this;
 		}
 
 		public Builder status(Status status) {
 			this.status = status;
+
 			return this;
 		}
 
 		public Builder pullUpAt(LocalDateTime pullUpAt) {
 			this.pullUpAt = pullUpAt;
+
 			return this;
 		}
 
 		public Post build() {
-			return new Post(title, description, price,views,transactionType,category,status,pullUpAt);
+			return new Post(title, description, price, views, transactionType, category, status, pullUpAt);
 		}
 	}
 
