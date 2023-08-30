@@ -1,5 +1,7 @@
 package com.devcourse.be04daangnmarket.post.application;
 
+import static com.devcourse.be04daangnmarket.post.exception.ErrorMessage.*;
+
 import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
@@ -52,7 +54,7 @@ public class PostService {
 
 	private Post findPostById(Long id) {
 		return postRepository.findById(id)
-			.orElseThrow(() -> new NoSuchElementException());
+			.orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
 	}
 
 	@Transactional
