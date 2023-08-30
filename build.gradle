@@ -8,7 +8,7 @@ group = 'com.devcourse'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    sourceCompatibility = '19'
+    sourceCompatibility = '20'
 }
 
 repositories {
@@ -16,6 +16,13 @@ repositories {
 }
 
 dependencies {
+    //THYMELEAF
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
+    // WEBJARS - AXIOS
+    implementation 'org.webjars.npm:axios:0.27.2'
+
     // Jasypt
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4'
 
