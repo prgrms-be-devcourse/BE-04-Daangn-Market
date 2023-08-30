@@ -2,6 +2,9 @@ package com.devcourse.be04daangnmarket.post.application;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -61,6 +64,49 @@ class PostServiceTest {
 		assertEquals(status, response.status());
 
 		verify(postRepository, times(1)).save(any(Post.class));
+	}
+
+	@Test
+	@DisplayName("게시글 수정 성공")
+	void updatePostTest() {
+
+		// Given
+		Long id = 1L;
+		String title = "keyboard~!";
+		String description = "this keyboard is good";
+		int price = 100000;
+		int views = 1000;
+		TransactionType transactionType = TransactionType.SALE;
+		Category category = Category.DIGITAL_DEVICES;
+		Status status = Status.FOR_SALE;
+
+		Post post = Post.builder()
+			.title("keyword~!")
+			.description("this keyboard is good")
+			.price(50000)
+			.views(10)
+			.transactionType(TransactionType.SHARE)
+			.category(Category.FURNITURE_INTERIOR)
+			.status(Status.FOR_SALE)
+			.build();
+		;
+		when(postRepository.findById(id)).thenReturn(Optional.of(post));
+
+		// When
+		PostResponse response = postService.update(id, title, description, price, views,
+			transactionType, category, status);
+
+		// Then
+		assertNotNull(response);
+		assertEquals(title, post.getTitle());
+		assertEquals(description, post.getDescription());
+		assertEquals(price, post.getPrice());
+		assertEquals(views, post.getViews());
+		assertEquals(transactionType, post.getTransactionType());
+		assertEquals(category, post.getCategory());
+		assertEquals(status, post.getStatus());
+
+		verify(postRepository, times(1)).findById(id);
 	}
 
 }
