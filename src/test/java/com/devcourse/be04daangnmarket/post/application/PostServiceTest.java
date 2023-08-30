@@ -69,7 +69,6 @@ class PostServiceTest {
 	@Test
 	@DisplayName("게시글 수정 성공")
 	void updatePostTest() {
-
 		// Given
 		Long id = 1L;
 		String title = "keyboard~!";
@@ -107,6 +106,19 @@ class PostServiceTest {
 		assertEquals(status, post.getStatus());
 
 		verify(postRepository, times(1)).findById(id);
+	}
+
+	@Test
+	@DisplayName("게시글 삭제 성공")
+	public void deletePostTest() {
+		// Given
+		Long postId = 1L;
+
+		// When
+		postService.delete(postId);
+
+		// Then
+		verify(postRepository, times(1)).deleteById(postId);
 	}
 
 }
