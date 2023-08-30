@@ -55,6 +55,12 @@ public class PostService {
 			.orElseThrow(() -> new NoSuchElementException());
 	}
 
+	@Transactional
+	public void delete(Long id) {
+		postRepository.deleteById(id);
+
+	}
+
 	private PostResponse toResponse(Post post) {
 		return new PostResponse(
 			post.getId(),
