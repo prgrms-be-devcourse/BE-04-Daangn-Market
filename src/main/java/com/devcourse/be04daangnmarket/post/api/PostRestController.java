@@ -29,7 +29,7 @@ public class PostRestController {
 		PostResponse response = postService.create(request.title(), request.description()
 			, request.price(), request.views(), request.transactionType(), request.category(), request.status());
 
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	@PutMapping("/{id}")
