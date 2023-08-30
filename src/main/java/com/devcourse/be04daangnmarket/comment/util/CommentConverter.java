@@ -10,6 +10,6 @@ public class CommentConverter {
     }
 
     public static CommentResponse toResponse(Comment comment) {
-        return new CommentResponse(comment.getComment());
+        return new CommentResponse(comment.getContent());
     }
 }

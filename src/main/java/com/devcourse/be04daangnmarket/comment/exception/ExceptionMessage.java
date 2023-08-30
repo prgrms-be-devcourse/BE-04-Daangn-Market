@@ -1,7 +1,7 @@
 package com.devcourse.be04daangnmarket.comment.exception;
 
 public enum ExceptionMessage {
-    INVALID_COMMENT("댓글의 길이가 잘못 되었습니다.");
+    INVALID_CONTENT("댓글의 값이 올바르지 않습니다.");
 
     private final String message;
 

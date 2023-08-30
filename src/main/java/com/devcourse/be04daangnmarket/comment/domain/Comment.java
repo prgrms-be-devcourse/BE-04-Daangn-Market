@@ -15,33 +15,33 @@ import static com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage.
 @Table(name = "comments")
 @DynamicInsert
 public class Comment extends BaseEntity {
-    @Column(name = "comment", length = 500)
-    private String comment;
+    @Column(name = "content", length = 500)
+    private String content;
 
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'ALIVE'")
-    private DeletedStatus isDeleted;
+    private DeletedStatus deletedStatus;
 
-    public Comment() {
+    protected Comment() {
 
     }
 
-    public Comment(String comment) {
-        validateComment(comment);
-        this.comment = comment;
+    public Comment(String content) {
+        validateComment(content);
+        this.content = content;
     }
 
-    public String getComment() {
-        return comment;
+    public String getContent() {
+        return content;
     }
 
-    public DeletedStatus getIsDeleted() {
-        return isDeleted;
+    public DeletedStatus getDeletedStatus() {
+        return deletedStatus;
     }
 
     private void validateComment(String comment) {
         if (isCommentWithinRange(comment)) {
-            throw new IllegalArgumentException(INVALID_COMMENT.getMessage());
+            throw new IllegalArgumentException(INVALID_CONTENT.getMessage());
         }
     }
 
