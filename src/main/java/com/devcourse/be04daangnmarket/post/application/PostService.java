@@ -43,6 +43,12 @@ public class PostService {
 		return toResponse(post);
 	}
 
+	public PostResponse getPost(Long id) {
+		Post post = findPostById(id);
+
+		return toResponse(post);
+	}
+
 	@Transactional
 	public PostResponse update(Long id, String title, String description, int price, int views,
 		TransactionType transactionType, Category category, Status status) {

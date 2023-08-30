@@ -9,9 +9,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
 
 @Entity
 @DynamicInsert
+@Table(name = "posts")
 public class Post extends BaseEntity {
 
 	@Column(nullable = false)
