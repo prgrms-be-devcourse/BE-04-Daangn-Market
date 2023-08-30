@@ -66,7 +66,7 @@ class PostRestControllerTest {
 
 	@Test
 	@DisplayName("게시글 수정 REST API 성공")
-	public void testUpdatePost() throws Exception {
+	public void updatePostTest() throws Exception {
 		// Given
 		Long postId = 1L;
 		PostRequest request = new PostRequest("Keyboard", "nice Keyboard", 100, 1000,
@@ -91,6 +91,20 @@ class PostRestControllerTest {
 			.andExpect(jsonPath("$.transactionType").value(request.transactionType().toString()))
 			.andExpect(jsonPath("$.category").value(request.category().toString()))
 			.andExpect(jsonPath("$.status").value(request.status().toString()));
+	}
+
+	@Test
+	@DisplayName("게시글 삭제 REST API 성공")
+	public void deletePostTest() throws Exception {
+		// Given
+		Long postId = 1L;
+
+		// When-Then
+		mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/posts/" + postId)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isNoContent());
+
+		verify(postService, times(1)).delete(postId);
 	}
 
 }
