@@ -44,6 +44,11 @@ public class PostService {
 		return toResponse(post);
 	}
 
+	public void delete(Long id) {
+		postRepository.deleteById(id);
+
+	}
+
 	private Post findPostById(Long id) {
 		return postRepository.findById(id)
 			.orElseThrow(() -> new NoSuchElementException());

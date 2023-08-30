@@ -3,6 +3,7 @@ package com.devcourse.be04daangnmarket.post.api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -19,10 +20,11 @@ public class PostController {
 
 	@Autowired
 	private PostService postService;
+
 	@PostMapping
 	public ResponseEntity<PostResponse> createPost(@RequestBody PostRequest request) {
 		PostResponse response = postService.create(request.title(), request.description()
-		,request.price(), request.views(), request.transactionType(), request.category(), request.status());
+			, request.price(), request.views(), request.transactionType(), request.category(), request.status());
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
@@ -30,9 +32,15 @@ public class PostController {
 	@PutMapping("/{id}")
 	public ResponseEntity<PostResponse> updatePost(@PathVariable Long id, @RequestBody PostRequest request) {
 		PostResponse response = postService.update(id, request.title(), request.description()
-			,request.price(), request.views(), request.transactionType(), request.category(), request.status());
+			, request.price(), request.views(), request.transactionType(), request.category(), request.status());
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deletePost(@PathVariable Long id) {
+		postService.delete(id);
+		return ResponseEntity.noContent().build();
 	}
 
 }
