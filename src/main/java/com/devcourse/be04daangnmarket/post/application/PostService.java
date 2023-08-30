@@ -1,5 +1,7 @@
 package com.devcourse.be04daangnmarket.post.application;
 
+import java.util.NoSuchElementException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +39,20 @@ public class PostService {
 		post = postRepository.save(post);
 
 		return toResponse(post);
+	}
+
+	@Transactional
+	public PostResponse update(Long id, String title, String description, int price, int views,
+		TransactionType transactionType, Category category, Status status) {
+		Post post = findPostById(id);
+		post.update(title, description, price, views, transactionType, category, status);
+
+		return toResponse(post);
+	}
+
+	private Post findPostById(Long id) {
+		return postRepository.findById(id)
+			.orElseThrow(() -> new NoSuchElementException());
 	}
 
 	private PostResponse toResponse(Post post) {
