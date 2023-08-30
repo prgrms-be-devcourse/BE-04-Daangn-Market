@@ -64,4 +64,33 @@ class PostRestControllerTest {
 			.andExpect(jsonPath("$.status").value(request.status().toString()));
 	}
 
+	@Test
+	@DisplayName("게시글 수정 REST API 성공")
+	public void testUpdatePost() throws Exception {
+		// Given
+		Long postId = 1L;
+		PostRequest request = new PostRequest("Keyboard", "nice Keyboard", 100, 1000,
+			TransactionType.SALE, Category.DIGITAL_DEVICES, Status.FOR_SALE);
+
+		PostResponse mockResponse = new PostResponse(1L, "Keyboard", "nice Keyboard", 100, 1000,
+			TransactionType.SALE, Category.DIGITAL_DEVICES, Status.FOR_SALE);
+
+		when(postService.update(1L,"Keyboard", "nice Keyboard", 100, 1000,
+			TransactionType.SALE, Category.DIGITAL_DEVICES, Status.FOR_SALE)).thenReturn(mockResponse);
+
+		// When-Then
+		mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/posts/" + postId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.id").value(postId))
+			.andExpect(jsonPath("$.title").value(request.title()))
+			.andExpect(jsonPath("$.description").value(request.description()))
+			.andExpect(jsonPath("$.price").value(request.price()))
+			.andExpect(jsonPath("$.views").value(request.views()))
+			.andExpect(jsonPath("$.transactionType").value(request.transactionType().toString()))
+			.andExpect(jsonPath("$.category").value(request.category().toString()))
+			.andExpect(jsonPath("$.status").value(request.status().toString()));
+	}
+
 }
