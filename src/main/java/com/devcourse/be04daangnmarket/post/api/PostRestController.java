@@ -2,6 +2,7 @@ package com.devcourse.be04daangnmarket.post.api;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -37,6 +38,12 @@ public class PostRestController {
 			, request.price(), request.views(), request.transactionType(), request.category(), request.status());
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deletePost(@PathVariable Long id) {
+		postService.delete(id);
+		return ResponseEntity.noContent().build();
 	}
 
 }
