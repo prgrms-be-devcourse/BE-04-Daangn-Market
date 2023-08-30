@@ -2,9 +2,7 @@ package com.devcourse.be04daangnmarket.post.application;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
 import java.util.Optional;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -67,9 +65,36 @@ class PostServiceTest {
 	}
 
 	@Test
+	@DisplayName("게시글 단일 상세 조회 성공")
+	void getPostTest() {
+		// given
+		Long postId = 1L;
+
+		Post post = Post.builder()
+			.title("keyboard~!")
+			.description("this keyboard is good")
+			.price(100000)
+			.views(1000)
+			.transactionType(TransactionType.SALE)
+			.category(Category.DIGITAL_DEVICES)
+			.status(Status.FOR_SALE)
+			.build();
+
+		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+
+		// when
+		PostResponse response = postService.getPost(postId);
+
+		// then
+		assertNotNull(response);
+		assertEquals(post.getId(), response.id());
+		verify(postRepository, times(1)).findById(postId);
+	}
+
+	@Test
 	@DisplayName("게시글 수정 성공")
 	void updatePostTest() {
-		// Given
+		// given
 		Long id = 1L;
 		String title = "keyboard~!";
 		String description = "this keyboard is good";
@@ -91,11 +116,11 @@ class PostServiceTest {
 		;
 		when(postRepository.findById(id)).thenReturn(Optional.of(post));
 
-		// When
+		// when
 		PostResponse response = postService.update(id, title, description, price, views,
 			transactionType, category, status);
 
-		// Then
+		// then
 		assertNotNull(response);
 		assertEquals(title, post.getTitle());
 		assertEquals(description, post.getDescription());
@@ -111,13 +136,13 @@ class PostServiceTest {
 	@Test
 	@DisplayName("게시글 삭제 성공")
 	public void deletePostTest() {
-		// Given
+		// given
 		Long postId = 1L;
 
-		// When
+		// when
 		postService.delete(postId);
 
-		// Then
+		// then
 		verify(postRepository, times(1)).deleteById(postId);
 	}
 
