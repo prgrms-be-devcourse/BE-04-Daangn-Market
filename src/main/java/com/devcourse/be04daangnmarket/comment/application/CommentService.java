@@ -3,6 +3,8 @@ package com.devcourse.be04daangnmarket.comment.application;
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
 import com.devcourse.be04daangnmarket.comment.dto.CommentResponse;
 import com.devcourse.be04daangnmarket.comment.dto.CreateCommentRequest;
+import com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage;
+import com.devcourse.be04daangnmarket.comment.exception.NotFoundException;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.comment.util.CommentConverter;
 import org.springframework.stereotype.Service;
@@ -23,5 +25,16 @@ public class CommentService {
         Comment saved = commentRepository.save(comment);
 
         return CommentConverter.toResponse(saved);
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        Comment comment = getOne(id);
+        comment.deleteStatus();
+    }
+
+    private Comment getOne(Long id) {
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ExceptionMessage.NOT_FOUND_COMMENT.getMessage()));
     }
 }

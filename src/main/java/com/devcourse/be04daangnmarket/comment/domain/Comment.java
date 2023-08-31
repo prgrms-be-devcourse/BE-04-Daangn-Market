@@ -45,7 +45,11 @@ public class Comment extends BaseEntity {
         }
     }
 
-    private static boolean isCommentWithinRange(String comment) {
+    private boolean isCommentWithinRange(String comment) {
         return comment.length() > 500;
+    }
+
+    public void deleteStatus() {
+        this.deletedStatus = DeletedStatus.DELETED;
     }
 }
