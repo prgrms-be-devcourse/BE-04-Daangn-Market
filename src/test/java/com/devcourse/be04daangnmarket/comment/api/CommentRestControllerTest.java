@@ -10,9 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -45,8 +50,8 @@ class CommentRestControllerTest {
 
         //when & then
         this.mockMvc.perform(post("/api/v1/comments")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andDo(print());
     }
@@ -58,7 +63,7 @@ class CommentRestControllerTest {
 
         //when & then
         mockMvc.perform(delete("/api/v1/comments/" + commentId)
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -73,7 +78,27 @@ class CommentRestControllerTest {
 
         //when & then
         mockMvc.perform(get("/api/v1/comments/{id}", commentId)
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    void 페이징_조회_성공() throws Exception {
+        //given
+        CommentResponse response1 = new CommentResponse("댓글");
+        CommentResponse response2 = new CommentResponse("댓글");
+
+        Pageable pageable = PageRequest.of(0, 10);
+        PageImpl<CommentResponse> responses = new PageImpl<>(List.of(response1, response2), pageable, 2);
+        given(commentService.getPage(pageable))
+                .willReturn(responses);
+
+        mockMvc.perform(get("/api/v1/comments")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("order", "createdAt.desc")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
