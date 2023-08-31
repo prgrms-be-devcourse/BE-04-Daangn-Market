@@ -7,6 +7,8 @@ import com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage;
 import com.devcourse.be04daangnmarket.comment.exception.NotFoundException;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.comment.util.CommentConverter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,9 +40,14 @@ public class CommentService {
                 .orElseThrow(() -> new NotFoundException(ExceptionMessage.NOT_FOUND_COMMENT.getMessage()));
     }
 
-    public CommentResponse getOneComment(Long id) {
+    public CommentResponse getDetail(Long id) {
         Comment comment = getOne(id);
 
         return CommentConverter.toResponse(comment);
+    }
+
+    public Page<CommentResponse> getPage(Pageable pageable) {
+        return commentRepository.findAll(pageable)
+                .map(CommentConverter::toResponse);
     }
 }
