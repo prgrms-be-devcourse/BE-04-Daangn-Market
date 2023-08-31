@@ -37,4 +37,10 @@ public class CommentService {
         return commentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ExceptionMessage.NOT_FOUND_COMMENT.getMessage()));
     }
+
+    public CommentResponse getOneComment(Long id) {
+        Comment comment = getOne(id);
+
+        return CommentConverter.toResponse(comment);
+    }
 }
