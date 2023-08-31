@@ -2,8 +2,11 @@ package com.devcourse.be04daangnmarket.post.application;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,11 +16,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
 import com.devcourse.be04daangnmarket.post.domain.Status;
 import com.devcourse.be04daangnmarket.post.domain.TransactionType;
-import com.devcourse.be04daangnmarket.post.dto.PostResponse;
+import com.devcourse.be04daangnmarket.post.dto.PostDto;
 import com.devcourse.be04daangnmarket.post.repository.PostRepository;
 
 @SpringBootTest
@@ -36,35 +40,24 @@ class PostServiceTest {
 		String title = "keyboard~!";
 		String description = "this keyboard is good";
 		int price = 100000;
-		int views = 1000;
 		TransactionType transactionType = TransactionType.SALE;
 		Category category = Category.DIGITAL_DEVICES;
-		Status status = Status.FOR_SALE;
 
-		Post post = Post.builder()
-			.title("keyboard~!")
-			.description("this keyboard is good")
-			.price(100000)
-			.views(1000)
-			.transactionType(TransactionType.SALE)
-			.category(Category.DIGITAL_DEVICES)
-			.status(Status.FOR_SALE)
-			.build();
+		Post post = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES);
 
 		when(postRepository.save(any(Post.class))).thenReturn(post);
 
 		// when
-		PostResponse response = postService.create(title, description, price, views, transactionType, category, status);
+		PostDto.Response response = postService.create(title, description, price, transactionType, category);
 
 		// then
 		assertNotNull(response);
 		assertEquals(title, response.title());
 		assertEquals(description, response.description());
 		assertEquals(price, response.price());
-		assertEquals(views, response.views());
 		assertEquals(transactionType, response.transactionType());
 		assertEquals(category, response.category());
-		assertEquals(status, response.status());
 
 		verify(postRepository, times(1)).save(any(Post.class));
 	}
@@ -75,20 +68,13 @@ class PostServiceTest {
 		// given
 		Long postId = 1L;
 
-		Post post = Post.builder()
-			.title("keyboard~!")
-			.description("this keyboard is good")
-			.price(100000)
-			.views(1000)
-			.transactionType(TransactionType.SALE)
-			.category(Category.DIGITAL_DEVICES)
-			.status(Status.FOR_SALE)
-			.build();
+		Post post = new Post("keyboard~!", "this keyboard is good", 100000, 1000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES, Status.FOR_SALE, LocalDateTime.now());
 
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
 		// when
-		PostResponse response = postService.getPost(postId);
+		PostDto.Response response = postService.getPost(postId);
 
 		// then
 		assertNotNull(response);
@@ -100,27 +86,13 @@ class PostServiceTest {
 	@DisplayName("게시글 전체 조회 성공")
 	public void testGetAllPost() {
 		// given
-		Post post = Post.builder()
-			.title("keyboard~!")
-			.description("this keyboard is good")
-			.price(100000)
-			.views(1000)
-			.transactionType(TransactionType.SALE)
-			.category(Category.DIGITAL_DEVICES)
-			.status(Status.FOR_SALE)
-			.build();
+		Post post = new Post("keyboard~!", "this keyboard is good", 100000, 1000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES, Status.FOR_SALE, LocalDateTime.now());
 
-		Post post2 = Post.builder()
-			.title("mouse~!")
-			.description("this mouse is good")
-			.price(100000)
-			.views(1000)
-			.transactionType(TransactionType.SALE)
-			.category(Category.DIGITAL_DEVICES)
-			.status(Status.FOR_SALE)
-			.build();
+		Post post2 = new Post("mouse~!", "this mouse is good", 100000, 1000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES, Status.FOR_SALE, LocalDateTime.now());
 
-		List<Post> posts = List.of(post,post2);
+		List<Post> posts = List.of(post, post2);
 
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<Post> page = new PageImpl<>(posts, pageable, posts.size());
@@ -128,7 +100,7 @@ class PostServiceTest {
 		when(postRepository.findAll(pageable)).thenReturn(page);
 
 		// when
-		Page<PostResponse> resultPage = postService.getAllPost(pageable);
+		Page<PostDto.Response> resultPage = postService.getAllPost(pageable);
 
 		// then
 		assertEquals(page.getTotalElements(), resultPage.getTotalElements());
@@ -144,36 +116,25 @@ class PostServiceTest {
 		String title = "keyboard~!";
 		String description = "this keyboard is good";
 		int price = 100000;
-		int views = 1000;
 		TransactionType transactionType = TransactionType.SALE;
 		Category category = Category.DIGITAL_DEVICES;
-		Status status = Status.FOR_SALE;
 
-		Post post = Post.builder()
-			.title("keyword~!")
-			.description("this keyboard is good")
-			.price(50000)
-			.views(10)
-			.transactionType(TransactionType.SHARE)
-			.category(Category.FURNITURE_INTERIOR)
-			.status(Status.FOR_SALE)
-			.build();
-		;
+		Post post = new Post("keyboard~!", "this keyboard is good", 50000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES);
+
 		when(postRepository.findById(id)).thenReturn(Optional.of(post));
 
 		// when
-		PostResponse response = postService.update(id, title, description, price, views,
-			transactionType, category, status);
+		PostDto.Response response = postService.update(id, title, description, price,
+			transactionType, category);
 
 		// then
 		assertNotNull(response);
 		assertEquals(title, post.getTitle());
 		assertEquals(description, post.getDescription());
 		assertEquals(price, post.getPrice());
-		assertEquals(views, post.getViews());
 		assertEquals(transactionType, post.getTransactionType());
 		assertEquals(category, post.getCategory());
-		assertEquals(status, post.getStatus());
 
 		verify(postRepository, times(1)).findById(id);
 	}

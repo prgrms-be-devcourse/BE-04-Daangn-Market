@@ -16,8 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.devcourse.be04daangnmarket.post.application.PostService;
-import com.devcourse.be04daangnmarket.post.dto.PostRequest;
-import com.devcourse.be04daangnmarket.post.dto.PostResponse;
+import com.devcourse.be04daangnmarket.post.dto.PostDto;
 
 @RestController
 @RequestMapping("api/v1/posts")
@@ -30,33 +29,34 @@ public class PostRestController {
 	private final PostService postService;
 
 	@PostMapping
-	public ResponseEntity<PostResponse> createPost(@RequestBody PostRequest request) {
-		PostResponse response = postService.create(request.title(), request.description()
-			, request.price(), request.views(), request.transactionType(), request.category(), request.status());
+	public ResponseEntity<PostDto.Response> createPost(@RequestBody PostDto.CreateRequest request) {
+		PostDto.Response response = postService.create(request.title(), request.description()
+			, request.price(), request.transactionType(), request.category());
 
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<PostResponse> getPost(@PathVariable Long id) {
-		PostResponse response = postService.getPost(id);
+	public ResponseEntity<PostDto.Response> getPost(@PathVariable Long id) {
+		PostDto.Response response = postService.getPost(id);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	@GetMapping
-	public ResponseEntity<Page<PostResponse>> getAllPost(@RequestParam(defaultValue = "0") int page,
+	public ResponseEntity<Page<PostDto.Response>> getAllPost(@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "0") int size) {
 		Pageable pageable = PageRequest.of(page, size);
-		Page<PostResponse> responses = postService.getAllPost(pageable);
+		Page<PostDto.Response> responses = postService.getAllPost(pageable);
 
 		return new ResponseEntity<>(responses, HttpStatus.OK);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<PostResponse> updatePost(@PathVariable Long id, @RequestBody PostRequest request) {
-		PostResponse response = postService.update(id, request.title(), request.description()
-			, request.price(), request.views(), request.transactionType(), request.category(), request.status());
+	public ResponseEntity<PostDto.Response> updatePost(@PathVariable Long id,
+		@RequestBody PostDto.UpdateRequest request) {
+		PostDto.Response response = postService.update(id, request.title(), request.description()
+			, request.price(), request.transactionType(), request.category());
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
