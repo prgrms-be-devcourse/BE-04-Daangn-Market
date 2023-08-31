@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<script th:src="@{https://unpkg.com/axios/dist/axios.min.js}"></script>
+<head>
+    <meta charset="utf-8">
+    <title>login</title>
+</head>
+
+<script>
+    function signUpRequest() {
+        axios
+            .post("/api/v1/members",
+                {
+                    headers: {
+                        'Content-type': 'application/json',
+                    },
+                    username: document.getElementById("username").value,
+                    phoneNumber : document.getElementById("phone_number").value,
+                    email : document.getElementById("email").value,
+                    password: document.getElementById("password").value,
+                }
+            )
+            .then(response => {
+                window.location.href = "http://localhost:8080/sign-in";
+            })
+            .catch(error => {
+                alert("오류가 발생했습니다. \n" + error);
+            })
+    }
+</script>
+
+<body>
+<main>
+    <div class="signup_container">
+        <div>
+            <div class="logo">당근마켓 회원가입</div>
+            <div class="username">
+                <input type="text" id="username" name="username" placeholder="username">
+            </div>
+            <div class="phone_number">
+                <input type="text" id="phone_number" name="phone_number" placeholder="phone_number">
+            </div>
+          <div class="email">
+              <input type="text" id="email" name="email" placeholder="email">
+          </div>
+          <div class="password">
+              <input type="password" id="password" name="password" placeholder="passoword">
+          </div>
+            <div class="button_container">
+                <button class="signup_btn" onclick="signUpRequest()">회원 가입</button>
+              <a th:href="@{/sign-in}">
+                  <button class="login_btn">이미 아이디가 있다면?</button>
+              </a>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
