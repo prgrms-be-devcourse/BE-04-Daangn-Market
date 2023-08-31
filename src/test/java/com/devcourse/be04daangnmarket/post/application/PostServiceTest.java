@@ -2,12 +2,17 @@ package com.devcourse.be04daangnmarket.post.application;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
 import com.devcourse.be04daangnmarket.post.domain.Status;
@@ -51,7 +56,7 @@ class PostServiceTest {
 		// when
 		PostResponse response = postService.create(title, description, price, views, transactionType, category, status);
 
-		// Then
+		// then
 		assertNotNull(response);
 		assertEquals(title, response.title());
 		assertEquals(description, response.description());
@@ -89,6 +94,46 @@ class PostServiceTest {
 		assertNotNull(response);
 		assertEquals(post.getId(), response.id());
 		verify(postRepository, times(1)).findById(postId);
+	}
+
+	@Test
+	@DisplayName("게시글 전체 조회 성공")
+	public void testGetAllPost() {
+		// given
+		Post post = Post.builder()
+			.title("keyboard~!")
+			.description("this keyboard is good")
+			.price(100000)
+			.views(1000)
+			.transactionType(TransactionType.SALE)
+			.category(Category.DIGITAL_DEVICES)
+			.status(Status.FOR_SALE)
+			.build();
+
+		Post post2 = Post.builder()
+			.title("mouse~!")
+			.description("this mouse is good")
+			.price(100000)
+			.views(1000)
+			.transactionType(TransactionType.SALE)
+			.category(Category.DIGITAL_DEVICES)
+			.status(Status.FOR_SALE)
+			.build();
+
+		List<Post> posts = List.of(post,post2);
+
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Post> page = new PageImpl<>(posts, pageable, posts.size());
+
+		when(postRepository.findAll(pageable)).thenReturn(page);
+
+		// when
+		Page<PostResponse> resultPage = postService.getAllPost(pageable);
+
+		// then
+		assertEquals(page.getTotalElements(), resultPage.getTotalElements());
+		assertEquals(page.getNumber(), resultPage.getNumber());
+
 	}
 
 	@Test
