@@ -4,6 +4,8 @@ import static com.devcourse.be04daangnmarket.post.exception.ErrorMessage.*;
 
 import java.util.NoSuchElementException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +43,17 @@ public class PostService {
 		post = postRepository.save(post);
 
 		return toResponse(post);
+	}
+
+	public PostResponse getPost(Long id) {
+		Post post = findPostById(id);
+
+		return toResponse(post);
+	}
+
+	public Page<PostResponse> getAllPost(Pageable pageable) {
+		return postRepository.findAll(pageable)
+			.map(this::toResponse);
 	}
 
 	@Transactional
