@@ -24,4 +24,10 @@ public class MemberRestController {
         MemberDto.Response response = memberService.signUp(request);
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<MemberDto.Response> signIn(@RequestBody MemberDto.SignInRequest request) {
+        MemberDto.Response response = memberService.signIn(request);
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
 }
