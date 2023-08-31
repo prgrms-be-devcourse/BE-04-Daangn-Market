@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<script th:src="@{https://unpkg.com/axios/dist/axios.min.js}"></script>
+<head>
+    <meta charset="utf-8">
+    <title>login</title>
+</head>
+
+<script>
+    // 로그인 처리하기
+    function loginRequest() {
+        axios
+            .post("/api/v1/login",
+                {
+                    headers: {
+                        'Content-type': 'application/json',
+                    },
+                    email: document.getElementById("email").value,
+                    password: document.getElementById("password").value,
+                }
+            )
+            .then(response => {
+                window.location.href = "http://localhost:8080/";
+            })
+            .catch(error => {
+                alert("오류가 발생했습니다. \n" + error);
+            })
+    }
+</script>
+
+<body>
+<main>
+    <div class="signin_container">
+        <div>
+            <div class="logo">당근마켓 로그인</div>
+            <div class="login_id">
+                <input type="text" id="email" name="email" placeholder="email">
+            </div>
+            <div class="login_password">
+                <input type="password" id="password" name="password" placeholder="passoword">
+            </div>
+            <div class="button_container">
+                <button class="login_btn" onclick="loginRequest()">로그인</button>
+                <a th:href="@{/sign-up}">
+                    <button class="signup_btn">회원가입</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
