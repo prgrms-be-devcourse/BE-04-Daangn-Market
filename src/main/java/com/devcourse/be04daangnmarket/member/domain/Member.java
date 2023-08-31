@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Table(name = "members")
@@ -62,7 +63,7 @@ public class Member extends BaseEntity {
         return status;
     }
 
-    public boolean isMatchedPassword(String password) {
-        return this.password.equals(password);
+    public boolean isMatchedPassword(PasswordEncoder passwordEncoder, String password) {
+        return passwordEncoder.matches(password, this.password);
     }
 }

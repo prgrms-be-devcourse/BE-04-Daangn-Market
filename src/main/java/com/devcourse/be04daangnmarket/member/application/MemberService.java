@@ -5,6 +5,7 @@ import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import com.devcourse.be04daangnmarket.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.FAIL_LOGIN;
@@ -13,9 +14,11 @@ import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.FAIL_
 @Transactional
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public MemberService(MemberRepository memberRepository) {
+    public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public MemberDto.Response signUp(MemberDto.SignUpRequest request) {
@@ -23,7 +26,7 @@ public class MemberService {
                 request.username(),
                 request.phoneNumber(),
                 request.email(),
-                request.password()
+                passwordEncoder.encode(request.password())
         );
 
         Member savedMember = memberRepository.save(member);
@@ -35,7 +38,7 @@ public class MemberService {
         Member member = memberRepository.findByEmail(request.email())
                 .orElseThrow(() -> new UsernameNotFoundException(FAIL_LOGIN.getMessage()));
 
-        if (!member.isMatchedPassword(request.password())) {
+        if (!member.isMatchedPassword(passwordEncoder, request.password())) {
             throw new UsernameNotFoundException(FAIL_LOGIN.getMessage());
         }
 
