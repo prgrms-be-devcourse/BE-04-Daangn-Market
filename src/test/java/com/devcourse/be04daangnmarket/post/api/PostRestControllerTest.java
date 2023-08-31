@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.devcourse.be04daangnmarket.common.config.SecurityConfig;
+import com.devcourse.be04daangnmarket.member.application.MemberService;
 import com.devcourse.be04daangnmarket.post.application.PostService;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Status;
@@ -37,6 +38,9 @@ class PostRestControllerTest {
 	@MockBean
 	private PostService postService;
 
+	@MockBean
+	MemberService memberService;
+
 	@Test
 	@DisplayName("게시글 등록 REST API 성공")
 	void PostRestControllerTest() throws Exception {
@@ -54,7 +58,7 @@ class PostRestControllerTest {
 		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/posts")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
-			.andExpect(status().isOk())
+			.andExpect(status().isCreated())
 			.andExpect(jsonPath("$.title").value(request.title()))
 			.andExpect(jsonPath("$.description").value(request.description()))
 			.andExpect(jsonPath("$.price").value(request.price()))
@@ -62,6 +66,30 @@ class PostRestControllerTest {
 			.andExpect(jsonPath("$.transactionType").value(request.transactionType().toString()))
 			.andExpect(jsonPath("$.category").value(request.category().toString()))
 			.andExpect(jsonPath("$.status").value(request.status().toString()));
+
+	}
+
+	@Test
+	@DisplayName("게시글 단일 상세 조회 REST API 성공")
+	public void getPostTest() throws Exception {
+		// Given
+		Long postId = 1L;
+		PostResponse mockResponse = new PostResponse(1L, "Keyboard", "nice Keyboard", 100, 1000,
+			TransactionType.SALE, Category.DIGITAL_DEVICES, Status.FOR_SALE);
+
+		when(postService.getPost(1L)).thenReturn(mockResponse);
+
+		// When and Then
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts/" + postId))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.title").value("Keyboard"))
+			.andExpect(jsonPath("$.description").value("nice Keyboard"))
+			.andExpect(jsonPath("$.price").value(100))
+			.andExpect(jsonPath("$.views").value(1000))
+			.andExpect(jsonPath("$.transactionType").value(TransactionType.SALE.toString()))
+			.andExpect(jsonPath("$.category").value(Category.DIGITAL_DEVICES.toString()))
+			.andExpect(jsonPath("$.status").value(Status.FOR_SALE.toString()));
+
 	}
 
 	@Test
@@ -75,7 +103,7 @@ class PostRestControllerTest {
 		PostResponse mockResponse = new PostResponse(1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE, Category.DIGITAL_DEVICES, Status.FOR_SALE);
 
-		when(postService.update(1L,"Keyboard", "nice Keyboard", 100, 1000,
+		when(postService.update(1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE, Category.DIGITAL_DEVICES, Status.FOR_SALE)).thenReturn(mockResponse);
 
 		// When-Then
@@ -91,6 +119,7 @@ class PostRestControllerTest {
 			.andExpect(jsonPath("$.transactionType").value(request.transactionType().toString()))
 			.andExpect(jsonPath("$.category").value(request.category().toString()))
 			.andExpect(jsonPath("$.status").value(request.status().toString()));
+
 	}
 
 	@Test
@@ -105,6 +134,7 @@ class PostRestControllerTest {
 			.andExpect(status().isNoContent());
 
 		verify(postService, times(1)).delete(postId);
+
 	}
 
 }
