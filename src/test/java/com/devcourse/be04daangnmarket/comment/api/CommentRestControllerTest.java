@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -57,6 +58,21 @@ class CommentRestControllerTest {
 
         //when & then
         mockMvc.perform(delete("/api/v1/comments/" + commentId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    void 조회_성공() throws Exception {
+        //given
+        Long commentId = 1L;
+        CommentResponse response = new CommentResponse("댓글");
+        given(commentService.getDetail(commentId))
+                .willReturn(response);
+
+        //when & then
+        mockMvc.perform(get("/api/v1/comments/{id}", commentId)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());

@@ -38,7 +38,7 @@ class CommentServiceTest {
     }
 
     @Test
-    void 삭제시_삭제상태변경이_확인() {
+    void 삭제시_삭제상태변경_확인() {
         //given
         Comment comment = new Comment("댓글");
 
