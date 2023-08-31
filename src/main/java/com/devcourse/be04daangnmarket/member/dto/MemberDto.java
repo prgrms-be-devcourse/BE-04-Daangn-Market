@@ -13,7 +13,7 @@ public class MemberDto {
             String password
     ) { }
 
-    public record signInRequest(
+    public record SignInRequest(
             String email,
             String password
     ) { }
