@@ -61,4 +61,8 @@ public class Member extends BaseEntity {
     public Status getStatus() {
         return status;
     }
+
+    public boolean isMatchedPassword(String password) {
+        return this.password.equals(password);
+    }
 }

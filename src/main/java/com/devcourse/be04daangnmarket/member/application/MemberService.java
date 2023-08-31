@@ -4,7 +4,10 @@ import com.devcourse.be04daangnmarket.member.domain.Member;
 import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import com.devcourse.be04daangnmarket.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.FAIL_LOGIN;
 
 @Service
 @Transactional
@@ -26,6 +29,17 @@ public class MemberService {
         Member savedMember = memberRepository.save(member);
 
         return toResponse(savedMember);
+    }
+
+    public MemberDto.Response signIn(MemberDto.SignInRequest request) {
+        Member member = memberRepository.findByEmail(request.email())
+                .orElseThrow(() -> new UsernameNotFoundException(FAIL_LOGIN.getMessage()));
+
+        if (!member.isMatchedPassword(request.password())) {
+            throw new UsernameNotFoundException(FAIL_LOGIN.getMessage());
+        }
+
+        return toResponse(member);
     }
 
     private MemberDto.Response toResponse(Member member) {
