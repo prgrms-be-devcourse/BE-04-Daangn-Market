@@ -38,11 +38,11 @@ public class MemberService {
         Member member = memberRepository.findByEmail(request.email())
                 .orElseThrow(() -> new UsernameNotFoundException(FAIL_LOGIN.getMessage()));
 
-        if (!member.isMatchedPassword(passwordEncoder, request.password())) {
-            throw new UsernameNotFoundException(FAIL_LOGIN.getMessage());
+        if (member.isMatchedPassword(passwordEncoder, request.password())) {
+            return toResponse(member);
         }
 
-        return toResponse(member);
+        throw new UsernameNotFoundException(FAIL_LOGIN.getMessage());
     }
 
     private MemberDto.Response toResponse(Member member) {
