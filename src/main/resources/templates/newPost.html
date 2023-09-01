@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<script th:src="@{https://unpkg.com/axios/dist/axios.min.js}"></script>
+<head>
+    <meta charset="utf-8">
+    <title>login</title>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css">
+</head>
+
+<script>
+    function createPostRequest() {
+        axios.post("/api/v1/posts",
+            {
+                headers: {
+                    'Content-type': 'application/json',
+                },
+
+                title: document.getElementById("title").value,
+                description: document.getElementById("description").value,
+                price: document.getElementById("price").value,
+                transactionType: document.getElementById("transactionType").value,
+                category: document.getElementById("category").value
+
+            }).then(res => {
+                const id = res.data.id;
+                window.location.href = `http://localhost:8080/posts/${id}`;
+            })
+            .catch(error => {
+                alert("오류가 발생했습니다. \n" + error);
+            })
+    }
+</script>
+
+<body>
+<form>
+    <div>
+        <input type="text" id="title" name="title" placeholder="제목">
+    </div>
+
+    <div>
+        <input type="text" id="description" name="description" placeholder="게시글 내용을 작성해주세요.">
+    </div>
+
+    <div>
+        <input type="number" id="price" name="price" placeholder="가격을 입력해주세요.">
+    </div>
+
+    <div>
+        <div>거래 방식</div>
+        <select id="transactionType" name="transactionType" class="form-select">
+            <option value="">==거래 방식 선택==</option>
+            <option th:each="transactionType : ${transactionTypes}" th:value="${transactionType.name()}"
+                    th:text="${transactionType.description}"></option>
+        </select>
+    </div>
+    <div>
+        <div>카테고리</div>
+        <select id="category" name="category" class="form-select">
+            <option value="">==카테고리 선택==</option>
+            <option th:each="category : ${categories}" th:value="${category.name()}"
+                    th:text="${category.description}"></option>
+        </select>
+    </div>
+</form>
+<button class="post_request_btn" onclick="createPostRequest()">작성 완료</button>
+</body>
+</html>
