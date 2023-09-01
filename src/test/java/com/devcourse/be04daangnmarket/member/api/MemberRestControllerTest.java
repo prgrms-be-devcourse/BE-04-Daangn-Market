@@ -5,6 +5,7 @@ import com.devcourse.be04daangnmarket.member.application.MemberService;
 import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import com.devcourse.be04daangnmarket.member.repository.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -46,8 +48,12 @@ class MemberRestControllerTest {
         String password = "1234";
 
         request = new MemberDto.SignUpRequest(username, phoneNumber, email, password);
-
         memberService.signUp(request);
+    }
+
+    @AfterEach
+    void deleteAll() {
+        memberRepository.deleteAll();
     }
 
     @Test
@@ -69,6 +75,19 @@ class MemberRestControllerTest {
         mockMvc.perform(post("/api/v1/members/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    void update() throws Exception {
+        String username = "abcd1111";
+
+        MemberDto.UpdateProfileRequest updateRequest = new MemberDto.UpdateProfileRequest(username);
+
+        mockMvc.perform(put("/api/v1/members/{id}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
