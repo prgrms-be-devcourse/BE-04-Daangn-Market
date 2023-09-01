@@ -11,25 +11,25 @@ import jakarta.persistence.Table;
 public class Image extends BaseEntity {
 
 	@Column(length = 500, nullable = false)
-	private String imageName;
+	private String name;
 
 	@Column(length = 1000, nullable = false)
-	private String imagePath;
+	private String path;
 
-	public Image() {
+	protected Image() {
 	}
 
-	public Image(String imageName, String imagePath) {
-		this.imageName = imageName;
-		this.imagePath = imagePath;
+	public Image(String name, String path) {
+		this.name = name;
+		this.path = path;
 	}
 
-	public String getImageName() {
-		return imageName;
+	public String getName() {
+		return name;
 	}
 
-	public String getImagePath() {
-		return imagePath;
+	public String getPath() {
+		return path;
 	}
 
 }

@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,11 +34,11 @@ public class PostRestController {
 	private final PostService postService;
 
 	@PostMapping
-	public ResponseEntity<PostDto.Response> createPost(@RequestPart(name="request") PostDto.CreateRequest request
-		,@RequestPart(name = "images") List<MultipartFile> receivedImages) throws IOException {
+	public ResponseEntity<PostDto.Response> createPost(@RequestPart(name = "request") PostDto.CreateRequest request
+		, @RequestPart(name = "images") List<MultipartFile> receivedImages) throws IOException {
 
 		PostDto.Response response = postService.create(request.title(), request.description()
-			, request.price(), request.transactionType(), request.category(),receivedImages);
+			, request.price(), request.transactionType(), request.category(), receivedImages);
 
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}

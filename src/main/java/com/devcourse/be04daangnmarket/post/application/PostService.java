@@ -89,7 +89,7 @@ public class PostService {
 
 		List<String> urls =  new ArrayList<>();;
 		for(Image image : post.getImages()){
-			urls.add(image.getImagePath());
+			urls.add(image.getPath());
 		}
 
 		return new PostDto.Response(
