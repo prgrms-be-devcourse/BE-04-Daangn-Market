@@ -115,6 +115,10 @@ public class Post extends BaseEntity {
 		return status;
 	}
 
+	public List<Image> getImages() {
+		return images;
+	}
+
 	public LocalDateTime getPullUpAt() {
 		return pullUpAt;
 	}

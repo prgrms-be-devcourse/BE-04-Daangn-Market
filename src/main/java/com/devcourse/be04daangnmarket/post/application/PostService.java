@@ -86,6 +86,12 @@ public class PostService {
 	}
 
 	private PostDto.Response toResponse(Post post) {
+
+		List<String> urls =  new ArrayList<>();;
+		for(Image image : post.getImages()){
+			urls.add(image.getImagePath());
+		}
+
 		return new PostDto.Response(
 			post.getId(),
 			post.getTitle(),
@@ -94,7 +100,8 @@ public class PostService {
 			post.getViews(),
 			post.getTransactionType().getDescription(),
 			post.getCategory().getDescription(),
-			post.getStatus().getDescription()
+			post.getStatus().getDescription(),
+			urls
 		);
 	}
 

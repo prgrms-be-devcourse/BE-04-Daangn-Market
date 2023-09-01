@@ -69,8 +69,8 @@ class PostServiceTest {
 		assertEquals(title, response.title());
 		assertEquals(description, response.description());
 		assertEquals(price, response.price());
-		assertEquals(transactionType, response.transactionType());
-		assertEquals(category, response.category());
+		assertEquals(transactionType.getDescription(), response.transactionType());
+		assertEquals(category.getDescription(), response.category());
 
 		verify(postRepository, times(1)).save(any(Post.class));
 	}
@@ -81,8 +81,10 @@ class PostServiceTest {
 		// given
 		Long postId = 1L;
 
-		Post post = new Post("keyboard~!", "this keyboard is good", 100000, 1000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES, Status.FOR_SALE, LocalDateTime.now());
+		List<Image> images = List.of(new Image("name1", "path1"));
+
+		Post post = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES, images);
 
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
@@ -99,11 +101,13 @@ class PostServiceTest {
 	@DisplayName("게시글 전체 조회 성공")
 	public void testGetAllPost() {
 		// given
-		Post post = new Post("keyboard~!", "this keyboard is good", 100000, 1000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES, Status.FOR_SALE, LocalDateTime.now());
+		List<Image> images = List.of(new Image("name1", "path1"));
 
-		Post post2 = new Post("mouse~!", "this mouse is good", 100000, 1000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES, Status.FOR_SALE, LocalDateTime.now());
+		Post post = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES, images);
+
+		Post post2 = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES, images);
 
 		List<Post> posts = List.of(post, post2);
 
@@ -134,7 +138,7 @@ class PostServiceTest {
 		List<Image> images = List.of(new Image("name1", "path1"));
 
 		Post post = new Post("keyboard~!", "this keyboard is good", 50000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES,images);
+			Category.DIGITAL_DEVICES, images);
 
 		when(postRepository.findById(id)).thenReturn(Optional.of(post));
 

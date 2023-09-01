@@ -65,7 +65,7 @@ class PostRestControllerTest {
 
 		PostDto.Response mockResponse = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
-			Status.FOR_SALE.getDescription());
+			Status.FOR_SALE.getDescription(), List.of("img_path"));
 
 		when(postService.create("Keyboard", "nice Keyboard", 100,
 			TransactionType.SALE, Category.DIGITAL_DEVICES, images)).thenReturn(mockResponse);
@@ -94,7 +94,7 @@ class PostRestControllerTest {
 		Long postId = 1L;
 		PostDto.Response mockResponse = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
-			Status.FOR_SALE.getDescription());
+			Status.FOR_SALE.getDescription(),List.of("img_path"));
 
 		when(postService.getPost(1L)).thenReturn(mockResponse);
 
@@ -117,11 +117,11 @@ class PostRestControllerTest {
 		// given
 		PostDto.Response postResponse1 = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
-			Status.FOR_SALE.getDescription());
+			Status.FOR_SALE.getDescription(),List.of("img_path"));
 
 		PostDto.Response postResponse2 = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
-			Status.FOR_SALE.getDescription());
+			Status.FOR_SALE.getDescription(),List.of("img_path"));
 
 		List<PostDto.Response> fakeResponses = List.of(postResponse1, postResponse2);
 
@@ -153,7 +153,7 @@ class PostRestControllerTest {
 
 		PostDto.Response mockResponse = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
-			Status.FOR_SALE.getDescription());
+			Status.FOR_SALE.getDescription(),List.of("img_path"));
 
 		when(postService.update(1L, "Keyboard", "nice Keyboard", 100,
 			TransactionType.SALE, Category.DIGITAL_DEVICES)).thenReturn(mockResponse);
