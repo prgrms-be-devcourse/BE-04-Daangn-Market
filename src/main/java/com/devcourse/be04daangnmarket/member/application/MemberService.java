@@ -7,8 +7,11 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.NoSuchElementException;
 
+import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.DUPLICATED_USERNAME;
 import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.FAIL_LOGIN;
+import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.NOT_FOUND_USER;
 
 @Service
 @Transactional
@@ -43,6 +46,26 @@ public class MemberService {
         }
 
         throw new UsernameNotFoundException(FAIL_LOGIN.getMessage());
+    }
+
+    public MemberDto.Response updateProfile(Long id, String username) {
+        Member member = getMember(id);
+
+        if (isAvailableUsername(username)) {
+            member.updateProfile(username);
+            return toResponse(member);
+        }
+
+        throw new IllegalArgumentException(DUPLICATED_USERNAME.getMessage());
+    }
+
+    private Member getMember(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_USER.getMessage()));
+    }
+
+    private boolean isAvailableUsername(String username) {
+        return memberRepository.findByUsername(username).isEmpty();
     }
 
     private MemberDto.Response toResponse(Member member) {

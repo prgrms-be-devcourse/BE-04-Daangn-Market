@@ -18,6 +18,10 @@ public class MemberDto {
             String password
     ) { }
 
+    public record UpdateProfileRequest(
+            String username
+    ) { }
+
     public record Response(
             Long id,
             String username,
