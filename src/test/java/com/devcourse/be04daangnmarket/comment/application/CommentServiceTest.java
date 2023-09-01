@@ -3,6 +3,7 @@ package com.devcourse.be04daangnmarket.comment.application;
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
 import com.devcourse.be04daangnmarket.comment.domain.DeletedStatus;
 import com.devcourse.be04daangnmarket.comment.dto.CommentResponse;
+import com.devcourse.be04daangnmarket.comment.dto.UpdateCommentRequest;
 import com.devcourse.be04daangnmarket.comment.exception.NotFoundException;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,6 @@ import java.util.Optional;
 import static com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage.NOT_FOUND_COMMENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
@@ -74,5 +74,19 @@ class CommentServiceTest {
         //then
         assertThat(comments.getSize()).isEqualTo(responses.getSize());
         assertThat(comments.getTotalElements()).isEqualTo(responses.getTotalElements());
+    }
+
+    @Test
+    void 수정_성공() {
+        //given
+        UpdateCommentRequest request = new UpdateCommentRequest("변경댓글");
+        Comment comment = new Comment("이전댓글");
+
+        //when
+        given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
+        commentService.update(comment.getId(), request);
+
+        //then
+        assertThat(comment.getContent()).isEqualTo(request.content());
     }
 }

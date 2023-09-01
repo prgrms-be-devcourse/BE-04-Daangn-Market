@@ -3,6 +3,7 @@ package com.devcourse.be04daangnmarket.comment.application;
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
 import com.devcourse.be04daangnmarket.comment.dto.CommentResponse;
 import com.devcourse.be04daangnmarket.comment.dto.CreateCommentRequest;
+import com.devcourse.be04daangnmarket.comment.dto.UpdateCommentRequest;
 import com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage;
 import com.devcourse.be04daangnmarket.comment.exception.NotFoundException;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
@@ -49,5 +50,13 @@ public class CommentService {
     public Page<CommentResponse> getPage(Pageable pageable) {
         return commentRepository.findAll(pageable)
                 .map(CommentConverter::toResponse);
+    }
+
+    @Transactional
+    public CommentResponse update(Long id, UpdateCommentRequest request) {
+        Comment comment = getOne(id);
+        comment.update(request.content());
+
+        return CommentConverter.toResponse(comment);
     }
 }

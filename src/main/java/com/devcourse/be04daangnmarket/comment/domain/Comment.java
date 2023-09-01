@@ -27,7 +27,7 @@ public class Comment extends BaseEntity {
     }
 
     public Comment(String content) {
-        validateComment(content);
+        validateContent(content);
         this.content = content;
     }
 
@@ -39,17 +39,22 @@ public class Comment extends BaseEntity {
         return deletedStatus;
     }
 
-    private void validateComment(String comment) {
-        if (isCommentWithinRange(comment)) {
+    private void validateContent(String content) {
+        if (isCommentWithinRange(content)) {
             throw new IllegalArgumentException(INVALID_CONTENT.getMessage());
         }
     }
 
-    private boolean isCommentWithinRange(String comment) {
-        return comment.length() > 500;
+    private boolean isCommentWithinRange(String content) {
+        return content.length() > 500;
     }
 
     public void deleteStatus() {
         this.deletedStatus = DeletedStatus.DELETED;
+    }
+
+    public void update(String content) {
+        validateContent(content);
+        this.content = content;
     }
 }

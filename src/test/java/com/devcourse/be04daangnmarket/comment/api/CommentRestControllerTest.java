@@ -3,7 +3,9 @@ package com.devcourse.be04daangnmarket.comment.api;
 import com.devcourse.be04daangnmarket.comment.application.CommentService;
 import com.devcourse.be04daangnmarket.comment.dto.CommentResponse;
 import com.devcourse.be04daangnmarket.comment.dto.CreateCommentRequest;
+import com.devcourse.be04daangnmarket.comment.dto.UpdateCommentRequest;
 import com.devcourse.be04daangnmarket.common.config.SecurityConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +22,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -99,6 +104,24 @@ class CommentRestControllerTest {
                         .param("size", "10")
                         .param("order", "createdAt.desc")
                         .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    void 수정_성공() throws Exception {
+        //given
+        Long commentId = 1L;
+        UpdateCommentRequest request = new UpdateCommentRequest("변경 댓글");
+        CommentResponse response = new CommentResponse("변경 댓글");
+
+        //when
+        when(commentService.update(commentId, request)).thenReturn(response);
+
+        //then
+        mockMvc.perform(put("/api/v1/comments/{id}", commentId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
