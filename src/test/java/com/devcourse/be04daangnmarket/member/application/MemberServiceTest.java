@@ -82,4 +82,23 @@ class MemberServiceTest {
         Assertions.assertThatThrownBy(() -> memberService.signIn(loginRequest))
                 .isInstanceOf(UsernameNotFoundException.class);
     }
+
+    @Test
+    @DisplayName("닉네임 수정 테스트 - 성공")
+    void update_success() {
+        String username = "abcd111";
+
+        MemberDto.Response updateResponse = memberService.updateProfile(response.id(), username);
+
+        Assertions.assertThat(updateResponse.username()).isEqualTo(username);
+    }
+
+    @Test
+    @DisplayName("닉네임 수정 실패 테스트 - 중복된 닉네임을 입력하였을 경우")
+    void update_fail() {
+        String username = "kys0411";
+
+        Assertions.assertThatThrownBy(() -> memberService.updateProfile(response.id(), username))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
