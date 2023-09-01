@@ -2,17 +2,23 @@ package com.devcourse.be04daangnmarket.post.application;
 
 import static com.devcourse.be04daangnmarket.post.exception.ErrorMessage.*;
 
-import java.time.LocalDateTime;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.devcourse.be04daangnmarket.image.Image;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
-import com.devcourse.be04daangnmarket.post.domain.Status;
 import com.devcourse.be04daangnmarket.post.domain.TransactionType;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 import com.devcourse.be04daangnmarket.post.repository.PostRepository;
@@ -23,15 +29,26 @@ public class PostService {
 
 	private final PostRepository postRepository;
 
+	@Value("${custom.absolute-path.image}")
+	private String absolutePath;
+
+	private String urlPath = "image/board";
+
 	public PostService(PostRepository postRepository) {
 		this.postRepository = postRepository;
 	}
 
 	@Transactional
 	public PostDto.Response create(String title, String description, int price,
-		TransactionType transactionType, Category category) {
+		TransactionType transactionType, Category category, List<MultipartFile> receivedImages) throws IOException {
 
-		Post post = new Post(title, description, price, transactionType, category);
+		List<Image> images = new ArrayList<>();
+		for (MultipartFile receivedImage : receivedImages) {
+			images.add(createImage(receivedImage));
+		}
+
+		Post post = new Post(title, description, price, transactionType, category, images);
+
 		post = postRepository.save(post);
 
 		return toResponse(post);
@@ -79,6 +96,30 @@ public class PostService {
 			post.getCategory().getDescription(),
 			post.getStatus().getDescription()
 		);
+	}
+
+	private Image createImage(MultipartFile image) throws IOException {
+
+		if (image.isEmpty()) {
+			return null;
+		}
+
+		String fileName = StringUtils.cleanPath(image.getOriginalFilename());
+		String filePath = absolutePath + urlPath;
+
+		try {
+			File directory = new File(filePath);
+			if (!directory.exists()) {
+				directory.mkdirs();
+			}
+
+			File imageFile = new File(directory, fileName);
+			image.transferTo(imageFile);
+		} catch (IOException e) {
+			throw new IOException(FILE_SAVE_ERROR.getMessage());
+		}
+
+		return new Image(image.getOriginalFilename(), urlPath + "/" + fileName);
 	}
 
 }

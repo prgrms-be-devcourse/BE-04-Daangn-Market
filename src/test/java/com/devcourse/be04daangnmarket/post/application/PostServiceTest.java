@@ -3,7 +3,9 @@ package com.devcourse.be04daangnmarket.post.application;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +18,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.devcourse.be04daangnmarket.image.Image;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
 import com.devcourse.be04daangnmarket.post.domain.Status;
@@ -35,21 +41,28 @@ class PostServiceTest {
 
 	@Test
 	@DisplayName("게시글 등록 성공")
-	void createPostTest() {
+	void createPostTest() throws IOException {
 		// given
 		String title = "keyboard~!";
 		String description = "this keyboard is good";
 		int price = 100000;
 		TransactionType transactionType = TransactionType.SALE;
 		Category category = Category.DIGITAL_DEVICES;
+		List<Image> images = List.of(new Image("name1", "path1"));
 
 		Post post = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES);
+			Category.DIGITAL_DEVICES, images);
 
 		when(postRepository.save(any(Post.class))).thenReturn(post);
 
+		List<MultipartFile> receivedImages = new ArrayList<>();
+		MockMultipartFile imageFile = new MockMultipartFile("images", "test-image.jpg",
+			MediaType.IMAGE_JPEG_VALUE, "test image content".getBytes());
+		receivedImages.add(imageFile);
+
 		// when
-		PostDto.Response response = postService.create(title, description, price, transactionType, category);
+		PostDto.Response response = postService.create(title, description, price, transactionType, category,
+			receivedImages);
 
 		// then
 		assertNotNull(response);
@@ -118,9 +131,10 @@ class PostServiceTest {
 		int price = 100000;
 		TransactionType transactionType = TransactionType.SALE;
 		Category category = Category.DIGITAL_DEVICES;
+		List<Image> images = List.of(new Image("name1", "path1"));
 
 		Post post = new Post("keyboard~!", "this keyboard is good", 50000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES);
+			Category.DIGITAL_DEVICES,images);
 
 		when(postRepository.findById(id)).thenReturn(Optional.of(post));
 
