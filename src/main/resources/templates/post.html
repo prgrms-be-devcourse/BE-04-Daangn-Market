@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<script th:src="@{https://unpkg.com/axios/dist/axios.min.js}"></script>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Post</title>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css">
+</head>
+
+<script>
+    getPost([[${id}]]);
+
+    function getPost(id) {
+        axios.get(`/api/v1/posts/${id}`)
+            .then(res => {
+            renderPost(res.data);
+        })
+            .catch(error => {
+                alert("오류가 발생했습니다. \n" + error);
+            })
+    }
+
+    const renderPost = (post) => {
+        document.getElementById("post-id").innerHTML = '게시글 번호 ' + post.id;
+        document.getElementById("title").innerHTML = post.title;
+        document.getElementById("description").innerHTML = post.description;
+        document.getElementById("price").innerHTML = '가격(₩) ' + post.price + '원';
+        document.getElementById("category").innerHTML = '카테고리 : ' + post.category;
+        document.getElementById("transactionType").innerHTML = '거래 방식 : ' + post.transactionType;
+    }
+</script>
+
+<body>
+    <div style="margin-left: auto; margin-right: auto; text-align: center;">
+        <div>
+            <h6 id="post-id"></h6>
+        </div>
+        <div>
+            <h1 id="title"></h1>
+        </div>
+        <div>
+            <h4 id="description"></h4>
+        </div>
+        <div>
+            <h4 id="price"></h4>
+        </div>
+        <div>
+            <h4 id="category"></h4>
+        </div>
+        <div>
+            <h4 id="transactionType"></h4>
+        </div>
+    </div>
+</body>
+</html>
