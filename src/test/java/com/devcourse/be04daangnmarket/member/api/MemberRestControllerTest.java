@@ -51,11 +51,6 @@ class MemberRestControllerTest {
         memberService.signUp(request);
     }
 
-    @AfterEach
-    void deleteAll() {
-        memberRepository.deleteAll();
-    }
-
     @Test
     void signUp() throws Exception {
         mockMvc.perform(post("/api/v1/members")
