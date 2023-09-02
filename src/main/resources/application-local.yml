@@ -18,5 +18,5 @@ jasypt:
     password: ${JASYPT_KEY:testKey}
 
 custom:
-  absolute-path:
+  base-path:
     image: /Users/juwoongkim/Documents/clone/BE-04-Daangn-Market/src/main/resources/static/
