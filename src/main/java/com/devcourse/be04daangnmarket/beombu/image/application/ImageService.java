@@ -1,7 +1,7 @@
 package com.devcourse.be04daangnmarket.beombu.image.application;
 
 import com.devcourse.be04daangnmarket.beombu.image.domain.DomainName;
-import com.devcourse.be04daangnmarket.beombu.image.domain.Image;
+import com.devcourse.be04daangnmarket.beombu.image.domain.File;
 import com.devcourse.be04daangnmarket.beombu.image.dto.ImageResponse;
 import com.devcourse.be04daangnmarket.beombu.image.exception.FileDeleteException;
 import com.devcourse.be04daangnmarket.beombu.image.exception.FileUploadException;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,9 +44,9 @@ public class ImageService {
 
                 saveImageToLocalStorage(multipartFile, uniqueName);
 
-                Image image = new Image(multipartFile.getOriginalFilename(), multipartFile.getContentType(), multipartFile.getSize(), getFullPath(uniqueName), domainName, domainId);
-                imageRepository.save(image);
-                responses.add(toDto(image));
+                File file = new File(multipartFile.getOriginalFilename(), multipartFile.getContentType(), multipartFile.getSize(), getFullPath(uniqueName), domainName, domainId);
+                imageRepository.save(file);
+                responses.add(toDto(file));
             }
         }
 
@@ -64,18 +63,18 @@ public class ImageService {
 
     private void saveImageToLocalStorage(MultipartFile multipartFile, String uniqueName) {
         try {
-            File file = new File(FOLDER_PATH);
+            java.io.File file = new java.io.File(FOLDER_PATH);
 
             if (isExistFile(file)) {
                 file.mkdirs();
             }
-            multipartFile.transferTo(new File(getFullPath(uniqueName)));
+            multipartFile.transferTo(new java.io.File(getFullPath(uniqueName)));
         } catch (IOException e) {
             throw new FileUploadException(FILE_UPLOAD_EXCEPTION.getMessage());
         }
     }
 
-    private static boolean isExistFile(File file) {
+    private static boolean isExistFile(java.io.File file) {
         return !file.exists();
     }
 
@@ -84,39 +83,39 @@ public class ImageService {
     }
 
     public List<ImageResponse> getImages(DomainName domainName, Long domainId) {
-        List<Image> images = imageRepository.findAllByDomainNameAndDomainId(domainName, domainId);
+        List<File> files = imageRepository.findAllByDomainNameAndDomainId(domainName, domainId);
 
-        return images.stream()
+        return files.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
-    private ImageResponse toDto(Image image) {
+    private ImageResponse toDto(File file) {
         return new ImageResponse(
-                image.getName(),
-                image.getPath(),
-                image.getType(),
-                image.getSize(),
-                image.getDomainName(),
-                image.getDomainId());
+                file.getName(),
+                file.getPath(),
+                file.getType(),
+                file.getSize(),
+                file.getDomainName(),
+                file.getDomainId());
     }
 
     @Transactional
     public void deleteAllImages(DomainName domainName, Long domainId) {
-        List<Image> entities = getAllImageEntities(domainName, domainId);
+        List<File> entities = getAllImageEntities(domainName, domainId);
 
         if (entities.isEmpty()) {
             return;
         }
 
         entities.stream()
-                .map(Image::getPath)
+                .map(File::getPath)
                 .forEach(this::deleteImageToLocalStorage);
 
         imageRepository.deleteAllByDomainNameAndDomainId(domainName, domainId);
     }
 
-    private List<Image> getAllImageEntities(DomainName domainName, Long domainId) {
+    private List<File> getAllImageEntities(DomainName domainName, Long domainId) {
         return imageRepository.findAllByDomainNameAndDomainId(domainName, domainId);
     }
 
