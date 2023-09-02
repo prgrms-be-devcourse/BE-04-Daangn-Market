@@ -11,8 +11,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "images")
-public class Image extends BaseEntity {
+@Table(name = "files")
+public class File extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,10 +36,10 @@ public class Image extends BaseEntity {
     @Column(nullable = false)
     private Long domainId;
 
-    protected Image() {
+    protected File() {
     }
 
-    public Image(String name, String type, long size, String path, DomainName domainName, Long domainId) {
+    public File(String name, String type, long size, String path, DomainName domainName, Long domainId) {
         this.name = name;
         this.type = type;
         this.size = size;
