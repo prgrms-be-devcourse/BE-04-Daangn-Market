@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<script th:src="@{https://unpkg.com/axios/dist/axios.min.js}"></script>
+<head>
+    <meta charset="utf-8">
+    <title>login</title>
+</head>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const id = [[${id}]];
+
+        axios.get(`/api/v1/members/${id}`)
+            .then(response => {
+                const profileData = response.data;
+                document.getElementById("userName").innerHTML = '사용자 : ' + profileData.username;
+
+            })
+            .catch(error => {
+                alert("오류가 발생했습니다. \n" + error);
+                console.error(error);
+            });
+    });
+</script>
+
+<body>
+<main>
+    <div class="signin_container">
+        <div>
+            <div class="logo">마이페이지</div>
+            <div class="username">
+                <h4 id="userName"></h4>
+            </div>
+            <div class="button_container">
+                <a th:href="@{'/profile/' + ${id}}">
+                    <button class="profile_btn">프로필 보기</button>
+                </a>
+            </div>
+            <div class="button_container">
+                <a th:href="@{'/sales-details/' + ${id}}">
+                    <button class="sales_details_btn">판매내역</button>
+                </a>
+            </div>
+            <div class="button_container">
+                <a th:href="@{'/purchase-details/' + ${id}}">
+                    <button class="purchase_details_btn">구매내역</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

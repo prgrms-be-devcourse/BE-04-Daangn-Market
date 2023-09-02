@@ -18,6 +18,13 @@ public class MemberViewController {
         return "signIn";
     }
 
+    @GetMapping(value = "/mypage/{id}")
+    public String mypage(@PathVariable Long id, Model model) {
+        model.addAttribute("id", id);
+
+        return "mypage";
+    }
+
     @GetMapping(value = "/profile/{id}")
     public String profile(@PathVariable Long id, Model model) {
         model.addAttribute("id", id);
