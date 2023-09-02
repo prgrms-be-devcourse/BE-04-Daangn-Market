@@ -1,8 +1,8 @@
 package com.devcourse.be04daangnmarket.comment.application;
 
-import com.devcourse.be04daangnmarket.beombu.image.application.ImageService;
-import com.devcourse.be04daangnmarket.beombu.image.domain.DomainName;
-import com.devcourse.be04daangnmarket.beombu.image.dto.ImageResponse;
+import com.devcourse.be04daangnmarket.image.application.ImageService;
+import com.devcourse.be04daangnmarket.image.domain.DomainName;
+import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
 import com.devcourse.be04daangnmarket.comment.dto.CommentResponse;
 import com.devcourse.be04daangnmarket.comment.dto.CreateCommentRequest;

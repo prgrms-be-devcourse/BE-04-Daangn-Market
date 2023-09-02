@@ -1,7 +1,7 @@
-package com.devcourse.be04daangnmarket.beombu.image.repository;
+package com.devcourse.be04daangnmarket.image.repository;
 
-import com.devcourse.be04daangnmarket.beombu.image.domain.DomainName;
-import com.devcourse.be04daangnmarket.beombu.image.domain.File;
+import com.devcourse.be04daangnmarket.image.domain.DomainName;
+import com.devcourse.be04daangnmarket.image.domain.File;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 

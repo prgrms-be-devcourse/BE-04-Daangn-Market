@@ -1,11 +1,11 @@
-package com.devcourse.be04daangnmarket.beombu.image.application;
+package com.devcourse.be04daangnmarket.image.application;
 
-import com.devcourse.be04daangnmarket.beombu.image.domain.DomainName;
-import com.devcourse.be04daangnmarket.beombu.image.domain.File;
-import com.devcourse.be04daangnmarket.beombu.image.dto.ImageResponse;
-import com.devcourse.be04daangnmarket.beombu.image.exception.FileDeleteException;
-import com.devcourse.be04daangnmarket.beombu.image.exception.FileUploadException;
-import com.devcourse.be04daangnmarket.beombu.image.repository.ImageRepository;
+import com.devcourse.be04daangnmarket.image.domain.DomainName;
+import com.devcourse.be04daangnmarket.image.domain.File;
+import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
+import com.devcourse.be04daangnmarket.image.exception.FileDeleteException;
+import com.devcourse.be04daangnmarket.image.exception.FileUploadException;
+import com.devcourse.be04daangnmarket.image.repository.ImageRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.devcourse.be04daangnmarket.beombu.image.exception.ExceptionMessage.FILE_DELETE_EXCEPTION;
-import static com.devcourse.be04daangnmarket.beombu.image.exception.ExceptionMessage.FILE_UPLOAD_EXCEPTION;
+import static com.devcourse.be04daangnmarket.image.exception.ExceptionMessage.FILE_DELETE_EXCEPTION;
+import static com.devcourse.be04daangnmarket.image.exception.ExceptionMessage.FILE_UPLOAD_EXCEPTION;
 
 @Transactional(readOnly = true)
 @Service
