@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.util.NoSuchElementException;
+
 @SpringBootTest
 class MemberServiceTest {
 
@@ -100,5 +102,21 @@ class MemberServiceTest {
 
         Assertions.assertThatThrownBy(() -> memberService.updateProfile(response.id(), username))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("유저의 프로필 조회 테스트 - 성공")
+    void get_profile() {
+        MemberDto.Response profile = memberService.getProfile(response.id());
+
+        Assertions.assertThat(profile.id()).isEqualTo(response.id());
+        Assertions.assertThat(profile.email()).isEqualTo(request.email());
+    }
+
+    @Test
+    @DisplayName("유저의 프로필 조회 실패 테스트 - 존재하지 않는 id일 경우")
+    void get_profile_fail() {
+        Assertions.assertThatThrownBy(() -> memberService.getProfile(-1L))
+                .isInstanceOf(NoSuchElementException.class);
     }
 }
