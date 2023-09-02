@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css">
+</head>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const id = [[${id}]];
+
+        axios.get(`/api/v1/members/${id}`)
+            .then(response => {
+                const profileData = response.data;
+
+                document.getElementById("userName").value = profileData.username;
+                document.getElementById("phoneNumber").innerHTML = '전화번호 : ' + profileData.phoneNumber;
+                document.getElementById("email").innerHTML = '이메일 : ' + profileData.email;
+                document.getElementById("temperature").innerHTML = '매너온도 : ' + profileData.temperature;
+
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+
+    function editProfileRequest() {
+
+        const id = [[${id}]];
+
+        axios.put(`/api/v1/members/${id}`,
+            {
+                headers: {
+                    'Content-type': 'application/json',
+                },
+
+                username: document.getElementById("userName").value,
+
+            }).then(res => {
+            const id = res.data.id;
+            window.location.href = `/profile/${id}`;
+        })
+            .catch(error => {
+                alert("오류가 발생했습니다. \n" + error);
+            })
+    }
+
+</script>
+
+<body>
+<div style="margin-left: auto; margin-right: auto; text-align: center;">
+    <div>
+        <h1>Edit User Profile</h1>
+    </div>
+    <form id="profileForm" method="put">
+        <div>
+            <label for="userName">사용자 이름</label>
+            <input type="text" id="userName" name="userName">
+        </div>
+    </form>
+    <div>
+        <h4 id="phoneNumber"></h4>
+    </div>
+    <div>
+        <h4 id="email"></h4>
+    </div>
+    <div>
+        <h4 id="temperature"></h4>
+    </div>
+    <button class="post_request_btn" onclick="editProfileRequest()">작성 완료</button>
+</div>
+
+</body>
+</html>
