@@ -30,9 +30,9 @@ public class PostService {
 	private final PostRepository postRepository;
 
 	@Value("${custom.absolute-path.image}")
-	private String absolutePath;
+	private String ABSOLUTE_PATH;
 
-	private String urlPath = "image/board";
+	private static final String URL_PATH = "image/board";
 
 	public PostService(PostRepository postRepository) {
 		this.postRepository = postRepository;
@@ -112,7 +112,7 @@ public class PostService {
 		}
 
 		String fileName = StringUtils.cleanPath(image.getOriginalFilename());
-		String filePath = absolutePath + urlPath;
+		String filePath = ABSOLUTE_PATH + URL_PATH;
 
 		try {
 			File directory = new File(filePath);
@@ -126,7 +126,7 @@ public class PostService {
 			throw new IOException(FILE_SAVE_ERROR.getMessage());
 		}
 
-		return new Image(image.getOriginalFilename(), urlPath + "/" + fileName);
+		return new Image(image.getOriginalFilename(), URL_PATH + "/" + fileName);
 	}
 
 }
