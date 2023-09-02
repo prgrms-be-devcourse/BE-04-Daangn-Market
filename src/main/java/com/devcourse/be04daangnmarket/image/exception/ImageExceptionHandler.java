@@ -1,4 +1,4 @@
-package com.devcourse.be04daangnmarket.beombu.image.exception;
+package com.devcourse.be04daangnmarket.image.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

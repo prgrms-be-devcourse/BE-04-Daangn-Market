@@ -1,4 +1,4 @@
-package com.devcourse.be04daangnmarket.beombu.image.exception;
+package com.devcourse.be04daangnmarket.image.exception;
 
 public enum ExceptionMessage {
     FILE_DELETE_EXCEPTION("파일 삭제에 실패하였습니다."),

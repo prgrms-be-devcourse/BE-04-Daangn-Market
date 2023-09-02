@@ -1,4 +1,4 @@
-package com.devcourse.be04daangnmarket.beombu.image.domain;
+package com.devcourse.be04daangnmarket.image.domain;
 
 import com.devcourse.be04daangnmarket.common.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -11,7 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "files")
+@Table(name = "images")
 public class File extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

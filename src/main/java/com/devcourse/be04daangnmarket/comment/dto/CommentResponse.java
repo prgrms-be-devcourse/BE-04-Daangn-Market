@@ -1,6 +1,6 @@
 package com.devcourse.be04daangnmarket.comment.dto;
 
-import com.devcourse.be04daangnmarket.beombu.image.dto.ImageResponse;
+import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
 
 import java.util.List;
 
