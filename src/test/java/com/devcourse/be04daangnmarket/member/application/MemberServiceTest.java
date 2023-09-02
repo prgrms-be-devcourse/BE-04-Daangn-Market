@@ -2,7 +2,6 @@ package com.devcourse.be04daangnmarket.member.application;
 
 import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import com.devcourse.be04daangnmarket.member.repository.MemberRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,8 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
 import java.util.NoSuchElementException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 class MemberServiceTest {
@@ -44,8 +45,8 @@ class MemberServiceTest {
     @Test
     @DisplayName("회원가입 성공 테스트")
     void signUpTest() {
-        Assertions.assertThat(response.id()).isNotNull();
-        Assertions.assertThat(response.username()).isEqualTo("kys0411");
+        assertThat(response.id()).isNotNull();
+        assertThat(response.username()).isEqualTo("kys0411");
     }
 
     @Test
@@ -57,8 +58,8 @@ class MemberServiceTest {
         MemberDto.SignInRequest loginRequest = new MemberDto.SignInRequest(email, password);
         MemberDto.Response loginResponse = memberService.signIn(loginRequest);
 
-        Assertions.assertThat(loginResponse.id()).isEqualTo(response.id());
-        Assertions.assertThat(loginResponse.email()).isEqualTo(response.email());
+        assertThat(loginResponse.id()).isEqualTo(response.id());
+        assertThat(loginResponse.email()).isEqualTo(response.email());
     }
 
     @Test
@@ -69,7 +70,7 @@ class MemberServiceTest {
 
         MemberDto.SignInRequest loginRequest = new MemberDto.SignInRequest(email, password);
 
-        Assertions.assertThatThrownBy(() -> memberService.signIn(loginRequest))
+        assertThatThrownBy(() -> memberService.signIn(loginRequest))
                         .isInstanceOf(UsernameNotFoundException.class);
     }
 
@@ -81,7 +82,7 @@ class MemberServiceTest {
 
         MemberDto.SignInRequest loginRequest = new MemberDto.SignInRequest(email, password);
 
-        Assertions.assertThatThrownBy(() -> memberService.signIn(loginRequest))
+        assertThatThrownBy(() -> memberService.signIn(loginRequest))
                 .isInstanceOf(UsernameNotFoundException.class);
     }
 
@@ -92,7 +93,7 @@ class MemberServiceTest {
 
         MemberDto.Response updateResponse = memberService.updateProfile(response.id(), username);
 
-        Assertions.assertThat(updateResponse.username()).isEqualTo(username);
+        assertThat(updateResponse.username()).isEqualTo(username);
     }
 
     @Test
@@ -100,7 +101,7 @@ class MemberServiceTest {
     void update_fail() {
         String username = "kys0411";
 
-        Assertions.assertThatThrownBy(() -> memberService.updateProfile(response.id(), username))
+        assertThatThrownBy(() -> memberService.updateProfile(response.id(), username))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -109,14 +110,14 @@ class MemberServiceTest {
     void get_profile() {
         MemberDto.Response profile = memberService.getProfile(response.id());
 
-        Assertions.assertThat(profile.id()).isEqualTo(response.id());
-        Assertions.assertThat(profile.email()).isEqualTo(request.email());
+        assertThat(profile.id()).isEqualTo(response.id());
+        assertThat(profile.email()).isEqualTo(request.email());
     }
 
     @Test
     @DisplayName("유저의 프로필 조회 실패 테스트 - 존재하지 않는 id일 경우")
     void get_profile_fail() {
-        Assertions.assertThatThrownBy(() -> memberService.getProfile(-1L))
+        assertThatThrownBy(() -> memberService.getProfile(-1L))
                 .isInstanceOf(NoSuchElementException.class);
     }
 }
