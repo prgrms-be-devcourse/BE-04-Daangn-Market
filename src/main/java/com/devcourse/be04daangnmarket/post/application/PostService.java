@@ -2,8 +2,10 @@ package com.devcourse.be04daangnmarket.post.application;
 
 import static com.devcourse.be04daangnmarket.post.exception.ErrorMessage.*;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -60,6 +62,11 @@ public class PostService {
 	public Page<PostDto.Response> getAllPost(Pageable pageable) {
 		return postRepository.findAll(pageable)
 			.map(this::toResponse);
+	}
+
+	public Page<PostDto.Response> getPostByCategory(Category category, Pageable pageable) {
+		return postRepository.findByCategory(category,pageable).map(this::toResponse);
+
 	}
 
 	@Transactional

@@ -117,12 +117,38 @@ class PostServiceTest {
 		when(postRepository.findAll(pageable)).thenReturn(page);
 
 		// when
-		Page<PostDto.Response> resultPage = postService.getAllPost(pageable);
+		Page<PostDto.Response> responses = postService.getAllPost(pageable);
 
 		// then
-		assertEquals(page.getTotalElements(), resultPage.getTotalElements());
-		assertEquals(page.getNumber(), resultPage.getNumber());
+		assertEquals(page.getTotalElements(), responses.getTotalElements());
+		assertEquals(page.getNumber(), responses.getNumber());
 
+	}
+
+	@Test
+	@DisplayName("카테고리 기반 게시글 전체 조회 성공")
+	public void getPostByCategoryTest() throws Exception {
+		// given
+		Category category = Category.DIGITAL_DEVICES;
+		List<Image> images = List.of(new Image("name1", "path1"));
+		Post post = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES, images);
+
+		List<Post> posts = List.of(post);
+
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Post> page = new PageImpl<>(posts);
+
+		when(postRepository.findByCategory(category, pageable)).thenReturn(page);
+
+		// when
+		Page<PostDto.Response> responses = postService.getPostByCategory(category, pageable);
+
+		// then
+		assertNotNull(responses);
+		assertEquals(page.getTotalElements(), responses.getTotalElements());
+		assertEquals(page.getNumber(), responses.getNumber());
+		verify(postRepository, times(1)).findByCategory(category, pageable);
 	}
 
 	@Test
