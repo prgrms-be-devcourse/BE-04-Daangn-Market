@@ -59,6 +59,12 @@ public class MemberService {
         throw new IllegalArgumentException(DUPLICATED_USERNAME.getMessage());
     }
 
+    public MemberDto.Response getProfile(Long id) {
+        Member member = getMember(id);
+
+        return toResponse(member);
+    }
+
     private Member getMember(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_USER.getMessage()));
