@@ -63,12 +63,12 @@ class PostRestControllerTest {
 			MediaType.IMAGE_JPEG_VALUE, "test image content".getBytes());
 		images.add(imageFile);
 
-		PostDto.Response mockResponse = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
+		PostDto.Response mockresponse = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(), List.of("img_path"));
 
 		when(postService.create("Keyboard", "nice Keyboard", 100,
-			TransactionType.SALE, Category.DIGITAL_DEVICES, images)).thenReturn(mockResponse);
+			TransactionType.SALE, Category.DIGITAL_DEVICES, images)).thenReturn(mockresponse);
 
 		// 요청 생성
 		mockMvc.perform(
@@ -94,7 +94,7 @@ class PostRestControllerTest {
 		Long postId = 1L;
 		PostDto.Response mockResponse = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
-			Status.FOR_SALE.getDescription(),List.of("img_path"));
+			Status.FOR_SALE.getDescription(), List.of("img_path"));
 
 		when(postService.getPost(1L)).thenReturn(mockResponse);
 
@@ -117,28 +117,53 @@ class PostRestControllerTest {
 		// given
 		PostDto.Response postResponse1 = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
-			Status.FOR_SALE.getDescription(),List.of("img_path"));
+			Status.FOR_SALE.getDescription(), List.of("img_path"));
 
 		PostDto.Response postResponse2 = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
-			Status.FOR_SALE.getDescription(),List.of("img_path"));
+			Status.FOR_SALE.getDescription(), List.of("img_path"));
 
-		List<PostDto.Response> fakeResponses = List.of(postResponse1, postResponse2);
+		List<PostDto.Response> mockResponses = List.of(postResponse1, postResponse2);
 
 		Pageable pageable = PageRequest.of(0, 10);
-		Page<PostDto.Response> responsePage = new PageImpl<>(fakeResponses, pageable, fakeResponses.size());
+		Page<PostDto.Response> responsePage = new PageImpl<>(mockResponses, pageable, mockResponses.size());
 
-		// when
 		when(postService.getAllPost(pageable)).thenReturn(responsePage);
 
-		// then
+		// when then
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts")
 				.param("page", "0")
 				.param("size", "10")
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.jsonPath("$.content").isArray())
-			.andExpect(MockMvcResultMatchers.jsonPath("$.content.length()").value(fakeResponses.size()));
+			.andExpect(MockMvcResultMatchers.jsonPath("$.content.length()").value(mockResponses.size()));
+
+	}
+
+	@Test
+	@DisplayName("게시글 카테고리 기반 전체 조회 REST API 성공")
+	public void testGetPostByCategory() throws Exception {
+		// given
+		Category category = Category.DIGITAL_DEVICES;
+		PageRequest pageable = PageRequest.of(0, 10);
+
+		PostDto.Response postResponse = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
+			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
+			Status.FOR_SALE.getDescription(), List.of("img_path"));
+
+		List<PostDto.Response> mockResponses = List.of(postResponse);
+
+		when(postService.getPostByCategory(category, pageable)).thenReturn(new PageImpl<>(mockResponses));
+
+		// when then
+		mockMvc.perform(get("/api/v1/posts/category")
+				.param("category", category.toString())
+				.param("page", "0")
+				.param("size", "10"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.content[0].title").value("Keyboard"))
+			.andExpect(jsonPath("$.content[0].description").value("nice Keyboard"));
 
 	}
 
@@ -153,7 +178,7 @@ class PostRestControllerTest {
 
 		PostDto.Response mockResponse = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
-			Status.FOR_SALE.getDescription(),List.of("img_path"));
+			Status.FOR_SALE.getDescription(), List.of("img_path"));
 
 		when(postService.update(1L, "Keyboard", "nice Keyboard", 100,
 			TransactionType.SALE, Category.DIGITAL_DEVICES)).thenReturn(mockResponse);

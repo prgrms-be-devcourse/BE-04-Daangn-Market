@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.devcourse.be04daangnmarket.post.application.PostService;
+import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 
 @RestController
@@ -52,11 +53,20 @@ public class PostRestController {
 
 	@GetMapping
 	public ResponseEntity<Page<PostDto.Response>> getAllPost(@RequestParam(defaultValue = "0") int page,
-		@RequestParam(defaultValue = "0") int size) {
+		@RequestParam(defaultValue = "10") int size) {
 		Pageable pageable = PageRequest.of(page, size);
 		Page<PostDto.Response> responses = postService.getAllPost(pageable);
 
 		return new ResponseEntity<>(responses, HttpStatus.OK);
+	}
+
+	@GetMapping("/category")
+	public ResponseEntity<Page<PostDto.Response>> getPostByCategory(@RequestParam Category category,@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size){
+		Pageable pageable = PageRequest.of(page, size);
+		Page<PostDto.Response> response = postService.getPostByCategory(category, pageable);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	@PutMapping("/{id}")
