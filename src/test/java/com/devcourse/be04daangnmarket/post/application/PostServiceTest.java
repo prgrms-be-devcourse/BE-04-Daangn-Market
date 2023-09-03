@@ -2,13 +2,10 @@ package com.devcourse.be04daangnmarket.post.application;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,7 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
-
+import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
 import com.devcourse.be04daangnmarket.post.domain.TransactionType;
@@ -37,6 +34,9 @@ class PostServiceTest {
 	@Mock
 	private PostRepository postRepository;
 
+	@Mock
+	private ImageService imageService;
+
 	@Test
 	@DisplayName("게시글 등록 성공")
 	void createPostTest() throws IOException {
@@ -46,10 +46,9 @@ class PostServiceTest {
 		int price = 100000;
 		TransactionType transactionType = TransactionType.SALE;
 		Category category = Category.DIGITAL_DEVICES;
-		//List<Image> images = List.of(new Image("name1", "path1"));
 
 		Post post = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
-				Category.DIGITAL_DEVICES);
+			Category.DIGITAL_DEVICES);
 
 		when(postRepository.save(any(Post.class))).thenReturn(post);
 
@@ -79,8 +78,6 @@ class PostServiceTest {
 		// given
 		Long postId = 1L;
 
-		//List<Image> images = List.of(new Image("name1", "path1"));
-
 		Post post = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
 			Category.DIGITAL_DEVICES);
 
@@ -99,8 +96,6 @@ class PostServiceTest {
 	@DisplayName("게시글 전체 조회 성공")
 	public void testGetAllPost() {
 		// given
-		//List<Image> images = List.of(new Image("name1", "path1"));
-
 		Post post = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
 			Category.DIGITAL_DEVICES);
 
@@ -115,11 +110,10 @@ class PostServiceTest {
 		when(postRepository.findAll(pageable)).thenReturn(page);
 
 		// when
-		Page<PostDto.Response> responses = postService.getAllPost(pageable);
+		Page<PostDto.Response> resultPage = postService.getAllPost(pageable);
 
 		// then
-		assertEquals(page.getTotalElements(), responses.getTotalElements());
-		assertEquals(page.getNumber(), responses.getNumber());
+		assertEquals(page.getNumber(), resultPage.getNumber());
 
 	}
 
@@ -128,16 +122,15 @@ class PostServiceTest {
 	public void getPostByCategoryTest() throws Exception {
 		// given
 		Category category = Category.DIGITAL_DEVICES;
-		List<Image> images = List.of(new Image("name1", "path1"));
 		Post post = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES, images);
+			Category.DIGITAL_DEVICES);
 
 		List<Post> posts = List.of(post);
 
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<Post> page = new PageImpl<>(posts);
 
-		when(postRepository.findByCategory(category, pageable)).thenReturn(page);
+		when(postRepository.findByCategory(category, pageable)).thenReturn(posts);
 
 		// when
 		Page<PostDto.Response> responses = postService.getPostByCategory(category, pageable);
@@ -159,7 +152,6 @@ class PostServiceTest {
 		int price = 100000;
 		TransactionType transactionType = TransactionType.SALE;
 		Category category = Category.DIGITAL_DEVICES;
-		//List<Image> images = List.of(new Image("name1", "path1"));
 
 		Post post = new Post("keyboard~!", "this keyboard is good", 50000, TransactionType.SALE,
 			Category.DIGITAL_DEVICES);

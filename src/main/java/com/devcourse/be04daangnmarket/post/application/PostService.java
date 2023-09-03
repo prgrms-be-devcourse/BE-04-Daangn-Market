@@ -41,9 +41,9 @@ public class PostService {
     public PostDto.Response create(String title, String description, int price,
                                    TransactionType transactionType, Category category, List<MultipartFile> files) throws IOException {
         Post post = new Post(title, description, price, transactionType, category);
-        List<ImageResponse> images = imageService.uploadImages(files, DomainName.POST, post.getId());
-
         postRepository.save(post);
+        System.out.println(post.getId());
+        List<ImageResponse> images = imageService.uploadImages(files, DomainName.POST, post.getId());
 
         return toResponse(post, images);
     }
@@ -57,6 +57,19 @@ public class PostService {
 
     public Page<PostDto.Response> getAllPost(Pageable pageable) {
         List<Post> posts = postRepository.findAll();
+        List<PostDto.Response> postResponses = new ArrayList<>();
+
+        for (Post post : posts) {
+            List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+            PostDto.Response postResponse = new PostDto.Response(post.getId(), post.getTitle(), post.getDescription(), post.getPrice(), post.getViews(), post.getTransactionType().name(), post.getCategory().name(), post.getStatus().name(), images);
+            postResponses.add(postResponse);
+        }
+
+        return new PageImpl<>(postResponses, pageable, postResponses.size());
+    }
+
+    public Page<PostDto.Response> getPostByCategory(Category category, Pageable pageable) {
+        List<Post> posts = postRepository.findByCategory(category,pageable);
         List<PostDto.Response> postResponses = new ArrayList<>();
 
         for (Post post : posts) {

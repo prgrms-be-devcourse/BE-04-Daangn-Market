@@ -70,15 +70,24 @@ public class PostRestController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-    @PutMapping("/{id}")
-    public ResponseEntity<PostDto.Response> updatePost(@PathVariable Long id,
-                                                       @RequestBody PostDto.UpdateRequest request,
-                                                       @RequestPart(name = "images") List<MultipartFile> files) {
-        PostDto.Response response = postService.update(id, request.title(), request.description()
-                , request.price(), request.transactionType(), request.category(), files);
+    // @PutMapping("/{id}")
+    // public ResponseEntity<PostDto.Response> updatePost(@PathVariable Long id,
+    //                                                    @RequestPart PostDto.UpdateRequest request,
+    //                                                    @RequestPart(name = "images") List<MultipartFile> files) {
+    //     PostDto.Response response = postService.update(id, request.title(), request.description()
+    //             , request.price(), request.transactionType(), request.category(), files);
+	//
+    //     return new ResponseEntity<>(response, HttpStatus.OK);
+    // }
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+	@PutMapping("/{id}")
+	public ResponseEntity<PostDto.Response> updatePost(@PathVariable Long id,
+		//@RequestPart PostDto.UpdateRequest request,
+		@RequestPart(name = "images") List<MultipartFile> files
+	) {
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable Long id) {
