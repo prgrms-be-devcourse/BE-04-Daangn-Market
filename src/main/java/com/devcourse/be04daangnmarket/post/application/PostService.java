@@ -2,8 +2,10 @@ package com.devcourse.be04daangnmarket.post.application;
 
 import static com.devcourse.be04daangnmarket.post.exception.ErrorMessage.*;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -26,6 +28,7 @@ import com.devcourse.be04daangnmarket.post.repository.PostRepository;
 @Service
 @Transactional(readOnly = true)
 public class PostService {
+
     private final PostRepository postRepository;
     private final ImageService imageService;
 
