@@ -22,10 +22,8 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.devcourse.be04daangnmarket.image.Image;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
-import com.devcourse.be04daangnmarket.post.domain.Status;
 import com.devcourse.be04daangnmarket.post.domain.TransactionType;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 import com.devcourse.be04daangnmarket.post.repository.PostRepository;
@@ -48,10 +46,10 @@ class PostServiceTest {
 		int price = 100000;
 		TransactionType transactionType = TransactionType.SALE;
 		Category category = Category.DIGITAL_DEVICES;
-		List<Image> images = List.of(new Image("name1", "path1"));
+		//List<Image> images = List.of(new Image("name1", "path1"));
 
 		Post post = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES, images);
+				Category.DIGITAL_DEVICES);
 
 		when(postRepository.save(any(Post.class))).thenReturn(post);
 
@@ -81,10 +79,10 @@ class PostServiceTest {
 		// given
 		Long postId = 1L;
 
-		List<Image> images = List.of(new Image("name1", "path1"));
+		//List<Image> images = List.of(new Image("name1", "path1"));
 
 		Post post = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES, images);
+			Category.DIGITAL_DEVICES);
 
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
@@ -101,13 +99,13 @@ class PostServiceTest {
 	@DisplayName("게시글 전체 조회 성공")
 	public void testGetAllPost() {
 		// given
-		List<Image> images = List.of(new Image("name1", "path1"));
+		//List<Image> images = List.of(new Image("name1", "path1"));
 
 		Post post = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES, images);
+			Category.DIGITAL_DEVICES);
 
 		Post post2 = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES, images);
+			Category.DIGITAL_DEVICES);
 
 		List<Post> posts = List.of(post, post2);
 
@@ -161,16 +159,16 @@ class PostServiceTest {
 		int price = 100000;
 		TransactionType transactionType = TransactionType.SALE;
 		Category category = Category.DIGITAL_DEVICES;
-		List<Image> images = List.of(new Image("name1", "path1"));
+		//List<Image> images = List.of(new Image("name1", "path1"));
 
 		Post post = new Post("keyboard~!", "this keyboard is good", 50000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES, images);
+			Category.DIGITAL_DEVICES);
 
 		when(postRepository.findById(id)).thenReturn(Optional.of(post));
 
 		// when
 		PostDto.Response response = postService.update(id, title, description, price,
-			transactionType, category);
+			transactionType, category, null);
 
 		// then
 		assertNotNull(response);

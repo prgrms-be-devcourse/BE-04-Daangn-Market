@@ -19,4 +19,4 @@ jasypt:
 
 custom:
   base-path:
-    image: /Users/juwoongkim/Documents/clone/BE-04-Daangn-Market/src/main/resources/static/
+    image: ${IMAGE_PATH}
