@@ -6,6 +6,7 @@ import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
 import com.devcourse.be04daangnmarket.image.exception.FileDeleteException;
 import com.devcourse.be04daangnmarket.image.exception.FileUploadException;
 import com.devcourse.be04daangnmarket.image.repository.ImageRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +26,9 @@ import static com.devcourse.be04daangnmarket.image.exception.ExceptionMessage.FI
 @Transactional(readOnly = true)
 @Service
 public class ImageService {
-    private final String FOLDER_PATH = "C:\\Users\\User\\Desktop\\image\\";
+
+    @Value("${custom.base-path.image}")
+    private String FOLDER_PATH;
 
     private final ImageRepository imageRepository;
 

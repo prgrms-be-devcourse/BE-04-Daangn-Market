@@ -7,16 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.devcourse.be04daangnmarket.image.application.ImageService;
+import com.devcourse.be04daangnmarket.image.domain.DomainName;
+import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.devcourse.be04daangnmarket.image.Domain;
-import com.devcourse.be04daangnmarket.image.Image;
-import com.devcourse.be04daangnmarket.image.ImageCreator;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
 import com.devcourse.be04daangnmarket.post.domain.TransactionType;
@@ -26,80 +26,79 @@ import com.devcourse.be04daangnmarket.post.repository.PostRepository;
 @Service
 @Transactional(readOnly = true)
 public class PostService {
+    private final PostRepository postRepository;
+    private final ImageService imageService;
 
-	private final PostRepository postRepository;
-	private final ImageCreator imageCreator;
+    public PostService(PostRepository postRepository, ImageService imageService) {
+        this.postRepository = postRepository;
+        this.imageService = imageService;
+    }
 
-	@Value("${custom.base-path.image}")
-	private String ABSOLUTE_PATH;
+    @Transactional
+    public PostDto.Response create(String title, String description, int price,
+                                   TransactionType transactionType, Category category, List<MultipartFile> files) throws IOException {
+        Post post = new Post(title, description, price, transactionType, category);
+        List<ImageResponse> images = imageService.uploadImages(files, DomainName.POST, post.getId());
 
-	private static final String URL_PATH = "image/board";
+        postRepository.save(post);
 
-	public PostService(PostRepository postRepository, ImageCreator imageCreator) {
-		this.postRepository = postRepository;
-		this.imageCreator = imageCreator;
-	}
+        return toResponse(post, images);
+    }
 
-	@Transactional
-	public PostDto.Response create(String title, String description, int price,
-		TransactionType transactionType, Category category, List<MultipartFile> files) throws IOException {
-		List<Image> images = imageCreator.createImages(files, Domain.POST);
+    public PostDto.Response getPost(Long id) {
+        Post post = findPostById(id);
+        List<ImageResponse> images = imageService.getImages(DomainName.POST, id);
 
-		Post post = new Post(title, description, price, transactionType, category, images);
+        return toResponse(post, images);
+    }
 
-		post = postRepository.save(post);
-		return toResponse(post);
-	}
+    public Page<PostDto.Response> getAllPost(Pageable pageable) {
+        List<Post> posts = postRepository.findAll();
+        List<PostDto.Response> postResponses = new ArrayList<>();
 
-	public PostDto.Response getPost(Long id) {
-		Post post = findPostById(id);
+        for (Post post : posts) {
+            List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+            PostDto.Response postResponse = new PostDto.Response(post.getId(), post.getTitle(), post.getDescription(), post.getPrice(), post.getViews(), post.getTransactionType().name(), post.getCategory().name(), post.getStatus().name(), images);
+            postResponses.add(postResponse);
+        }
 
-		return toResponse(post);
-	}
+        return new PageImpl<>(postResponses, pageable, postResponses.size());
+    }
 
-	public Page<PostDto.Response> getAllPost(Pageable pageable) {
-		return postRepository.findAll(pageable)
-			.map(this::toResponse);
-	}
+    @Transactional
+    public PostDto.Response update(Long id, String title, String description, int price,
+                                   TransactionType transactionType, Category category, List<MultipartFile> files) {
+        Post post = findPostById(id);
+        post.update(title, description, price, transactionType, category);
 
-	@Transactional
-	public PostDto.Response update(Long id, String title, String description, int price,
-		TransactionType transactionType, Category category) {
-		Post post = findPostById(id);
-		post.update(title, description, price, transactionType, category);
+        imageService.deleteAllImages(DomainName.POST, id);
+        List<ImageResponse> images = imageService.uploadImages(files, DomainName.POST, id);
 
-		return toResponse(post);
-	}
+        return toResponse(post, images);
+    }
 
-	private Post findPostById(Long id) {
-		return postRepository.findById(id)
-			.orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
-	}
+    private Post findPostById(Long id) {
+        return postRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
+    }
 
-	@Transactional
-	public void delete(Long id) {
-		postRepository.deleteById(id);
+    @Transactional
+    public void delete(Long id) {
+        postRepository.deleteById(id);
+        imageService.deleteAllImages(DomainName.POST, id);
+    }
 
-	}
-
-	private PostDto.Response toResponse(Post post) {
-
-		List<String> urls =  new ArrayList<>();;
-		for(Image image : post.getImages()){
-			urls.add(image.getPath());
-		}
-
-		return new PostDto.Response(
-			post.getId(),
-			post.getTitle(),
-			post.getDescription(),
-			post.getPrice(),
-			post.getViews(),
-			post.getTransactionType().getDescription(),
-			post.getCategory().getDescription(),
-			post.getStatus().getDescription(),
-			urls
-		);
-	}
-
+    private PostDto.Response toResponse(Post post, List<ImageResponse> images) {
+        return new PostDto.Response(
+                post.getId(),
+                post.getTitle(),
+                post.getDescription(),
+                post.getPrice(),
+                post.getViews(),
+                post.getTransactionType().getDescription(),
+                post.getCategory().getDescription(),
+                post.getStatus().getDescription(),
+                images
+        );
+    }
 }

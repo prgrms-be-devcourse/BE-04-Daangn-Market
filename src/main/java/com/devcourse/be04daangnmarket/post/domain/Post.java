@@ -1,22 +1,18 @@
 package com.devcourse.be04daangnmarket.post.domain;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 import com.devcourse.be04daangnmarket.common.entity.BaseEntity;
-import com.devcourse.be04daangnmarket.image.Image;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -51,10 +47,6 @@ public class Post extends BaseEntity {
 	@ColumnDefault("'FOR_SALE'")
 	private Status status;
 
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "posts_id")
-	private List<Image> images;
-
 	@Column(columnDefinition = "TIMESTAMP")
 	private LocalDateTime pullUpAt;
 
@@ -75,14 +67,13 @@ public class Post extends BaseEntity {
 	}
 
 	public Post(String title, String description, int price, TransactionType transactionType,
-		Category category, List<Image> images) {
+		Category category) {
 		this.title = title;
 		this.description = description;
 		this.price = price;
 		this.views = 0;
 		this.transactionType = transactionType;
 		this.category = category;
-		this.images = images;
 		this.status = Status.FOR_SALE;
 		this.pullUpAt = LocalDateTime.now();
 	}
@@ -113,10 +104,6 @@ public class Post extends BaseEntity {
 
 	public Status getStatus() {
 		return status;
-	}
-
-	public List<Image> getImages() {
-		return images;
 	}
 
 	public LocalDateTime getPullUpAt() {
