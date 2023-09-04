@@ -72,7 +72,7 @@ public class ImageService {
 
 	private void saveImageToLocalStorage(MultipartFile multipartFile, String uniqueName) {
 		try {
-			java.io.File file = new java.io.File(FOLDER_PATH);
+			java.io.File file = new java.io.File(FOLDER_PATH + RELATIVE_PATH);
 
 			if (isExistFile(file)) {
 				file.mkdirs();
@@ -92,7 +92,7 @@ public class ImageService {
 	}
 
 	private String getFullPath(String uniqueName) {
-		return FOLDER_PATH + uniqueName;
+		return FOLDER_PATH + RELATIVE_PATH + uniqueName;
 	}
 
 	public List<ImageResponse> getImages(DomainName domainName, Long domainId) {
@@ -133,7 +133,7 @@ public class ImageService {
 	}
 
 	private void deleteImageToLocalStorage(String path) {
-		Path fullPath = Paths.get(path);
+		Path fullPath = Paths.get(FOLDER_PATH + path);
 
 		try {
 			Files.delete(fullPath);

@@ -2,10 +2,12 @@ package com.devcourse.be04daangnmarket.post.application;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
+
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
@@ -41,13 +44,14 @@ class PostServiceTest {
 	@DisplayName("게시글 등록 성공")
 	void createPostTest() throws IOException {
 		// given
+		Long memberId = 1L;
 		String title = "keyboard~!";
 		String description = "this keyboard is good";
 		int price = 100000;
 		TransactionType transactionType = TransactionType.SALE;
 		Category category = Category.DIGITAL_DEVICES;
 
-		Post post = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
 			Category.DIGITAL_DEVICES);
 
 		when(postRepository.save(any(Post.class))).thenReturn(post);
@@ -58,7 +62,7 @@ class PostServiceTest {
 		receivedImages.add(imageFile);
 
 		// when
-		PostDto.Response response = postService.create(title, description, price, transactionType, category,
+		PostDto.Response response = postService.create(memberId, title, description, price, transactionType, category,
 			receivedImages);
 
 		// then
@@ -78,7 +82,7 @@ class PostServiceTest {
 		// given
 		Long postId = 1L;
 
-		Post post = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
 			Category.DIGITAL_DEVICES);
 
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
@@ -96,10 +100,10 @@ class PostServiceTest {
 	@DisplayName("게시글 전체 조회 성공")
 	public void testGetAllPost() {
 		// given
-		Post post = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
 			Category.DIGITAL_DEVICES);
 
-		Post post2 = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+		Post post2 = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
 			Category.DIGITAL_DEVICES);
 
 		List<Post> posts = List.of(post, post2);
@@ -122,7 +126,7 @@ class PostServiceTest {
 	public void getPostByCategoryTest() throws Exception {
 		// given
 		Category category = Category.DIGITAL_DEVICES;
-		Post post = new Post("keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
 			Category.DIGITAL_DEVICES);
 
 		List<Post> posts = List.of(post);
@@ -143,6 +147,32 @@ class PostServiceTest {
 	}
 
 	@Test
+	@DisplayName("")
+	void PostServiceTest() {
+		// given
+		Long memberId = 1L;
+		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES);
+
+		List<Post> posts = List.of(post);
+
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Post> page = new PageImpl<>(posts);
+
+		when(postRepository.findByMemberId(memberId, pageable)).thenReturn(posts);
+
+		// when
+		Page<PostDto.Response> responses = postService.getPostByMemberId(memberId, pageable);
+
+		// then
+		assertNotNull(responses);
+		assertEquals(page.getTotalElements(), responses.getTotalElements());
+		assertEquals(page.getNumber(), responses.getNumber());
+		verify(postRepository, times(1)).findByMemberId(memberId, pageable);
+
+	}
+
+	@Test
 	@DisplayName("게시글 수정 성공")
 	void updatePostTest() {
 		// given
@@ -153,7 +183,7 @@ class PostServiceTest {
 		TransactionType transactionType = TransactionType.SALE;
 		Category category = Category.DIGITAL_DEVICES;
 
-		Post post = new Post("keyboard~!", "this keyboard is good", 50000, TransactionType.SALE,
+		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 50000, TransactionType.SALE,
 			Category.DIGITAL_DEVICES);
 
 		when(postRepository.findById(id)).thenReturn(Optional.of(post));
