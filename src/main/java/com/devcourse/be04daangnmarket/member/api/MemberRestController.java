@@ -6,6 +6,7 @@ import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -40,6 +41,12 @@ public class MemberRestController {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Authorization", token);
         return new ResponseEntity(response, httpHeaders, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MemberDto.Response> getProfile(@PathVariable Long id) {
+        MemberDto.Response response = memberService.getProfile(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")

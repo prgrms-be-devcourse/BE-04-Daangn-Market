@@ -7,6 +7,7 @@ import org.hibernate.annotations.DynamicInsert;
 
 import com.devcourse.be04daangnmarket.common.entity.BaseEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

@@ -10,8 +10,13 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: create
+      generate-ddl: true
 
 jasypt:
   encryptor:
     bean: jasyptStringEncryptor
     password: ${JASYPT_KEY:testKey}
+
+custom:
+  base-path:
+    image: ${IMAGE_PATH}

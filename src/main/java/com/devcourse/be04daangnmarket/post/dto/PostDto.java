@@ -1,5 +1,8 @@
 package com.devcourse.be04daangnmarket.post.dto;
 
+import java.util.List;
+
+import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Status;
 import com.devcourse.be04daangnmarket.post.domain.TransactionType;
@@ -32,7 +35,8 @@ public class PostDto {
 		int views,
 		String transactionType,
 		String category,
-		String status
+		String status,
+		List<ImageResponse> images
 	) {
 	}
 

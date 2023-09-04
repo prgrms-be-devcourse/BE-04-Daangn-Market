@@ -84,7 +84,7 @@ class CommentServiceTest {
 
         //when
         given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
-        commentService.update(comment.getId(), request);
+        commentService.update(comment.getId(), request, null);
 
         //then
         assertThat(comment.getContent()).isEqualTo(request.content());

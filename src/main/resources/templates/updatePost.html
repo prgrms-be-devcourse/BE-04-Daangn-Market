@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<script th:src="@{https://unpkg.com/axios/dist/axios.min.js}"></script>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Post</title>
+  <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css">
+</head>
+
+<script>
+  function updatePostRequest() {
+    const id = [[${id}]];
+
+    axios.put(`/api/v1/posts/${id}`,
+            {
+              headers: {
+                'Content-type': 'application/json',
+              },
+
+              title: document.getElementById("title").value,
+              description: document.getElementById("description").value,
+              price: document.getElementById("price").value,
+              transactionType: document.getElementById("transactionType").value,
+              category: document.getElementById("category").value
+
+            }).then(res => {
+              window.location.href = `/posts/${id}`;
+            })
+
+            .catch(error => {
+              alert("오류가 발생했습니다. \n" + error);
+            })
+  }
+
+</script>
+
+<body>
+<div style="margin-left: auto; margin-right: auto; text-align: center;">
+  <div>
+    <h1>Edit Post</h1>
+  </div>
+
+  <form th:object="${post}">
+    <div>
+      <label th:for="title">제목</label>
+      <input type="text" id="title" name="title" th:field="*{title}">
+    </div>
+
+    <div>
+      <label th:for="description">설명</label>
+      <input type="text" id="description" name="description" th:field="*{description}">
+    </div>
+
+    <div>
+      <label th:for="price">가격</label>
+      <input type="text" id="price" name="price" th:field="*{price}">
+    </div>
+
+    <div>
+      <div>거래 방식</div>
+      <select id="transactionType" name="transactionType" class="form-select">
+        <option value="">==거래 방식 선택==</option>
+        <option th:each="transactionType : ${transactionTypes}"
+                th:value="${transactionType.name()}"
+                th:text="${transactionType.description}"></option>
+      </select>
+    </div>
+
+    <div>
+      <div>카테고리</div>
+      <select id="category" name="category" class="form-select">
+        <option value="">==카테고리 선택==</option>
+        <option th:each="category : ${categories}"
+                th:value="${category.name()}"
+                th:text="${category.description}"></option>
+      </select>
+    </div>
+
+  </form>
+
+  <button class="post_request_btn" onclick="updatePostRequest()">수정 완료</button>
+  <a style="margin-right: 20px; margin-left: 20px" th:href="@{/posts/{id}(id=${id})}">취소</a>
+</div>
+
+</body>
+</html>
