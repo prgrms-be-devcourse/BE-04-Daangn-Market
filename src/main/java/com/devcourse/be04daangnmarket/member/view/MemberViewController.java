@@ -40,4 +40,10 @@ public class MemberViewController {
         return "editProfile";
     }
 
+    @GetMapping(value = "/mypage/purchase/{id}")
+    public String purchasePost(@PathVariable Long id, Model model) {
+        model.addAttribute("id", id);
+
+        return "purchasePost";
+    }
 }
