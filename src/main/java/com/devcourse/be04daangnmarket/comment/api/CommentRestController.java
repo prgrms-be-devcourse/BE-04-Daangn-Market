@@ -3,6 +3,7 @@ package com.devcourse.be04daangnmarket.comment.api;
 import com.devcourse.be04daangnmarket.comment.application.CommentService;
 import com.devcourse.be04daangnmarket.comment.dto.CommentResponse;
 import com.devcourse.be04daangnmarket.comment.dto.CreateCommentRequest;
+import com.devcourse.be04daangnmarket.common.auth.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import com.devcourse.be04daangnmarket.comment.dto.UpdateCommentRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,9 +27,8 @@ public class CommentRestController {
     }
 
     @PostMapping
-    public ResponseEntity<CommentResponse> create(@RequestPart(name = "request") CreateCommentRequest request,
-                                                  @RequestPart(name = "images") List<MultipartFile> files) {
-        CommentResponse response = commentService.create(request, files);
+    public ResponseEntity<CommentResponse> create(CreateCommentRequest request, @AuthenticationPrincipal User user) {
+        CommentResponse response = commentService.create(request, user.getId());
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }

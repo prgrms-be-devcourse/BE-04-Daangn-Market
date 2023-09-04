@@ -8,11 +8,12 @@ import com.devcourse.be04daangnmarket.comment.dto.CreateCommentRequest;
 import java.util.List;
 
 public class CommentConverter {
-    public static Comment toEntity(CreateCommentRequest dto) {
-        return new Comment(dto.content());
+    public static Comment toEntity(CreateCommentRequest dto, Long userId) {
+        return new Comment(dto.content(), userId, dto.postId(), 0);
     }
 
     public static CommentResponse toResponse(Comment comment, List<ImageResponse> images) {
-        return new CommentResponse(comment.getContent(), images);
+        return new CommentResponse(comment.getContent(), comment.getMemberId(),
+                comment.getPostId(), comment.getCommentGroup(), comment.getSeq(), images);
     }
 }

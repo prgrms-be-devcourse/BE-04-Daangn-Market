@@ -11,6 +11,8 @@ import com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage;
 import com.devcourse.be04daangnmarket.comment.exception.NotFoundException;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.comment.util.CommentConverter;
+import com.devcourse.be04daangnmarket.member.repository.MemberRepository;
+import com.devcourse.be04daangnmarket.post.repository.PostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -26,17 +28,25 @@ import java.util.List;
 public class CommentService {
     private final ImageService imageService;
     private final CommentRepository commentRepository;
+    private final MemberRepository memberRepository;
+    private final PostRepository postRepository;
 
-    public CommentService(ImageService imageService, CommentRepository commentRepository) {
+    public CommentService(ImageService imageService, CommentRepository commentRepository, MemberRepository memberRepository, PostRepository postRepository) {
         this.imageService = imageService;
         this.commentRepository = commentRepository;
+        this.memberRepository = memberRepository;
+        this.postRepository = postRepository;
     }
 
     @Transactional
-    public CommentResponse create(CreateCommentRequest request, List<MultipartFile> files) {
-        Comment comment = CommentConverter.toEntity(request);
+    public CommentResponse create(CreateCommentRequest request, Long userId) {
+        Integer groupNumber = commentRepository.findPostCount().orElse(0);
+
+        Comment comment = CommentConverter.toEntity(request, userId);
+        comment.addGroup(groupNumber);
+
         Comment saved = commentRepository.save(comment);
-        List<ImageResponse> images = imageService.uploadImages(files, DomainName.COMMENT, saved.getId());
+        List<ImageResponse> images = imageService.uploadImages(request.files(), DomainName.COMMENT, saved.getId());
 
         return CommentConverter.toResponse(saved, images);
     }
@@ -66,7 +76,8 @@ public class CommentService {
 
         for (Comment comment : comments) {
             List<ImageResponse> images = imageService.getImages(DomainName.COMMENT, comment.getId());
-            CommentResponse commentResponse = new CommentResponse(comment.getContent(), images);
+            CommentResponse commentResponse = new CommentResponse(comment.getContent(), comment.getMemberId(), comment.getPostId(),
+                    comment.getCommentGroup(), comment.getSeq(), images);
             commentResponses.add(commentResponse);
         }
 
