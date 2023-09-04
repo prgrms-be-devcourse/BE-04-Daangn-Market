@@ -42,7 +42,6 @@ public class PostService {
                                    TransactionType transactionType, Category category, List<MultipartFile> files) throws IOException {
         Post post = new Post(title, description, price, transactionType, category);
         postRepository.save(post);
-        System.out.println(post.getId());
         List<ImageResponse> images = imageService.uploadImages(files, DomainName.POST, post.getId());
 
         return toResponse(post, images);

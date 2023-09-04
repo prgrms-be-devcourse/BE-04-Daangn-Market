@@ -26,7 +26,8 @@ public class PostDto {
 		String description,
 		int price,
 		TransactionType transactionType,
-		Category category
+		Category category,
+		List<MultipartFile> receivedImages
 	) {
 	}
 
