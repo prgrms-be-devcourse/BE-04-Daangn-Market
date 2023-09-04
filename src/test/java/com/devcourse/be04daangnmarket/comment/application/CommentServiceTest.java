@@ -40,7 +40,7 @@ class CommentServiceTest {
         Long commentId = 9L;
 
         //when & then
-        assertThatThrownBy(() -> commentService.deleteReply(commentId))
+        assertThatThrownBy(() -> commentService.delete(commentId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage(NOT_FOUND_COMMENT.getMessage());
     }
@@ -52,7 +52,7 @@ class CommentServiceTest {
         given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
 
         //when
-        commentService.deleteReply(comment.getId());
+        commentService.delete(comment.getId());
 
         // then
         assertThat(comment.getDeletedStatus()).isEqualTo(DeletedStatus.DELETED);

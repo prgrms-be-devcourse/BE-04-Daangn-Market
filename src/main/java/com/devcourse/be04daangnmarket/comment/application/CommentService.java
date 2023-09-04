@@ -62,21 +62,24 @@ public class CommentService {
     }
 
     @Transactional
-    public void delete(int commentGroup) {
-        List<Comment> groupComments = commentRepository.findAllByCommentGroup(commentGroup);
-
-        for (Comment comment : groupComments) {
-            comment.deleteStatus();
-            imageService.deleteAllImages(DomainName.COMMENT, comment.getId());
-        }
-    }
-
-
-    @Transactional
-    public void deleteReply(Long id) {
+    public void delete(Long id) {
         Comment comment = getOne(id);
+
+        if (isGroupComment(comment)) {
+            List<Comment> sameGroupComments = commentRepository.findAllByCommentGroup(comment.getCommentGroup());
+
+            for (Comment sameGroupComment : sameGroupComments) {
+                sameGroupComment.deleteStatus();
+                imageService.deleteAllImages(DomainName.COMMENT, sameGroupComment.getId());
+            }
+        }
+
         comment.deleteStatus();
         imageService.deleteAllImages(DomainName.COMMENT, id);
+    }
+
+    private boolean isGroupComment(Comment comment) {
+        return comment.getSeq() == 0;
     }
 
     private Comment getOne(Long id) {

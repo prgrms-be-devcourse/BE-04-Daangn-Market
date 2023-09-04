@@ -41,16 +41,9 @@ public class CommentRestController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{commentGroup}")
-    public ResponseEntity delete(@PathVariable int commentGroup) {
-        commentService.delete(commentGroup);
-
-        return new ResponseEntity(HttpStatus.OK);
-    }
-
-    @DeleteMapping("/reply/{id}")
-    public ResponseEntity deleteReply(@PathVariable Long id) {
-        commentService.deleteReply(id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity delete(@PathVariable Long id) {
+        commentService.delete(id);
 
         return new ResponseEntity(HttpStatus.OK);
     }
