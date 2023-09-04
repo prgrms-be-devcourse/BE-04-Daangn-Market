@@ -7,7 +7,6 @@ import org.hibernate.annotations.DynamicInsert;
 
 import com.devcourse.be04daangnmarket.common.entity.BaseEntity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,6 +18,9 @@ import jakarta.persistence.Table;
 @DynamicInsert
 @Table(name = "posts")
 public class Post extends BaseEntity {
+
+	@Column(nullable = false)
+	private Long memberId;
 
 	@Column(nullable = false)
 	private String title;
@@ -53,9 +55,10 @@ public class Post extends BaseEntity {
 	protected Post() {
 	}
 
-	public Post(String title, String description, int price, int views, TransactionType transactionType,
+	public Post(Long memberId, String title, String description, int price, int views, TransactionType transactionType,
 		Category category,
 		Status status, LocalDateTime pullUpAt) {
+		this.memberId = memberId;
 		this.title = title;
 		this.description = description;
 		this.price = price;
@@ -66,8 +69,9 @@ public class Post extends BaseEntity {
 		this.pullUpAt = pullUpAt;
 	}
 
-	public Post(String title, String description, int price, TransactionType transactionType,
+	public Post(Long memberId, String title, String description, int price, TransactionType transactionType,
 		Category category) {
+		this.memberId = memberId;
 		this.title = title;
 		this.description = description;
 		this.price = price;
@@ -76,6 +80,10 @@ public class Post extends BaseEntity {
 		this.category = category;
 		this.status = Status.FOR_SALE;
 		this.pullUpAt = LocalDateTime.now();
+	}
+
+	public Long getMemberId() {
+		return memberId;
 	}
 
 	public String getTitle() {

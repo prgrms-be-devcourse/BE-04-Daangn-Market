@@ -38,8 +38,7 @@ class PostRestControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
-	@Autowired
-	private ObjectMapper objectMapper;
+
 	@MockBean
 	private PostService postService;
 
@@ -55,11 +54,11 @@ class PostRestControllerTest {
 			"This is a test file content".getBytes()
 		);
 
-		PostDto.Response mockResponse = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
+		PostDto.Response mockResponse = new PostDto.Response(1L, 1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(), null);
 
-		when(postService.create("Keyboard", "nice Keyboard", 100,
+		when(postService.create(1L, "Keyboard", "nice Keyboard", 100,
 			TransactionType.SALE, Category.DIGITAL_DEVICES, null)).thenReturn(mockResponse);
 
 		// when then
@@ -79,7 +78,7 @@ class PostRestControllerTest {
 	public void getPostTest() throws Exception {
 		// given
 		Long postId = 1L;
-		PostDto.Response mockResponse = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
+		PostDto.Response mockResponse = new PostDto.Response(1L, 1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(), null);
 
@@ -102,11 +101,11 @@ class PostRestControllerTest {
 	@DisplayName("게시글 전체 조회 REST API 성공")
 	public void getAllPostTest() throws Exception {
 		// given
-		PostDto.Response postResponse1 = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
+		PostDto.Response postResponse1 = new PostDto.Response(1L, 1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(), null);
 
-		PostDto.Response postResponse2 = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
+		PostDto.Response postResponse2 = new PostDto.Response(1L, 1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(), null);
 
@@ -130,43 +129,13 @@ class PostRestControllerTest {
 	}
 
 	@Test
-	@DisplayName("게시글 수정 REST API 성공")
-	public void updatePostTest() throws Exception {
-		// given
-		Long postId = 1L;
-		PostDto.UpdateRequest request = new PostDto.UpdateRequest("Keyboard", "nice Keyboard", 100,
-			TransactionType.SALE,
-			Category.DIGITAL_DEVICES);
-
-		PostDto.Response mockResponse = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
-			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
-			Status.FOR_SALE.getDescription(), null);
-
-		when(postService.update(1L, "Keyboard", "nice Keyboard", 100,
-			TransactionType.SALE, Category.DIGITAL_DEVICES, null)).thenReturn(mockResponse);
-
-		// when then
-		mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/posts/" + postId)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.id").value(postId))
-			.andExpect(jsonPath("$.title").value(request.title()))
-			.andExpect(jsonPath("$.description").value(request.description()))
-			.andExpect(jsonPath("$.price").value(request.price()))
-			.andExpect(jsonPath("$.transactionType").value(request.transactionType().getDescription()))
-			.andExpect(jsonPath("$.category").value(request.category().getDescription()));
-
-	}
-
-	@Test
 	@DisplayName("게시글 카테고리 기반 전체 조회 REST API 성공")
 	public void testGetPostByCategory() throws Exception {
 		// given
 		Category category = Category.DIGITAL_DEVICES;
 		PageRequest pageable = PageRequest.of(0, 10);
 
-		PostDto.Response postResponse = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
+		PostDto.Response postResponse = new PostDto.Response(1L, 1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(), null);
 

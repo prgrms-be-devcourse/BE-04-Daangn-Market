@@ -6,7 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
 import com.devcourse.be04daangnmarket.post.domain.Category;
-import com.devcourse.be04daangnmarket.post.domain.Status;
 import com.devcourse.be04daangnmarket.post.domain.TransactionType;
 
 public class PostDto {
@@ -33,6 +32,7 @@ public class PostDto {
 
 	public record Response(
 		Long id,
+		Long memberId,
 		String title,
 		String description,
 		int price,
