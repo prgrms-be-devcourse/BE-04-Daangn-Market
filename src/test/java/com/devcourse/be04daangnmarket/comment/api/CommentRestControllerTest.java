@@ -49,42 +49,34 @@ class CommentRestControllerTest {
     @MockBean
     private CommentService commentService;
 
-    @MockBean
-    private ImageService imageService;
-
     @Test
-    void 저장_성공() throws Exception {
+    void 댓글_저장_성공() throws Exception {
         //given
-        CreateCommentRequest request = new CreateCommentRequest("댓글");
-        String requestJson = objectMapper.writeValueAsString(request);
-        MockMultipartFile jsonFile = new MockMultipartFile("request", "request", "application/json", requestJson.getBytes(StandardCharsets.UTF_8));
-
-        MockMultipartFile imageFile = new MockMultipartFile("test", "test.jpeg", MediaType.IMAGE_JPEG_VALUE, "test".getBytes());
         List<MultipartFile> images = new ArrayList<>();
+        MockMultipartFile imageFile = new MockMultipartFile("구직_공고문", "구직_공고문.png", MediaType.IMAGE_JPEG_VALUE, "test".getBytes());
         images.add(imageFile);
+        CreateCommentRequest request = new CreateCommentRequest("댓글", 1L, images);
 
-        List<ImageResponse> imageResponses = new ArrayList<>();
-        ImageResponse imageResponse = new ImageResponse("test.jpeg", "C:\\Users\\User\\Desktop\\image\\17801b4d-d7b8-4ba6-9c7d-d9ba4cbf6b21-test.jpeg", "image/jpeg",
-                502868, DomainName.COMMENT, 1L);
-        imageResponses.add(imageResponse);
+        List<ImageResponse> imageResponseList1 = new ArrayList<>();
+        ImageResponse imageResponse1 = new ImageResponse("구직_공고문.png", "images/a8f468c1-d234-4c08-8235-63cc59f73a15-구직_공고문.png", "image/png",
+                898066, DomainName.COMMENT, 1L);
+        imageResponseList1.add(imageResponse1);
 
-        CommentResponse mockResponse = new CommentResponse("댓글", imageResponses);
+        CommentResponse mockResponse = new CommentResponse("댓글", 1L, 1L, 1, 0, imageResponseList1);
 
-        given(imageService.uploadImages(images, DomainName.COMMENT, 1L))
-                .willReturn(imageResponses);
-        given(commentService.create(request, images))
+//        given(imageService.uploadImages(images, DomainName.COMMENT, 1L))
+//                .willReturn(imageResponses);
+        given(commentService.create(request, 1L))
                 .willReturn(mockResponse);
 
         //when & then
         this.mockMvc.perform(multipart("/api/v1/comments")
-                        .file(jsonFile)
-                        .file("request", requestJson.getBytes())
                         .file(imageFile)
-                        .param("test.jpeg", "value"))
+                        .param("postId", "1L")
+                        .param("content", "댓글"))
                 .andExpect(status().isCreated())
                 .andDo(print());
     }
-
     @Test
     void 삭제_성공() throws Exception {
         //given
@@ -100,7 +92,7 @@ class CommentRestControllerTest {
     void 조회_성공() throws Exception {
         //given
         Long commentId = 1L;
-        CommentResponse response = new CommentResponse("댓글", null);
+        CommentResponse response = new CommentResponse("댓글", 1L, 1L, 1, 0, null);
         given(commentService.getDetail(commentId))
                 .willReturn(response);
 
@@ -114,8 +106,8 @@ class CommentRestControllerTest {
     @Test
     void 페이징_조회_성공() throws Exception {
         //given
-        CommentResponse response1 = new CommentResponse("댓글", null);
-        CommentResponse response2 = new CommentResponse("댓글", null);
+        CommentResponse response1 = new CommentResponse("댓글", 1L, 1L, 1, 0, null);
+        CommentResponse response2 = new CommentResponse("댓글", 1L, 1L, 1, 0, null);
 
         Pageable pageable = PageRequest.of(0, 10);
         PageImpl<CommentResponse> responses = new PageImpl<>(List.of(response1, response2), pageable, 2);
@@ -135,7 +127,7 @@ class CommentRestControllerTest {
     void 수정_성공() throws Exception {
         //given
         Long commentId = 1L;
-        CommentResponse response = new CommentResponse("변경 댓글", null);
+        CommentResponse response = new CommentResponse("댓글", 1L, 1L, 1, 0, null);
 
         UpdateCommentRequest request = new UpdateCommentRequest("변경 댓글");
         String requestJson = objectMapper.writeValueAsString(request);
