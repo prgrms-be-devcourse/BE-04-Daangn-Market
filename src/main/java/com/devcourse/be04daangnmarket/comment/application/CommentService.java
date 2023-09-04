@@ -62,7 +62,18 @@ public class CommentService {
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void delete(int commentGroup) {
+        List<Comment> groupComments = commentRepository.findAllByCommentGroup(commentGroup);
+
+        for (Comment comment : groupComments) {
+            comment.deleteStatus();
+            imageService.deleteAllImages(DomainName.COMMENT, comment.getId());
+        }
+    }
+
+
+    @Transactional
+    public void deleteReply(Long id) {
         Comment comment = getOne(id);
         comment.deleteStatus();
         imageService.deleteAllImages(DomainName.COMMENT, id);
