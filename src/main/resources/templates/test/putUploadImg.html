@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>파일 업로드</title>
+</head>
+<body>
+<h1>파일 업로드</h1>
+<form id="uploadForm" action="/createPost" method="put" enctype="multipart/form-data"> <!-- method="put"로 변경 -->
+    <div>
+        <label for="name">이름:</label>
+        <input type="text" id="name" name="name" />
+    </div>
+    <div>
+        <label for="file">파일 선택:</label>
+        <input type="file" id="file" name="file" multiple />
+    </div>
+    <div>
+        <button type="button" onclick="uploadData()">업로드</button>
+    </div>
+</form>
+
+<div id="message"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    function uploadData() {
+        const formData = new FormData(document.getElementById('uploadForm'));
+
+        axios.put('/update-img', formData) // PUT 요청으로 변경
+            .then(function (response) {
+                document.getElementById('message').innerText = response.data;
+            })
+            .catch(function (error) {
+                console.error(error);
+                document.getElementById('message').innerText = '업로드 실패: ' + error.message;
+            });
+    }
+</script>
+</body>
+</html>
