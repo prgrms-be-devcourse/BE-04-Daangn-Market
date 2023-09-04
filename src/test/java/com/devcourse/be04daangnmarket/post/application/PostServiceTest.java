@@ -147,6 +147,32 @@ class PostServiceTest {
 	}
 
 	@Test
+	@DisplayName("")
+	void PostServiceTest() {
+		// given
+		Long memberId = 1L;
+		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES);
+
+		List<Post> posts = List.of(post);
+
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Post> page = new PageImpl<>(posts);
+
+		when(postRepository.findByMemberId(memberId, pageable)).thenReturn(posts);
+
+		// when
+		Page<PostDto.Response> responses = postService.getPostByMemberId(memberId, pageable);
+
+		// then
+		assertNotNull(responses);
+		assertEquals(page.getTotalElements(), responses.getTotalElements());
+		assertEquals(page.getNumber(), responses.getNumber());
+		verify(postRepository, times(1)).findByMemberId(memberId, pageable);
+
+	}
+
+	@Test
 	@DisplayName("게시글 수정 성공")
 	void updatePostTest() {
 		// given
