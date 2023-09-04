@@ -2,6 +2,8 @@ package com.devcourse.be04daangnmarket.post.dto;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Status;
@@ -14,7 +16,8 @@ public class PostDto {
 		String description,
 		int price,
 		TransactionType transactionType,
-		Category category
+		Category category,
+		List<MultipartFile> receivedImages
 	) {
 	}
 

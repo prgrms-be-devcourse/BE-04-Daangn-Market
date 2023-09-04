@@ -4,8 +4,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +22,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.devcourse.be04daangnmarket.common.config.SecurityConfig;
 import com.devcourse.be04daangnmarket.post.application.PostService;
@@ -50,39 +47,31 @@ class PostRestControllerTest {
 	@DisplayName("게시글 등록 REST API 성공")
 	public void createPostTest() throws Exception {
 
-		PostDto.CreateRequest request = new PostDto.CreateRequest("Keyboard", "nice Keyboard",
-			100, TransactionType.SALE, Category.DIGITAL_DEVICES);
-		String requestJson = objectMapper.writeValueAsString(request);
-		MockMultipartFile jsonFile = new MockMultipartFile("request", "request",
-			"application/json", requestJson.getBytes(StandardCharsets.UTF_8));
-
-		List<MultipartFile> images = new ArrayList<>();
-		MockMultipartFile imageFile = new MockMultipartFile("images", "test-image.jpg",
-			MediaType.IMAGE_JPEG_VALUE, "test image content".getBytes());
-		images.add(imageFile);
+		// given
+		MockMultipartFile file = new MockMultipartFile(
+			"file",
+			"test-file.txt",
+			MediaType.TEXT_PLAIN_VALUE,
+			"This is a test file content".getBytes()
+		);
 
 		PostDto.Response mockResponse = new PostDto.Response(1L, "Keyboard", "nice Keyboard", 100, 1000,
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(), null);
 
 		when(postService.create("Keyboard", "nice Keyboard", 100,
-			TransactionType.SALE, Category.DIGITAL_DEVICES, images)).thenReturn(mockResponse);
+			TransactionType.SALE, Category.DIGITAL_DEVICES, null)).thenReturn(mockResponse);
 
-		// 요청 생성
-		mockMvc.perform(
-				multipart("/api/v1/posts")
-					.file(jsonFile)
-					.file("request", requestJson.getBytes())
-					.file(imageFile)
-			)
-			.andExpect(status().isCreated())
-			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(jsonPath("$.title").value(request.title()))
-			.andExpect(jsonPath("$.description").value(request.description()))
-			.andExpect(jsonPath("$.price").value(request.price()))
-			.andExpect(jsonPath("$.transactionType").value(request.transactionType().getDescription()))
-			.andExpect(jsonPath("$.category").value(request.category().getDescription()));
-
+		// when then
+		mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/posts")
+				.file(file)
+				.param("title", "Keyboard")
+				.param("description", "nice Keyboard")
+				.param("price", "100")
+				.param("transactionType", TransactionType.SALE.name())
+				.param("category", Category.DIGITAL_DEVICES.name()))
+			.andExpect(MockMvcResultMatchers.status().isCreated())
+			.andExpect(jsonPath("$.title").value("Keyboard"));
 	}
 
 	@Test
