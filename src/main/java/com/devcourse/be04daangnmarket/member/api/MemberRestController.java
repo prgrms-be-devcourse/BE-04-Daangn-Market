@@ -1,7 +1,9 @@
 package com.devcourse.be04daangnmarket.member.api;
 
+import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
 import com.devcourse.be04daangnmarket.member.application.MemberService;
 import com.devcourse.be04daangnmarket.member.dto.MemberDto;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberRestController {
 
     private final MemberService memberService;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public MemberRestController(MemberService memberService) {
+    public MemberRestController(MemberService memberService, JwtTokenProvider jwtTokenProvider) {
         this.memberService = memberService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @PostMapping
@@ -31,7 +35,12 @@ public class MemberRestController {
     @PostMapping("/login")
     public ResponseEntity<MemberDto.Response> signIn(@RequestBody MemberDto.SignInRequest request) {
         MemberDto.Response response = memberService.signIn(request);
-        return new ResponseEntity(response, HttpStatus.OK);
+
+        String token = jwtTokenProvider.createToken(request.email());
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Authorization", token);
+        return new ResponseEntity(response, httpHeaders, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
