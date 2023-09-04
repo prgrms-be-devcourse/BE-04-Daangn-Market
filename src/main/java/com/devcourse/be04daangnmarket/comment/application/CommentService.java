@@ -1,5 +1,6 @@
 package com.devcourse.be04daangnmarket.comment.application;
 
+import com.devcourse.be04daangnmarket.comment.dto.CreateReplyCommentRequest;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.image.domain.DomainName;
 import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
@@ -7,12 +8,9 @@ import com.devcourse.be04daangnmarket.comment.domain.Comment;
 import com.devcourse.be04daangnmarket.comment.dto.CommentResponse;
 import com.devcourse.be04daangnmarket.comment.dto.CreateCommentRequest;
 import com.devcourse.be04daangnmarket.comment.dto.UpdateCommentRequest;
-import com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage;
 import com.devcourse.be04daangnmarket.comment.exception.NotFoundException;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.comment.util.CommentConverter;
-import com.devcourse.be04daangnmarket.member.repository.MemberRepository;
-import com.devcourse.be04daangnmarket.post.repository.PostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -23,27 +21,39 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage.NOT_FOUND_COMMENT;
+
 @Transactional(readOnly = true)
 @Service
 public class CommentService {
     private final ImageService imageService;
     private final CommentRepository commentRepository;
-    private final MemberRepository memberRepository;
-    private final PostRepository postRepository;
 
-    public CommentService(ImageService imageService, CommentRepository commentRepository, MemberRepository memberRepository, PostRepository postRepository) {
+    public CommentService(ImageService imageService, CommentRepository commentRepository) {
         this.imageService = imageService;
         this.commentRepository = commentRepository;
-        this.memberRepository = memberRepository;
-        this.postRepository = postRepository;
     }
 
     @Transactional
     public CommentResponse create(CreateCommentRequest request, Long userId) {
-        Integer groupNumber = commentRepository.findPostCount().orElse(0);
-
         Comment comment = CommentConverter.toEntity(request, userId);
+
+        Integer groupNumber = commentRepository.findMaxCommentGroup().orElse(0);
         comment.addGroup(groupNumber);
+
+        Comment saved = commentRepository.save(comment);
+        List<ImageResponse> images = imageService.uploadImages(request.files(), DomainName.COMMENT, saved.getId());
+
+        return CommentConverter.toResponse(saved, images);
+    }
+
+    @Transactional
+    public CommentResponse createReply(CreateReplyCommentRequest request, Long userId) {
+        Comment comment = CommentConverter.toEntity(request, userId);
+
+        Integer seqNumber = commentRepository.findMaxSeqFromCommentGroup(request.commentGroup())
+                .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_COMMENT.getMessage()));
+        comment.addSeq(seqNumber);
 
         Comment saved = commentRepository.save(comment);
         List<ImageResponse> images = imageService.uploadImages(request.files(), DomainName.COMMENT, saved.getId());
@@ -60,7 +70,7 @@ public class CommentService {
 
     private Comment getOne(Long id) {
         return commentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ExceptionMessage.NOT_FOUND_COMMENT.getMessage()));
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_COMMENT.getMessage()));
     }
 
     public CommentResponse getDetail(Long id) {

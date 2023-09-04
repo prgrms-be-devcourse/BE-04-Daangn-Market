@@ -3,6 +3,7 @@ package com.devcourse.be04daangnmarket.comment.api;
 import com.devcourse.be04daangnmarket.comment.application.CommentService;
 import com.devcourse.be04daangnmarket.comment.dto.CommentResponse;
 import com.devcourse.be04daangnmarket.comment.dto.CreateCommentRequest;
+import com.devcourse.be04daangnmarket.comment.dto.CreateReplyCommentRequest;
 import com.devcourse.be04daangnmarket.common.auth.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +30,13 @@ public class CommentRestController {
     @PostMapping
     public ResponseEntity<CommentResponse> create(CreateCommentRequest request, @AuthenticationPrincipal User user) {
         CommentResponse response = commentService.create(request, user.getId());
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/reply")
+    public ResponseEntity<CommentResponse> createReply(CreateReplyCommentRequest request, @AuthenticationPrincipal User user) {
+        CommentResponse response = commentService.createReply(request, user.getId());
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }

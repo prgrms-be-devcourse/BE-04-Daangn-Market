@@ -39,14 +39,21 @@ public class Comment extends BaseEntity {
     public Comment(String content) {//테스트를 막기 위한 임시
             validateContent(content);
             this.content = content;
-        }
+    }
 
-    public Comment(String content, Long memberId, Long postId, int seq) {
+    public Comment(String content, Long memberId, Long postId) {
         validateContent(content);
         this.content = content;
         this.memberId = memberId;
         this.postId = postId;
-        this.seq = seq;
+        this.seq = 0;
+    }
+
+    public Comment(String content, Long memberId, Long postId, int commentGroup) {
+        this.content = content;
+        this.memberId = memberId;
+        this.postId = postId;
+        this.commentGroup = commentGroup;
     }
 
     public String getContent() {
@@ -85,6 +92,10 @@ public class Comment extends BaseEntity {
 
     public void addGroup(int groupNumber) {
         this.commentGroup = groupNumber + 1;
+    }
+
+    public void addSeq(int seqNumber) {
+        this.seq = seqNumber + 1;
     }
 
     public void deleteStatus() {
