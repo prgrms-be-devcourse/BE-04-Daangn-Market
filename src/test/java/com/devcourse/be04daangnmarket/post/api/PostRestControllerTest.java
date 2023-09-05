@@ -82,7 +82,7 @@ class PostRestControllerTest {
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(), null);
 
-		when(postService.getPost(1L)).thenReturn(mockResponse);
+		when(postService.getPost(1L, null, null)).thenReturn(mockResponse);
 
 		// when then
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts/" + postId))
