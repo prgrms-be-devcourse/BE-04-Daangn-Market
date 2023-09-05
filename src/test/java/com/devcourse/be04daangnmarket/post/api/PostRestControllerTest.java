@@ -30,7 +30,6 @@ import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Status;
 import com.devcourse.be04daangnmarket.post.domain.TransactionType;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(PostRestController.class)
 @MockBean(JpaMetamodelMappingContext.class)
@@ -159,6 +158,33 @@ class PostRestControllerTest {
 	}
 
 	@Test
+	@DisplayName("게시글 상태 변경 REST API 성공")
+	void updatePostStatusTest() throws Exception {
+		// given
+		Long postId = 1L;
+		PostDto.StatusUpdateRequest mockRequest = new PostDto.StatusUpdateRequest(Status.SOLD);
+
+		PostDto.Response mockResponse = new PostDto.Response(
+			1L,
+			1L,
+			"Keyboard",
+			"nice Keyboard",
+			100,
+			1000,
+			TransactionType.SALE.getDescription(),
+			Category.DIGITAL_DEVICES.getDescription(),
+			Status.FOR_SALE.getDescription(),
+			null);
+
+		// when
+		when(postService.updateStatus(postId, mockRequest.status())).thenReturn(mockResponse);
+
+		// Send PATCH request
+		mockMvc.perform(patch("/api/v1/posts/{id}/status", postId)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk());
+
+  @Test
 	@DisplayName("키워드를 포함하는 제목을 가진 게시글 전체 조회 성공")
 	void GetPostByKeywordTest() throws Exception {
 	    // given

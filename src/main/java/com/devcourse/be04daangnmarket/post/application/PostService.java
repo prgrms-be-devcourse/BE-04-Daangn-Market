@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
+import com.devcourse.be04daangnmarket.post.domain.Status;
 import com.devcourse.be04daangnmarket.post.domain.TransactionType;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 import com.devcourse.be04daangnmarket.post.repository.PostRepository;
@@ -139,6 +140,15 @@ public class PostService {
 
 		imageService.deleteAllImages(DomainName.POST, id);
 		List<ImageResponse> images = imageService.uploadImages(files, DomainName.POST, id);
+
+		return toResponse(post, images);
+	}
+
+	@Transactional
+	public PostDto.Response updateStatus(Long id, Status status) {
+		Post post = findPostById(id);
+		post.updateStatus(status);
+		List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
 
 		return toResponse(post, images);
 	}
