@@ -25,6 +25,9 @@ import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Status;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("api/v1/posts")
 public class PostRestController {
@@ -45,8 +48,9 @@ public class PostRestController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<PostDto.Response> getPost(@PathVariable Long id) {
-		PostDto.Response response = postService.getPost(id);
+	public ResponseEntity<PostDto.Response> getPost(@PathVariable Long id, HttpServletRequest req,
+		HttpServletResponse res) {
+		PostDto.Response response = postService.getPost(id, req, res);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
@@ -76,6 +80,18 @@ public class PostRestController {
 		@RequestParam(defaultValue = "10") int size) {
 		Pageable pageable = PageRequest.of(page, size);
 		Page<PostDto.Response> response = postService.getPostByMemberId(memberId, pageable);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@GetMapping("/search")
+	public ResponseEntity<Page<PostDto.Response>> getPostByKeyword(@RequestParam String keyword,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size
+	) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<PostDto.Response> response = postService.getPostByKeyword(keyword, pageable);
+
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}

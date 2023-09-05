@@ -141,4 +141,9 @@ public class Post extends BaseEntity {
 	public void updateStatus(Status status) {
 		this.status = status;
 	}
+  
+	public void updateView() {
+		this.views++;
+	}
+
 }

@@ -13,14 +13,18 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
@@ -28,6 +32,8 @@ import com.devcourse.be04daangnmarket.post.domain.Status;
 import com.devcourse.be04daangnmarket.post.domain.TransactionType;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 import com.devcourse.be04daangnmarket.post.repository.PostRepository;
+
+import jakarta.servlet.http.Cookie;
 
 @SpringBootTest
 class PostServiceTest {
@@ -40,6 +46,9 @@ class PostServiceTest {
 
 	@Mock
 	private ImageService imageService;
+
+	@MockBean
+	private JwtTokenProvider jwtTokenProvider;
 
 	@Test
 	@DisplayName("게시글 등록 성공")
@@ -89,11 +98,54 @@ class PostServiceTest {
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
 		// when
-		PostDto.Response response = postService.getPost(postId);
+		PostDto.Response response = postService.getPost(postId, null, null);
 
 		// then
 		assertNotNull(response);
 		assertEquals(post.getId(), response.id());
+		verify(postRepository, times(1)).findById(postId);
+	}
+
+	@Test
+	@DisplayName("사용자가 게시물을 처음 조회 시 조회수가 1 증가한다")
+	void viewUpdateSuccessTest() {
+		// given
+		Long postId = 1L;
+		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES);
+		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+
+		MockHttpServletRequest req = new MockHttpServletRequest();
+		MockHttpServletResponse res = new MockHttpServletResponse();
+
+		// when
+		PostDto.Response response = postService.getPost(postId, req, res);
+
+		// then
+		assertNotNull(response);
+		assertEquals(1, post.getViews());
+		verify(postRepository, times(1)).findById(postId);
+	}
+
+	@Test
+	@DisplayName("사용자가 게시물을 재 조회 시 조회수가 증가하지 않는다")
+	void viewUpdateFailTest() {
+		// given
+		Long postId = 1L;
+		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES);
+		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+
+		MockHttpServletRequest req = new MockHttpServletRequest();
+		MockHttpServletResponse res = new MockHttpServletResponse();
+		req.setCookies(new Cookie(postId.toString(), postId.toString()));
+
+		// when
+		PostDto.Response response = postService.getPost(postId, req, res);
+
+		// then
+		assertNotNull(response);
+		assertEquals(0, post.getViews());
 		verify(postRepository, times(1)).findById(postId);
 	}
 
@@ -148,7 +200,8 @@ class PostServiceTest {
 	}
 
 	@Test
-	@DisplayName("사용자 아이디 기반 게시글 전체 조회 성공")
+	@DisplayName("사용자자 아이디 기반 게시물 전체조회 성공")
+
 	void getPostByMemberIdTest() {
 		// given
 		Long memberId = 1L;
@@ -221,10 +274,10 @@ class PostServiceTest {
 
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
-	    // when
-	    PostDto.Response response = postService.updateStatus(postId, updateStatus);
+	  // when
+	  PostDto.Response response = postService.updateStatus(postId, updateStatus);
 
-	    // then
+	  // then
 		assertNotNull(response);
 		assertEquals(updateStatus.getDescription(), response.status());
 

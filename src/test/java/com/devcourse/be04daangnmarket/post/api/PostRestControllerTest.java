@@ -85,7 +85,7 @@ class PostRestControllerTest {
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(), null);
 
-		when(postService.getPost(1L)).thenReturn(mockResponse);
+		when(postService.getPost(1L, null, null)).thenReturn(mockResponse);
 
 		// when then
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts/" + postId))
@@ -133,7 +133,7 @@ class PostRestControllerTest {
 
 	@Test
 	@DisplayName("게시글 카테고리 기반 전체 조회 REST API 성공")
-	public void testGetPostByCategory() throws Exception {
+	public void GetPostByCategoryTest() throws Exception {
 		// given
 		Category category = Category.DIGITAL_DEVICES;
 		PageRequest pageable = PageRequest.of(0, 10);
@@ -184,6 +184,18 @@ class PostRestControllerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk());
 
+  @Test
+	@DisplayName("키워드를 포함하는 제목을 가진 게시글 전체 조회 성공")
+	void GetPostByKeywordTest() throws Exception {
+	    // given
+	    String keyword = "Key";
+
+	    // when then
+		mockMvc.perform(get("/api/v1/posts/search")
+			.param("keyword", keyword)
+			.param("page", "0")
+			.param("size", "10"))
+			.andExpect(status().isOk());
 	}
 
 	@Test
