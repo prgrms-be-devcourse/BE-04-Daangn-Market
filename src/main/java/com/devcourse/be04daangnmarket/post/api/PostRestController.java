@@ -40,8 +40,9 @@ public class PostRestController {
 	}
 
 	@PostMapping
-	public ResponseEntity<PostDto.Response> createPost(PostDto.CreateRequest request,  @AuthenticationPrincipal User user) throws IOException {
-		PostDto.Response response = postService.create(user.getId(),request.title(), request.description()
+	public ResponseEntity<PostDto.Response> createPost(PostDto.CreateRequest request,
+		@AuthenticationPrincipal User user) throws IOException {
+		PostDto.Response response = postService.create(user.getId(), request.title(), request.description()
 			, request.price(), request.transactionType(), request.category(), request.receivedImages());
 
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -80,7 +81,17 @@ public class PostRestController {
 		Pageable pageable = PageRequest.of(page, size);
 		Page<PostDto.Response> response = postService.getPostByMemberId(memberId, pageable);
 
-		System.out.println("member");
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@GetMapping("/search")
+	public ResponseEntity<Page<PostDto.Response>> getPostByKeyword(@RequestParam String keyword,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size
+	) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<PostDto.Response> response = postService.getPostByKeyword(keyword, pageable);
+
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
