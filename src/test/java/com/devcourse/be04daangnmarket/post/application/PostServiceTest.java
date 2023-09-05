@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
+import com.devcourse.be04daangnmarket.post.domain.Status;
 import com.devcourse.be04daangnmarket.post.domain.TransactionType;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 import com.devcourse.be04daangnmarket.post.repository.PostRepository;
@@ -147,8 +148,8 @@ class PostServiceTest {
 	}
 
 	@Test
-	@DisplayName("")
-	void PostServiceTest() {
+	@DisplayName("사용자 아이디 기반 게시글 전체 조회 성공")
+	void getPostByMemberIdTest() {
 		// given
 		Long memberId = 1L;
 		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
@@ -202,6 +203,33 @@ class PostServiceTest {
 
 		verify(postRepository, times(1)).findById(id);
 	}
+
+	@Test
+	@DisplayName("게시글 상태 수정 성공")
+	void updatePostStatusTest() {
+	    // given
+		Long postId = 1L;
+		Status updateStatus = Status.SOLD;
+
+		Post post = new Post(
+			1L,
+			"keyboard~!",
+			"this keyboard is good",
+			50000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES
+		);
+
+		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+
+	    // when
+	    PostDto.Response response = postService.updateStatus(postId, updateStatus);
+
+	    // then
+		assertNotNull(response);
+		assertEquals(updateStatus.getDescription(), response.status());
+
+	}
+
 
 	@Test
 	@DisplayName("게시글 삭제 성공")
