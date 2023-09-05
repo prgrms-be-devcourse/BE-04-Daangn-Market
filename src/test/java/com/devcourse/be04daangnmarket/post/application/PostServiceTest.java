@@ -187,7 +187,7 @@ class PostServiceTest {
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<Post> page = new PageImpl<>(posts);
 
-		when(postRepository.findByCategory(category, pageable)).thenReturn(posts);
+		when(postRepository.findByCategory(category, pageable)).thenReturn(page);
 
 		// when
 		Page<PostDto.Response> responses = postService.getPostByCategory(category, pageable);
@@ -213,7 +213,7 @@ class PostServiceTest {
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<Post> page = new PageImpl<>(posts);
 
-		when(postRepository.findByMemberId(memberId, pageable)).thenReturn(posts);
+		when(postRepository.findByMemberId(memberId, pageable)).thenReturn(page);
 
 		// when
 		Page<PostDto.Response> responses = postService.getPostByMemberId(memberId, pageable);
