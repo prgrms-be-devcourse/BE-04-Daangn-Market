@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.devcourse.be04daangnmarket.common.config.SecurityConfig;
+import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
 import com.devcourse.be04daangnmarket.post.application.PostService;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Status;
@@ -41,6 +42,9 @@ class PostRestControllerTest {
 
 	@MockBean
 	private PostService postService;
+
+	@MockBean
+	private JwtTokenProvider jwtTokenProvider;
 
 	@Test
 	@DisplayName("게시글 등록 REST API 성공")
@@ -130,7 +134,7 @@ class PostRestControllerTest {
 
 	@Test
 	@DisplayName("게시글 카테고리 기반 전체 조회 REST API 성공")
-	public void testGetPostByCategory() throws Exception {
+	public void GetPostByCategoryTest() throws Exception {
 		// given
 		Category category = Category.DIGITAL_DEVICES;
 		PageRequest pageable = PageRequest.of(0, 10);
@@ -152,6 +156,20 @@ class PostRestControllerTest {
 			.andExpect(jsonPath("$.content[0].title").value("Keyboard"))
 			.andExpect(jsonPath("$.content[0].description").value("nice Keyboard"));
 
+	}
+
+	@Test
+	@DisplayName("키워드를 포함하는 제목을 가진 게시글 전체 조회 성공")
+	void GetPostByKeywordTest() throws Exception {
+	    // given
+	    String keyword = "Key";
+
+	    // when then
+		mockMvc.perform(get("/api/v1/posts/search")
+			.param("keyword", keyword)
+			.param("page", "0")
+			.param("size", "10"))
+			.andExpect(status().isOk());
 	}
 
 	@Test

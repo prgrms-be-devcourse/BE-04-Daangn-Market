@@ -115,6 +115,22 @@ public class PostService {
 		return new PageImpl<>(postResponses, pageable, postResponses.size());
 	}
 
+	public Page<PostDto.Response> getPostByKeyword(String keyword, Pageable pageable) {
+		List<Post> posts = postRepository.findByTitleContaining(keyword, pageable);
+		List<PostDto.Response> postResponses = new ArrayList<>();
+
+		for (Post post : posts) {
+			List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+			PostDto.Response postResponse = new PostDto.Response(post.getId(), post.getMemberId(), post.getTitle(),
+				post.getDescription(),
+				post.getPrice(), post.getViews(), post.getTransactionType().name(), post.getCategory().name(),
+				post.getStatus().name(), images);
+			postResponses.add(postResponse);
+		}
+
+		return new PageImpl<>(postResponses, pageable, postResponses.size());
+	}
+
 	@Transactional
 	public PostDto.Response update(Long id, String title, String description, int price,
 		TransactionType transactionType, Category category, List<MultipartFile> files) {

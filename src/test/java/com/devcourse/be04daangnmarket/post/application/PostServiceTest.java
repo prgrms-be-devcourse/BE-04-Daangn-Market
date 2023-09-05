@@ -199,8 +199,8 @@ class PostServiceTest {
 	}
 
 	@Test
-	@DisplayName("")
-	void PostServiceTest() {
+	@DisplayName("사용자자 아이디 기반 게시물 전체조회 성공")
+	void getPostByMemberIdTest() {
 		// given
 		Long memberId = 1L;
 		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,

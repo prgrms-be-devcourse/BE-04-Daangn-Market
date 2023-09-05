@@ -85,7 +85,17 @@ public class PostRestController {
 		Pageable pageable = PageRequest.of(page, size);
 		Page<PostDto.Response> response = postService.getPostByMemberId(memberId, pageable);
 
-		System.out.println("member");
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@GetMapping("/search")
+	public ResponseEntity<Page<PostDto.Response>> getPostByKeyword(@RequestParam String keyword,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size
+	) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<PostDto.Response> response = postService.getPostByKeyword(keyword, pageable);
+
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
