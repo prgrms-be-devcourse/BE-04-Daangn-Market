@@ -29,6 +29,9 @@ import com.devcourse.be04daangnmarket.post.domain.Status;
 import com.devcourse.be04daangnmarket.post.domain.TransactionType;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("api/v1/posts")
 public class PostRestController {
@@ -40,16 +43,18 @@ public class PostRestController {
 	}
 
 	@PostMapping
-	public ResponseEntity<PostDto.Response> createPost(PostDto.CreateRequest request,  @AuthenticationPrincipal User user) throws IOException {
-		PostDto.Response response = postService.create(user.getId(),request.title(), request.description()
+	public ResponseEntity<PostDto.Response> createPost(PostDto.CreateRequest request,
+		@AuthenticationPrincipal User user) throws IOException {
+		PostDto.Response response = postService.create(user.getId(), request.title(), request.description()
 			, request.price(), request.transactionType(), request.category(), request.receivedImages());
 
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<PostDto.Response> getPost(@PathVariable Long id) {
-		PostDto.Response response = postService.getPost(id);
+	public ResponseEntity<PostDto.Response> getPost(@PathVariable Long id, HttpServletRequest req,
+		HttpServletResponse res) {
+		PostDto.Response response = postService.getPost(id, req, res);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
