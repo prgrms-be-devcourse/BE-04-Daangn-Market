@@ -183,8 +183,8 @@ class PostRestControllerTest {
 		mockMvc.perform(patch("/api/v1/posts/{id}/status", postId)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk());
-
-  @Test
+	}
+  	@Test
 	@DisplayName("키워드를 포함하는 제목을 가진 게시글 전체 조회 성공")
 	void GetPostByKeywordTest() throws Exception {
 	    // given
