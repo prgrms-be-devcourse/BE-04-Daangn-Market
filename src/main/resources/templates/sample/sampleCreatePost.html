@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Post Domain sample Page</title>
+<!--    <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css">-->
+</head>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    function signUpForm() {
+
+        axios.post('/api/v1/members',
+            {
+                headers: {
+                    'Content-type': 'application/json',
+                },
+
+                username: document.getElementById("su-username").value,
+                phoneNumber: document.getElementById("su-phoneNumber").value,
+                email: document.getElementById("su-email").value,
+                password: document.getElementById("su-password").value
+            })
+            .then(function (response) {
+                document.getElementById("signUp-result").innerHTML = JSON.stringify(response.data);
+                console.log('가입 성공:', response.data);
+            })
+            .catch(function (error) {
+                console.error('가입 실패:', error);
+            });
+    }
+
+    function signInForm() {
+
+        axios.post('/api/v1/members/login',
+            {
+                headers: {
+                    'Content-type': 'application/json',
+                },
+
+                email: document.getElementById("si-email").value,
+                password: document.getElementById("si-password").value
+            })
+            .then(function (response) {
+                document.getElementById("signIn-result").innerHTML = JSON.stringify(response.data);
+                console.log('가입 성공:', response.data);
+
+                const authorizationHeader = response.headers['authorization'];
+
+                if (authorizationHeader) {
+                    localStorage.setItem('Authorization', authorizationHeader);
+                    console.log('Authorization 값이 로컬 스토리지에 저장되었습니다.');
+                }
+                document.getElementById("auth").innerHTML = localStorage.getItem('Authorization');
+
+            })
+            .catch(function (error) {
+                console.error('가입 실패:', error);
+            });
+    }
+
+    function createPost() {
+        const formData = new FormData(document.getElementById('create-post-form'));
+
+        console.log(formData)
+
+        const authorizationToken = localStorage.getItem('Authorization');
+
+        const axiosConfig = {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': authorizationToken
+            }
+        };
+
+        axios.post('/api/v1/posts', formData, axiosConfig)
+            .then(function (response) {
+                console.log("성공");
+                document.getElementById('create-post-result2').innerText = JSON.stringify(response.data);
+                renderPostData(response.data);
+            })
+            .catch(function (error) {
+                console.error(error);
+                document.getElementById('create-post-result2').innerText = '업로드 실패: ' + error.message;
+            });
+    }
+
+    function renderPostData(data) {
+        const postIdElement = document.createElement('p');
+        postIdElement.textContent = '게시물 ID: ' + data.id;
+        document.getElementById('post-data-container').appendChild(postIdElement);
+
+        const titleElement = document.createElement('p');
+        titleElement.textContent = '제목: ' + data.title;
+        document.getElementById('post-data-container').appendChild(titleElement);
+
+        const imagesContainer = document.createElement('div');
+        imagesContainer.classList.add('image-container');
+
+        data.images.forEach(function (image) {
+            const imageElement = document.createElement('img');
+            imageElement.src = image.path;
+            imageElement.alt = '이미지';
+            imagesContainer.appendChild(imageElement);
+        });
+
+        document.getElementById('post-data-container').appendChild(imagesContainer);
+
+    }
+
+</script>
+
+<body>
+<div>
+    <h1>폼 태그를 사용한 회원가입 요청 </h1>
+<!--    <form action="/signup" method="POST">-->
+    <form id="signup-form">
+        <label for="su-username">사용자 이름:</label>
+        <input type="text" id="su-username" name="username" required><br>
+
+        <label for="su-phoneNumber">전화번호: </label>
+        <input type="text" id="su-phoneNumber" name="phoneNumber" required><br>
+
+        <label for="su-email">이메일:</label>
+        <input type="text" id="su-email" name="email" required><br>
+
+        <label for="su-password">비밀번호:</label>
+        <input type="text" id="su-password" name="password" required><br>
+
+        <!--        <input type="submit" value="가입하기">-->
+        <button type="button" onclick="signUpForm()">가입하기</button>
+
+        <div id ="signUp-result"></div>
+    </form>
+</div>
+
+<div>
+    <h1> 로그인 요청 </h1>
+    <form id="login-form">
+
+        <label for="si-email">이메일:</label>
+        <input type="text" id="si-email" name="si-email" required><br>
+
+        <label for="si-password">비밀번호:</label>
+        <input type="text" id="si-password" name="si-password" required><br>
+
+        <button type="button" onclick="signInForm()">로그인 하기 </button>
+
+        <div id ="signIn-result"></div>
+        <div id ="auth"></div>
+    </form>
+</div>
+
+
+<div>
+    <h1> 게시글 생성 </h1>
+    <form id="create-post-form" action="/createPost" method="post" enctype="multipart/form-data">
+        <div>
+            <label for="title">이름:</label>
+            <input type="text" id="title" name="title" placeholder="제목">
+        </div>
+
+        <div>
+            <label for="description">내용상세:</label>
+            <input type="text" id="description" name="description" placeholder="게시글 내용을 작성해주세요.">
+        </div>
+
+        <div>
+            <label for="price">가격</label>
+            <input type="number" id="price" name="price" placeholder="가격을 입력해주세요.">
+        </div>
+
+        <div>
+            <div>거래 방식</div>
+            <select id="transactionType" name="transactionType" class="form-select">
+                <option value="">==거래 방식 선택==</option>
+                <option th:each="transactionType : ${transactionTypes}" th:value="${transactionType.name()}"
+                        th:text="${transactionType.description}"></option>
+            </select>
+        </div>
+        <div>
+            <div>카테고리</div>
+            <select id="category" name="category" class="form-select">
+                <option value="">==카테고리 선택==</option>
+                <option th:each="category : ${categories}" th:value="${category.name()}"
+                        th:text="${category.description}"></option>
+            </select>
+        </div>
+        <div>
+            <label for="files">파일 선택:</label>
+            <input type="file" id="files" name="files" multiple/>
+        </div>
+        <div>
+            <button type="button" onclick="createPost()">게시글 등록</button>
+        </div>
+    </form>
+    <div id ="create-post-result2"></div>
+
+    <h1>게시물 생성 결과</h1>
+    <div id="post-data-container"></div>
+
+</div>
+
+</body>
+</html>
