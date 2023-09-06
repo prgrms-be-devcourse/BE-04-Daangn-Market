@@ -18,6 +18,11 @@ public class PostController {
         this.postService = postService;
     }
 
+    @GetMapping
+    public String getAllPosts() {
+        return "main";
+    }
+
     @GetMapping(value = "/posts/new")
     public String newPost(Model model) {
         model.addAttribute("categories", Category.values());
