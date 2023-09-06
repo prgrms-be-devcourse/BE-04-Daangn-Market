@@ -3,12 +3,10 @@ package com.devcourse.be04daangnmarket.post.application;
 import static com.devcourse.be04daangnmarket.post.exception.ErrorMessage.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,9 +117,7 @@ public class PostService {
 	@Transactional
 	public PostDto.Response updateStatus(Long id, Status status) {
 		Post post = findPostById(id);
-
 		post.updateStatus(status);
-
 		List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
 
 		return toResponse(post, images);
@@ -156,14 +152,14 @@ public class PostService {
 	private boolean isViewed(Long id, HttpServletRequest req, HttpServletResponse res) {
 		String cookieName = Long.toString(id);
 		String cookieValue = Long.toString(id);
-
 		Cookie[] cookies = req.getCookies();
 
-		if (cookies != null) {
-			for (Cookie cookie : cookies)
-				if (cookie.getName().contains(cookieName))
-					return true;
-		}
+		if(cookies == null )
+			return false;
+
+		for (Cookie cookie : cookies)
+			if (cookie.getName().contains(cookieName))
+				return true;
 
 		Cookie cookie = new Cookie(cookieName, cookieValue);
 		cookie.setPath("/");
