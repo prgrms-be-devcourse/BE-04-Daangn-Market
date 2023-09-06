@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<script th:src="@{https://unpkg.com/axios/dist/axios.min.js}"></script>
+<head>
+    <meta charset="utf-8">
+    <title>당근</title>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css">
+    <style>
+        .nav-link {
+            margin-right: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header style="padding: 10px 20px; margin:0 20px; height: 60px;">
+    <nav style="margin-bottom: 0">
+        <ul>
+            <a class="nav-link" th:href="@{/sign-up}">회원가입</a>
+            <a class="nav-link" th:href="@{/sign-in}">로그인</a>
+        </ul>
+    </nav>
+</header>
+
+<div>
+    <div>
+        <h1>🥕당근🥕</h1>
+    </div>
+    <div>
+        <a href="/posts/new">내 물건 팔기</a>
+    </div>
+    <div>
+        <ul class="posts" style="width: 600px;"></ul>
+    </div>
+
+    <div>
+        <nav>
+            <ul id="pagination"></ul>
+        </nav>
+    </div>
+
+</div>
+
+<script>
+    const tbody = document.querySelector('.posts');
+    let itemList = '';
+    let pagination = '';
+
+    requestPagination(0);
+
+    function addRow(post) {
+        let item2 = '';
+
+        for (let imageKey of post.images) {
+            item2 +=
+                `
+                    <div style="float: left; margin-right: 20px">
+                      <img src="${imageKey.path}" alt="이미지" style="width: 120px; height: 120px">
+                    </div>
+                    `
+        }
+
+        const item =
+            `
+              <div style="margin-bottom: 50px">
+                <div>
+                  <div><a href="posts/${post.id}">제목 : ${post.title}</a></div>
+                </div>
+                <div>
+                  <div>카테고리 : ${post.category}</div>
+                </div>
+                <div>
+                  <div>상태 : ${post.status}</div>
+                </div>
+                <div>
+                  <div>가격 : ${post.price}</div>
+                </div>
+                <div>
+                  <div>조회수 : ${post.views}</div>
+                </div>
+              </div>
+                `
+        itemList += item2;
+        itemList += item;
+    }
+
+    function requestPagination(page) {
+        itemList = '';
+        pagination.innerHTML = '';
+
+        axios.get(`/api/v1/posts`, {params: {page: page}})
+            .then(response => {
+
+                if (response.data.content.length !== 0) {
+                    response.data.content.map(post => addRow(post));
+                    tbody.innerHTML = itemList;
+
+                    const totalPages = response.data.totalPages;
+                    const number = response.data.number;
+
+                    const start = Math.floor(number / 10) * 10 + 1;
+                    const last = start + 9 < totalPages ? start + 9 : totalPages;
+
+                    const firstPage = `<li>
+                    <a aria-label="First" onclick="requestPagination(0)">
+                        <span aria-hidden="true">First</span>
+                    </a>
+                </li>`
+
+                    const lastPage = `<li>
+                    <a onclick="requestPagination(${totalPages - 1})" aria-label="Last">
+                        <span aria-hidden="true">Last</span>
+                    </a>
+                </li>`
+
+                    pagination = document.getElementById('pagination');
+                    pagination.innerHTML += firstPage;
+
+                    let i;
+                    for (i = start; i < last + 1; i++) {
+                        pagination.innerHTML += `<li class="${i === number + 1} ? 'active'">
+                    <a onclick="requestPagination(${i - 1})">${i}</a>
+                </li>`
+                    }
+
+                    pagination.innerHTML += lastPage;
+                }
+            })
+            .catch(error => {
+                alert("오류가 발생했습니다. \n" + error);
+                console.error(error);
+            });
+    }
+
+</script>
+
+</body>
+</html>
