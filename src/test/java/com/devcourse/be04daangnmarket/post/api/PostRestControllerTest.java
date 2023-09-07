@@ -24,12 +24,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.devcourse.be04daangnmarket.common.config.SecurityConfig;
+import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
 import com.devcourse.be04daangnmarket.post.application.PostService;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Status;
 import com.devcourse.be04daangnmarket.post.domain.TransactionType;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(PostRestController.class)
 @MockBean(JpaMetamodelMappingContext.class)
@@ -41,6 +41,9 @@ class PostRestControllerTest {
 
 	@MockBean
 	private PostService postService;
+
+	@MockBean
+	private JwtTokenProvider jwtTokenProvider;
 
 	@Test
 	@DisplayName("게시글 등록 REST API 성공")
@@ -82,7 +85,7 @@ class PostRestControllerTest {
 			TransactionType.SALE.getDescription(), Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(), null);
 
-		when(postService.getPost(1L)).thenReturn(mockResponse);
+		when(postService.getPost(1L, null, null)).thenReturn(mockResponse);
 
 		// when then
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts/" + postId))
@@ -130,7 +133,7 @@ class PostRestControllerTest {
 
 	@Test
 	@DisplayName("게시글 카테고리 기반 전체 조회 REST API 성공")
-	public void testGetPostByCategory() throws Exception {
+	public void GetPostByCategoryTest() throws Exception {
 		// given
 		Category category = Category.DIGITAL_DEVICES;
 		PageRequest pageable = PageRequest.of(0, 10);
@@ -152,6 +155,47 @@ class PostRestControllerTest {
 			.andExpect(jsonPath("$.content[0].title").value("Keyboard"))
 			.andExpect(jsonPath("$.content[0].description").value("nice Keyboard"));
 
+	}
+
+	@Test
+	@DisplayName("게시글 상태 변경 REST API 성공")
+	void updatePostStatusTest() throws Exception {
+		// given
+		Long postId = 1L;
+		PostDto.StatusUpdateRequest mockRequest = new PostDto.StatusUpdateRequest(Status.SOLD);
+
+		PostDto.Response mockResponse = new PostDto.Response(
+			1L,
+			1L,
+			"Keyboard",
+			"nice Keyboard",
+			100,
+			1000,
+			TransactionType.SALE.getDescription(),
+			Category.DIGITAL_DEVICES.getDescription(),
+			Status.FOR_SALE.getDescription(),
+			null);
+
+		// when
+		when(postService.updateStatus(postId, mockRequest.status())).thenReturn(mockResponse);
+
+		// Send PATCH request
+		mockMvc.perform(patch("/api/v1/posts/{id}/status", postId)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk());
+	}
+  	@Test
+	@DisplayName("키워드를 포함하는 제목을 가진 게시글 전체 조회 성공")
+	void GetPostByKeywordTest() throws Exception {
+	    // given
+	    String keyword = "Key";
+
+	    // when then
+		mockMvc.perform(get("/api/v1/posts/search")
+			.param("keyword", keyword)
+			.param("page", "0")
+			.param("size", "10"))
+			.andExpect(status().isOk());
 	}
 
 	@Test
