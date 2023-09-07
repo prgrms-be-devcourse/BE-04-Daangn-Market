@@ -14,9 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/comments")
@@ -29,14 +26,14 @@ public class CommentRestController {
 
     @PostMapping
     public ResponseEntity<CommentResponse> create(CreateCommentRequest request, @AuthenticationPrincipal User user) {
-        CommentResponse response = commentService.create(request, user.getId());
+        CommentResponse response = commentService.create(request, user.getId(), user.getUsername());
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/reply")
     public ResponseEntity<CommentResponse> createReply(CreateReplyCommentRequest request, @AuthenticationPrincipal User user) {
-        CommentResponse response = commentService.createReply(request, user.getId());
+        CommentResponse response = commentService.createReply(request, user.getId(), user.getUsername());
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -70,8 +67,8 @@ public class CommentRestController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CommentResponse> update(@PathVariable Long id, @RequestPart(name = "request") UpdateCommentRequest request, @RequestPart(name = "images") List <MultipartFile> files) {
-        CommentResponse response = commentService.update(id, request, files);
+    public ResponseEntity<CommentResponse> update(@PathVariable Long id, UpdateCommentRequest request, @AuthenticationPrincipal User user) {
+        CommentResponse response = commentService.update(id, request, user.getUsername());
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

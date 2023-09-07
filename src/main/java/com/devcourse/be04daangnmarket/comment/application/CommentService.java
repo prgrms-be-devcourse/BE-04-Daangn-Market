@@ -11,6 +11,8 @@ import com.devcourse.be04daangnmarket.comment.dto.UpdateCommentRequest;
 import com.devcourse.be04daangnmarket.comment.exception.NotFoundException;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.comment.util.CommentConverter;
+import com.devcourse.be04daangnmarket.member.domain.Member;
+import com.devcourse.be04daangnmarket.member.repository.MemberRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -20,22 +22,31 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage.NOT_FOUND_COMMENT;
+import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.NOT_FOUND_USER;
 
 @Transactional(readOnly = true)
 @Service
 public class CommentService {
     private final ImageService imageService;
     private final CommentRepository commentRepository;
+    private final MemberRepository memberRepository;
 
-    public CommentService(ImageService imageService, CommentRepository commentRepository) {
+    public CommentService(ImageService imageService, CommentRepository commentRepository, MemberRepository memberRepository) {
         this.imageService = imageService;
         this.commentRepository = commentRepository;
+        this.memberRepository = memberRepository;
+    }
+
+    private Member getMember(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_USER.getMessage()));
     }
 
     @Transactional
-    public CommentResponse create(CreateCommentRequest request, Long userId) {
+    public CommentResponse create(CreateCommentRequest request, Long userId, String username) {
         Comment comment = CommentConverter.toEntity(request, userId);
 
         Integer groupNumber = commentRepository.findMaxCommentGroup().orElse(0);
@@ -44,11 +55,11 @@ public class CommentService {
         Comment saved = commentRepository.save(comment);
         List<ImageResponse> images = imageService.uploadImages(request.files(), DomainName.COMMENT, saved.getId());
 
-        return CommentConverter.toResponse(saved, images);
+        return CommentConverter.toResponse(saved, images, username);
     }
 
     @Transactional
-    public CommentResponse createReply(CreateReplyCommentRequest request, Long userId) {
+    public CommentResponse createReply(CreateReplyCommentRequest request, Long userId, String username) {
         Comment comment = CommentConverter.toEntity(request, userId);
 
         Integer seqNumber = commentRepository.findMaxSeqFromCommentGroup(request.commentGroup())
@@ -58,7 +69,7 @@ public class CommentService {
         Comment saved = commentRepository.save(comment);
         List<ImageResponse> images = imageService.uploadImages(request.files(), DomainName.COMMENT, saved.getId());
 
-        return CommentConverter.toResponse(saved, images);
+        return CommentConverter.toResponse(saved, images, username);
     }
 
     @Transactional
@@ -89,9 +100,10 @@ public class CommentService {
 
     public CommentResponse getDetail(Long id) {
         Comment comment = getOne(id);
+        String username = getMember(comment.getMemberId()).getUsername();
         List<ImageResponse> images = imageService.getImages(DomainName.COMMENT, id);
 
-        return CommentConverter.toResponse(comment, images);
+        return CommentConverter.toResponse(comment, images, username);
     }
 
     public Page<CommentResponse> getPage(Pageable pageable) {
@@ -99,9 +111,10 @@ public class CommentService {
         List<CommentResponse> commentResponses = new ArrayList<>();
 
         for (Comment comment : comments) {
+            String username = getMember(comment.getMemberId()).getUsername();
             List<ImageResponse> images = imageService.getImages(DomainName.COMMENT, comment.getId());
-            CommentResponse commentResponse = new CommentResponse(comment.getContent(), comment.getMemberId(), comment.getPostId(),
-                    comment.getCommentGroup(), comment.getSeq(), images);
+            CommentResponse commentResponse = new CommentResponse(comment.getId(), comment.getMemberId(), username, comment.getPostId(),
+                    comment.getContent(), images, comment.getCreatedAt(), comment.getUpdatedAt());
             commentResponses.add(commentResponse);
         }
 
@@ -109,12 +122,20 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponse update(Long id, UpdateCommentRequest request, List<MultipartFile> files) {
+    public CommentResponse update(Long id, UpdateCommentRequest request, String username) {
         Comment comment = getOne(id);
         comment.update(request.content());
-        imageService.deleteAllImages(DomainName.COMMENT, id);
-        List<ImageResponse> images = imageService.uploadImages(files, DomainName.COMMENT, id);
+        List<ImageResponse> images = imageService.getImages(DomainName.COMMENT, comment.getId());
+        
+        if (isExistImages(request.files())) {
+            imageService.deleteAllImages(DomainName.COMMENT, id);
+            images = imageService.uploadImages(request.files(), DomainName.COMMENT, id);
+        }
 
-        return CommentConverter.toResponse(comment, images);
+        return CommentConverter.toResponse(comment, images, username);
+    }
+
+    private boolean isExistImages(List<MultipartFile> files) {
+        return files != null;
     }
 }
