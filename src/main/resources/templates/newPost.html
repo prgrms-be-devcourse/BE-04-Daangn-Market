@@ -7,41 +7,21 @@
     <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css">
 </head>
 
-<script>
-    function createPostRequest() {
-        axios.post("/api/v1/posts",
-            {
-                headers: {
-                    'Content-type': 'application/json',
-                },
-
-                title: document.getElementById("title").value,
-                description: document.getElementById("description").value,
-                price: document.getElementById("price").value,
-                transactionType: document.getElementById("transactionType").value,
-                category: document.getElementById("category").value
-
-            }).then(res => {
-                const id = res.data.id;
-                window.location.href = `http://localhost:8080/posts/${id}`;
-            })
-            .catch(error => {
-                alert("오류가 발생했습니다. \n" + error);
-            })
-    }
-</script>
-
 <body>
-<form>
+<form id="uploadForm" action="/createPost" method="post" enctype="multipart/form-data">
+
     <div>
+        <label for="title">제목:</label>
         <input type="text" id="title" name="title" placeholder="제목">
     </div>
 
     <div>
+        <label for="description">내용상세:</label>
         <input type="text" id="description" name="description" placeholder="게시글 내용을 작성해주세요.">
     </div>
 
     <div>
+        <label for="price">가격</label>
         <input type="number" id="price" name="price" placeholder="가격을 입력해주세요.">
     </div>
 
@@ -61,7 +41,33 @@
                     th:text="${category.description}"></option>
         </select>
     </div>
+    <div>
+        <label for="files">파일 선택:</label>
+        <input type="file" id="files" name="files" multiple/>
+    </div>
+    <div>
+        <button type="button" onclick="uploadPost()">작성 완료</button>
+    </div>
 </form>
-<button class="post_request_btn" onclick="createPostRequest()">작성 완료</button>
+
+<script>
+    function uploadPost() {
+        const formData = new FormData(document.getElementById('uploadForm'));
+
+        const headers = {
+            'Authorization': localStorage.getItem('token'),
+            'Content-Type': "multipart/form-data"
+        }
+
+        axios.post('/api/v1/posts', formData, {headers : headers})
+            .then(function (response) {
+                const id = response.data.id;
+                window.location.href = `http://localhost:8080/posts/${id}`;
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+    }
+</script>
 </body>
 </html>
