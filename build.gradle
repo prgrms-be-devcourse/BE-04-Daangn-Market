@@ -16,7 +16,10 @@ repositories {
 }
 
 dependencies {
-    //THYMELEAF
+    // Bean Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // THYMELEAF
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 
@@ -39,7 +42,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    //loging
+    // loging
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 
     // jwt
@@ -48,7 +51,7 @@ dependencies {
     implementation 'com.sun.xml.bind:jaxb-core:4.0.1'
     implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
 
-    //swagger
+    // swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 }
 
