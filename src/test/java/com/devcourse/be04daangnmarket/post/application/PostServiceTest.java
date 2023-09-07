@@ -26,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
+import com.devcourse.be04daangnmarket.image.domain.DomainName;
+import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
 import com.devcourse.be04daangnmarket.post.domain.Status;
@@ -54,36 +56,59 @@ class PostServiceTest {
 	@DisplayName("게시글 등록 성공")
 	void createPostTest() throws IOException {
 		// given
-		Long memberId = 1L;
-		String title = "keyboard~!";
-		String description = "this keyboard is good";
-		int price = 100000;
-		TransactionType transactionType = TransactionType.SALE;
-		Category category = Category.DIGITAL_DEVICES;
-
-		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES);
-
+		Post post = new Post(
+			1L,
+			"keyboard~!",
+			"this keyboard is good",
+			100000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES
+		);
 		when(postRepository.save(any(Post.class))).thenReturn(post);
 
-		List<MultipartFile> receivedImages = new ArrayList<>();
-		MockMultipartFile imageFile = new MockMultipartFile("images", "test-image.jpg",
-			MediaType.IMAGE_JPEG_VALUE, "test image content".getBytes());
-		receivedImages.add(imageFile);
+		List<ImageResponse> imageResponses = List.of(
+			new ImageResponse(
+				"name",
+				"type",
+				"type",
+				1L,
+				DomainName.POST,
+				1L
+			)
+		);
+		when(imageService.uploadImages(anyList(), eq(DomainName.POST), eq(null))).thenReturn(imageResponses);
 
 		// when
-		PostDto.Response response = postService.create(memberId, title, description, price, transactionType, category,
-			receivedImages);
+		List<MultipartFile> receivedImages = List.of(
+			new MockMultipartFile(
+				"images",
+				"test-image.jpg",
+				MediaType.IMAGE_JPEG_VALUE,
+				"test image content".getBytes()
+			)
+		);
+
+		PostDto.Response response = postService.create(
+			1L,
+			"keyboard~!",
+			"this keyboard is good",
+			100000,
+			TransactionType.SALE,
+			Category.DIGITAL_DEVICES,
+			receivedImages
+		);
 
 		// then
 		assertNotNull(response);
-		assertEquals(title, response.title());
-		assertEquals(description, response.description());
-		assertEquals(price, response.price());
-		assertEquals(transactionType.getDescription(), response.transactionType());
-		assertEquals(category.getDescription(), response.category());
+		assertEquals(1L, response.memberId());
+		assertEquals("keyboard~!", response.title());
+		assertEquals("this keyboard is good", response.description());
+		assertEquals(100000, response.price());
+		assertEquals(TransactionType.SALE.getDescription(), response.transactionType());
+		assertEquals(Category.DIGITAL_DEVICES.getDescription(), response.category());
+		assertEquals(imageResponses, response.images());
 
 		verify(postRepository, times(1)).save(any(Post.class));
+		verify(imageService, times(1)).uploadImages(anyList(), eq(DomainName.POST), eq(null));
 	}
 
 	@Test
@@ -92,60 +117,76 @@ class PostServiceTest {
 		// given
 		Long postId = 1L;
 
-		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES);
+		Post post = new Post(
+			1L,
+			"keyboard~!",
+			"this keyboard is good",
+			100000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES
+		);
 
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
 		// when
-		PostDto.Response response = postService.getPost(postId, null, null);
+		MockHttpServletRequest req = new MockHttpServletRequest();
+		MockHttpServletResponse res = new MockHttpServletResponse();
+		PostDto.Response response = postService.getPost(postId, req, res);
 
 		// then
-		assertNotNull(response);
 		assertEquals(post.getId(), response.id());
 		verify(postRepository, times(1)).findById(postId);
 	}
 
 	@Test
-	@DisplayName("사용자가 게시물을 처음 조회 시 조회수가 1 증가한다")
+	@DisplayName("게시글 처음 조회 시 조회수 1 증가")
 	void viewUpdateSuccessTest() {
 		// given
 		Long postId = 1L;
-		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES);
+
+		Post post = new Post(
+			1L,
+			"keyboard~!",
+			"this keyboard is good",
+			100000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES
+		);
+
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
+		// when
 		MockHttpServletRequest req = new MockHttpServletRequest();
 		MockHttpServletResponse res = new MockHttpServletResponse();
-
-		// when
 		PostDto.Response response = postService.getPost(postId, req, res);
 
 		// then
-		assertNotNull(response);
-		assertEquals(1, post.getViews());
+		assertEquals(1, response.views());
 		verify(postRepository, times(1)).findById(postId);
 	}
 
 	@Test
-	@DisplayName("사용자가 게시물을 재 조회 시 조회수가 증가하지 않는다")
+	@DisplayName("게시물 재조회 시 조회수 변동 없음")
 	void viewUpdateFailTest() {
 		// given
 		Long postId = 1L;
-		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES);
+
+		Post post = new Post(
+			1L,
+			"keyboard~!",
+			"this keyboard is good",
+			100000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES
+		);
+
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
+		// when
 		MockHttpServletRequest req = new MockHttpServletRequest();
 		MockHttpServletResponse res = new MockHttpServletResponse();
 		req.setCookies(new Cookie(postId.toString(), postId.toString()));
-
-		// when
 		PostDto.Response response = postService.getPost(postId, req, res);
 
 		// then
-		assertNotNull(response);
-		assertEquals(0, post.getViews());
+		assertEquals(0, response.views());
 		verify(postRepository, times(1)).findById(postId);
 	}
 
@@ -153,25 +194,33 @@ class PostServiceTest {
 	@DisplayName("게시글 전체 조회 성공")
 	public void testGetAllPost() {
 		// given
-		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES);
+		Post post = new Post(
+			1L,
+			"keyboard~!",
+			"this keyboard is good",
+			100000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES
+		);
 
-		Post post2 = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES);
+		Post post2 = new Post(1L,
+			"keyboard~!",
+			"this keyboard is good",
+			100000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES
+		);
 
 		List<Post> posts = List.of(post, post2);
-
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<Post> page = new PageImpl<>(posts, pageable, posts.size());
-
 		when(postRepository.findAll(pageable)).thenReturn(page);
 
 		// when
-		Page<PostDto.Response> resultPage = postService.getAllPost(pageable);
+		Page<PostDto.Response> response = postService.getAllPost(pageable);
 
 		// then
-		assertEquals(page.getNumber(), resultPage.getNumber());
-
+		assertEquals(page.getTotalElements(), response.getTotalElements());
+		assertEquals(page.getNumber(), response.getNumber());
+		verify(postRepository, times(1)).findAll(pageable);
 	}
 
 	@Test
@@ -179,49 +228,54 @@ class PostServiceTest {
 	public void getPostByCategoryTest() throws Exception {
 		// given
 		Category category = Category.DIGITAL_DEVICES;
-		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES);
+		Post post = new Post(
+			1L,
+			"keyboard~!",
+			"this keyboard is good",
+			100000,
+			TransactionType.SALE,
+			Category.DIGITAL_DEVICES
+		);
 
 		List<Post> posts = List.of(post);
-
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<Post> page = new PageImpl<>(posts);
-
-		when(postRepository.findByCategory(category, pageable)).thenReturn(posts);
+		when(postRepository.findByCategory(category, pageable)).thenReturn(page);
 
 		// when
-		Page<PostDto.Response> responses = postService.getPostByCategory(category, pageable);
+		Page<PostDto.Response> response = postService.getPostByCategory(category, pageable);
 
 		// then
-		assertNotNull(responses);
-		assertEquals(page.getTotalElements(), responses.getTotalElements());
-		assertEquals(page.getNumber(), responses.getNumber());
+		assertEquals(page.getTotalElements(), response.getTotalElements());
+		assertEquals(page.getNumber(), response.getNumber());
 		verify(postRepository, times(1)).findByCategory(category, pageable);
 	}
 
 	@Test
 	@DisplayName("사용자자 아이디 기반 게시물 전체조회 성공")
-
 	void getPostByMemberIdTest() {
 		// given
 		Long memberId = 1L;
-		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES);
+		Post post = new Post(
+			1L,
+			"keyboard~!",
+			"this keyboard is good",
+			100000,
+			TransactionType.SALE,
+			Category.DIGITAL_DEVICES
+		);
 
 		List<Post> posts = List.of(post);
-
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<Post> page = new PageImpl<>(posts);
-
-		when(postRepository.findByMemberId(memberId, pageable)).thenReturn(posts);
+		when(postRepository.findByMemberId(memberId, pageable)).thenReturn(page);
 
 		// when
-		Page<PostDto.Response> responses = postService.getPostByMemberId(memberId, pageable);
+		Page<PostDto.Response> response = postService.getPostByMemberId(memberId, pageable);
 
 		// then
-		assertNotNull(responses);
-		assertEquals(page.getTotalElements(), responses.getTotalElements());
-		assertEquals(page.getNumber(), responses.getNumber());
+		assertEquals(page.getTotalElements(), response.getTotalElements());
+		assertEquals(page.getNumber(), response.getNumber());
 		verify(postRepository, times(1)).findByMemberId(memberId, pageable);
 
 	}
@@ -237,14 +291,26 @@ class PostServiceTest {
 		TransactionType transactionType = TransactionType.SALE;
 		Category category = Category.DIGITAL_DEVICES;
 
-		Post post = new Post(1L, "keyboard~!", "this keyboard is good", 50000, TransactionType.SALE,
-			Category.DIGITAL_DEVICES);
+		Post post = new Post(
+			1L,
+			"keyboard~!",
+			"this keyboard is good",
+			50000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES
+		);
 
 		when(postRepository.findById(id)).thenReturn(Optional.of(post));
 
 		// when
-		PostDto.Response response = postService.update(id, title, description, price,
-			transactionType, category, null);
+		PostDto.Response response = postService.update(
+			id,
+			title,
+			description,
+			price,
+			transactionType,
+			category,
+			new ArrayList<MultipartFile>()
+		);
 
 		// then
 		assertNotNull(response);
@@ -260,10 +326,9 @@ class PostServiceTest {
 	@Test
 	@DisplayName("게시글 상태 수정 성공")
 	void updatePostStatusTest() {
-	    // given
+		// given
 		Long postId = 1L;
 		Status updateStatus = Status.SOLD;
-
 		Post post = new Post(
 			1L,
 			"keyboard~!",
@@ -274,15 +339,14 @@ class PostServiceTest {
 
 		when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
-	  // when
-	  PostDto.Response response = postService.updateStatus(postId, updateStatus);
+		// when
+		PostDto.Response response = postService.updateStatus(postId, updateStatus);
 
-	  // then
+		// then
 		assertNotNull(response);
 		assertEquals(updateStatus.getDescription(), response.status());
 
 	}
-
 
 	@Test
 	@DisplayName("게시글 삭제 성공")

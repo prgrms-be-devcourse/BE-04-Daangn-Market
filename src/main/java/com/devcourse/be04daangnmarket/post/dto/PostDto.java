@@ -17,7 +17,7 @@ public class PostDto {
 		int price,
 		TransactionType transactionType,
 		Category category,
-		List<MultipartFile> receivedImages
+		List<MultipartFile> files
 	) {
 	}
 
@@ -27,7 +27,7 @@ public class PostDto {
 		int price,
 		TransactionType transactionType,
 		Category category,
-		List<MultipartFile> receivedImages
+		List<MultipartFile> files
 	) {
 	}
 

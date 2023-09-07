@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -24,7 +25,6 @@ class PostRepositoryTest {
 	@Test
 	@DisplayName("검색어를 포함하는 제목을 가진 게시글 전체 조회 성공")
 	void findByContentContaining() {
-
 		// given
 		List<Post> posts = List.of(
 			new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
@@ -40,11 +40,10 @@ class PostRepositoryTest {
 
 		// when
 		Pageable pageable = PageRequest.of(0, 10);
-		List<Post> selectedPost = postRepository.findByTitleContaining("key",pageable);
+		Page<Post> selectedPost = postRepository.findByTitleContaining("key", pageable);
 
 		// then
-		assertEquals(2, selectedPost.size());
-
+		assertEquals(2, selectedPost.getTotalPages());
 	}
 
 }
