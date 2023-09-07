@@ -17,4 +17,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Optional<Integer> findMaxSeqFromCommentGroup(@Param("commentGroup") int commentGroup);
 
     List<Comment> findAllByCommentGroup(int commentGroup);
+
+    @Query("SELECT c FROM Comment c WHERE c.postId=:postId AND c.seq=0")
+    List<Comment> findAllByPostIdToSeqIsZero(@Param("postId") Long postId);
+
+    @Query("SELECT c FROM Comment c WHERE c.commentGroup=:commentGroup AND c.seq > 0 ORDER BY c.seq ASC")
+    List<Comment> findRepliesByCommentGroup(@Param("commentGroup") int commentGroup);
 }

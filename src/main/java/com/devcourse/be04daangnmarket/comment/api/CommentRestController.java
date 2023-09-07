@@ -4,6 +4,7 @@ import com.devcourse.be04daangnmarket.comment.application.CommentService;
 import com.devcourse.be04daangnmarket.comment.dto.CommentResponse;
 import com.devcourse.be04daangnmarket.comment.dto.CreateCommentRequest;
 import com.devcourse.be04daangnmarket.comment.dto.CreateReplyCommentRequest;
+import com.devcourse.be04daangnmarket.comment.dto.PostCommentResponse;
 import com.devcourse.be04daangnmarket.common.auth.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -52,16 +53,17 @@ public class CommentRestController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping
-    public ResponseEntity<Page<CommentResponse>> getPage(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
-                                                         @RequestParam(defaultValue = "createdAt.desc") String order) {
+    @GetMapping("/page/{postId}")
+    public ResponseEntity<Page<PostCommentResponse>> getPage(@PathVariable("postId") Long postId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
+                                                             @RequestParam(defaultValue = "createdAt.desc") String order) {
         String[] sorted = order.split("\\.");
         Pageable pageable = PageRequest.of(page, size, Sort.by(sorted[0]).descending());
+
         if (sorted[1].equals("asc")) {
             pageable = PageRequest.of(page, size, Sort.by(sorted[0]).ascending());
         }
 
-        Page<CommentResponse> response = commentService.getPage(pageable);
+        Page<PostCommentResponse> response = commentService.getPostComment(postId, pageable);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
