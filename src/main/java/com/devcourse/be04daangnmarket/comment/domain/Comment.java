@@ -22,13 +22,38 @@ public class Comment extends BaseEntity {
     @ColumnDefault("'ALIVE'")
     private DeletedStatus deletedStatus;
 
+    @Column(nullable = false)
+    private Long memberId;//작성자 Id
+
+    @Column(nullable = false)
+    private Long postId;//댓글이 작성된 게시글 Id
+
+    private int commentGroup;//그룹 Id 댓글을 작성할 때 마다 증가
+
+    private int seq;//댓글의 순서 1번이 댓글 주인, 뒤로 대댓글
+
     protected Comment() {
 
     }
 
-    public Comment(String content) {
+    public Comment(String content) {//테스트를 막기 위한 임시
+            validateContent(content);
+            this.content = content;
+    }
+
+    public Comment(String content, Long memberId, Long postId) {
         validateContent(content);
         this.content = content;
+        this.memberId = memberId;
+        this.postId = postId;
+        this.seq = 0;
+    }
+
+    public Comment(String content, Long memberId, Long postId, int commentGroup) {
+        this.content = content;
+        this.memberId = memberId;
+        this.postId = postId;
+        this.commentGroup = commentGroup;
     }
 
     public String getContent() {
@@ -39,6 +64,22 @@ public class Comment extends BaseEntity {
         return deletedStatus;
     }
 
+    public Long getMemberId() {
+        return memberId;
+    }
+
+    public Long getPostId() {
+        return postId;
+    }
+
+    public int getCommentGroup() {
+        return commentGroup;
+    }
+
+    public int getSeq() {
+        return seq;
+    }
+
     private void validateContent(String content) {
         if (isCommentWithinRange(content)) {
             throw new IllegalArgumentException(INVALID_CONTENT.getMessage());
@@ -47,6 +88,14 @@ public class Comment extends BaseEntity {
 
     private boolean isCommentWithinRange(String content) {
         return content.length() > 500;
+    }
+
+    public void addGroup(int groupNumber) {
+        this.commentGroup = groupNumber + 1;
+    }
+
+    public void addSeq(int seqNumber) {
+        this.seq = seqNumber + 1;
     }
 
     public void deleteStatus() {
