@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -92,7 +93,7 @@ public class PostRestController {
 	}
 
 	@GetMapping("/member/{memberId}")
-	public ResponseEntity<Page<PostDto.Response>> getPostByCategory(
+	public ResponseEntity<Page<PostDto.Response>> getPostByMemberId(
 		@PathVariable @NotNull Long memberId,
 		@RequestParam(defaultValue = "0") int page
 	) {
@@ -134,9 +135,19 @@ public class PostRestController {
 	@PatchMapping("/{id}/status")
 	public ResponseEntity<PostDto.Response> updatePostStatus(
 		@PathVariable @NotNull Long id,
-		@Valid PostDto.StatusUpdateRequest request
+		@RequestBody @Valid PostDto.StatusUpdateRequest request
 	) {
 		PostDto.Response response = postService.updateStatus(id, request.status());
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@PatchMapping("/{id}/purchase")
+	public ResponseEntity<PostDto.Response> purchaseProduct(
+		@PathVariable @NotNull Long id,
+		@RequestBody @Valid PostDto.BuyerUpdateRequest request
+	) {
+		PostDto.Response response = postService.purchaseProduct(id, request.buyerId());
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
