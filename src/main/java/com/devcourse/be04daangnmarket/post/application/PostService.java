@@ -15,6 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.image.domain.DomainName;
 import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
+import com.devcourse.be04daangnmarket.member.application.MemberService;
+import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
 import com.devcourse.be04daangnmarket.post.domain.Status;
@@ -32,10 +34,12 @@ public class PostService {
 
 	private final PostRepository postRepository;
 	private final ImageService imageService;
+	private final MemberService memberService;
 
-	public PostService(PostRepository postRepository, ImageService imageService) {
+	public PostService(PostRepository postRepository, ImageService imageService, MemberService memberService) {
 		this.postRepository = postRepository;
 		this.imageService = imageService;
+		this.memberService = memberService;
 	}
 
 	@Transactional
@@ -144,9 +148,12 @@ public class PostService {
 	}
 
 	private PostDto.Response toResponse(Post post, List<ImageResponse> images) {
+		MemberDto.Response member = memberService.getProfile(post.getMemberId());
+
 		return new PostDto.Response(
 			post.getId(),
 			post.getMemberId(),
+			member.username(),
 			post.getTitle(),
 			post.getDescription(),
 			post.getPrice(),
@@ -155,7 +162,8 @@ public class PostService {
 			post.getCategory().getDescription(),
 			post.getStatus().getDescription(),
 			images,
-			post.getBuyerId()
+			post.getBuyerId(),
+			post.getCreatedAt()
 		);
 	}
 
