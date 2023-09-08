@@ -46,6 +46,8 @@ public class ImageService {
 
 		if (isExistImages(multipartFiles)) {
 			for (MultipartFile multipartFile : multipartFiles) {
+				if(multipartFile.isEmpty()) continue;
+
 				String originalName = multipartFile.getOriginalFilename();
 				String uniqueName = createUniqueName(originalName);
 
