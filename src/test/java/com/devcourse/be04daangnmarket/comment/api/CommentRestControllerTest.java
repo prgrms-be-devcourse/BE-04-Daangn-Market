@@ -13,7 +13,6 @@ import com.devcourse.be04daangnmarket.comment.dto.CreateCommentRequest;
 import com.devcourse.be04daangnmarket.comment.dto.UpdateCommentRequest;
 import com.devcourse.be04daangnmarket.common.config.SecurityConfig;
 import com.devcourse.be04daangnmarket.member.domain.Member;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +40,6 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -96,17 +94,17 @@ class CommentRestControllerTest {
 
         CommentResponse mockResponse = new CommentResponse(1L, 1L, "username", 1L, "댓글", null, LocalDateTime.now(), LocalDateTime.now());
 
-        when(imageService.uploadImages(
+        given(imageService.uploadImages(
                 eq(images),
                 eq(DomainName.COMMENT),
                 eq(1L)
-        )).thenReturn(mockImageResponseList);
+        )).willReturn(mockImageResponseList);
 
-        when(commentService.create(
+        given(commentService.create(
                 eq(request),
                 eq(null),
                 eq("username")
-        )).thenReturn(mockResponse);
+        )).willReturn(mockResponse);
 
         //when & then
         this.mockMvc.perform(multipart("/api/v1/comments")
@@ -133,17 +131,17 @@ class CommentRestControllerTest {
 
         CommentResponse mockResponse = new CommentResponse(1L, 1L, "username", 1L, "댓글", null, LocalDateTime.now(), LocalDateTime.now());
 
-        when(imageService.uploadImages(
+        given(imageService.uploadImages(
                 eq(images),
                 eq(DomainName.COMMENT),
                 eq(1L)
-        )).thenReturn(mockImageResponseList);
+        )).willReturn(mockImageResponseList);
 
-        when(commentService.createReply(
+        given(commentService.createReply(
                 eq(request),
                 eq(null),
                 eq("username")
-        )).thenReturn(mockResponse);
+        )).willReturn(mockResponse);
 
         //when & then
         this.mockMvc.perform(multipart("/api/v1/comments/reply")
@@ -193,9 +191,10 @@ class CommentRestControllerTest {
         List<PostCommentResponse> fakeResponses = List.of(mockResponse1, mockResponse2);
         Page<PostCommentResponse> responsePage = new PageImpl<>(fakeResponses, pageable, fakeResponses.size());
 
-        when(commentService.getPostComments(1L, pageable))
-                .thenReturn(responsePage);
+        given(commentService.getPostComments(1L, pageable))
+                .willReturn(responsePage);
 
+        //when & then
         mockMvc.perform(get("/api/v1/comments/page/{postId}", postId)
                         .param("page", "0")
                         .param("size", "10")
@@ -211,14 +210,13 @@ class CommentRestControllerTest {
         UpdateCommentRequest request = new UpdateCommentRequest("댓글", 1L, null);
         CommentResponse mockResponse = new CommentResponse(1L, 1L, "username", 1L, "댓글", null, LocalDateTime.now(), LocalDateTime.now());
 
-        //when
-        when(commentService.update(
+        given(commentService.update(
                 eq(1L),
                 eq(request),
                 eq("username")
-        )).thenReturn(mockResponse);
+        )).willReturn(mockResponse);
 
-        //then
+        //when & then
         mockMvc.perform(put("/api/v1/comments/{id}", 1L)
                         .param("postId", "1")
                         .param("content", "댓글"))
