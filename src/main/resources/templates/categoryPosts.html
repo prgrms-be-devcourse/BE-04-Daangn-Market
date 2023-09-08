@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css">
+</head>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script defer>
+
+    let tbody;
+    let itemList = '';
+    let pagination = '';
+    const baseUrl = "http://localhost:8080/"
+
+    document.addEventListener('DOMContentLoaded', function() {
+        tbody = document.querySelector('.posts');
+        itemList = '';
+        pagination = '';
+    });
+
+    function searchByCategory() {
+        const selectedCategory = document.getElementById("category").value;
+        requestPagination(0, selectedCategory);
+
+    }
+
+    function requestPagination(page, category) {
+        itemList = '';
+        pagination.innerHTML = '';
+
+        axios.get(`/api/v1/posts/category?category=${category}&page=${page}`)
+            .then(res => {
+                if (res.data.content.length !== 0) {
+                    res.data.content.map(post => addRow(post));
+                    tbody.innerHTML = itemList;
+
+                    const totalPages = res.data.totalPages;
+                    const number = res.data.number;
+
+                    const start = Math.floor(number / 10) * 10 + 1;
+                    const last = start + 9 < totalPages ? start + 9 : totalPages;
+
+                    const firstPage = `<li>
+                    <a aria-label="First" onclick="requestPagination(0,'${category}')">
+                        <span aria-hidden="true">First</span>
+                    </a>
+                </li>`
+
+                    const lastPage = `<li>
+                    <a onclick="requestPagination(${totalPages - 1},'${category}')" aria-label="Last">
+                        <span aria-hidden="true">Last</span>
+                    </a>
+                </li>`
+
+                    pagination = document.getElementById('pagination');
+                    pagination.innerHTML += firstPage;
+
+                    let i;
+                    for (i = start; i < last + 1; i++) {
+                        pagination.innerHTML += `<li class="${i === number + 1} ? 'active'">
+                    <a onclick="requestPagination(${i - 1},'${category}')">${i}</a>
+                </li>`
+                    }
+                    pagination.innerHTML += lastPage;
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            })
+    }
+
+    function addRow(post) {
+        let item2 = '';
+
+        for (let imageKey of post.images) {
+            const urlPath = baseUrl +imageKey.path;
+
+            item2 +=
+                `
+                    <div style="float: left; margin-right: 20px">
+                      <img src= ${urlPath} alt="이미지" style="width: 120px; height: 120px">
+                    </div>
+                    `
+        }
+
+        const item =
+            `
+              <div style="margin-bottom: 50px">
+                <div>
+                  <div><a href="${post.id}">제목 : ${post.title}</a></div>
+                </div>
+                <div>
+                  <div>카테고리 : ${post.category}</div>
+                </div>
+                <div>
+                  <div>상태 : ${post.status}</div>
+                </div>
+                <div>
+                  <div>가격 : ${post.price}</div>
+                </div>
+                <div>
+                  <div>조회수 : ${post.views}</div>
+                </div>
+              </div>
+                `
+        itemList += item2;
+        itemList += item;
+    }
+
+
+</script>
+
+<body>
+
+<div>
+    <form>
+        <div>
+            <div>카테고리</div>
+            <select id="category" name="category" class="form-select">
+                <option value="">==카테고리 선택==</option>
+                <option th:each="category : ${categories}" th:value="${category.name()}"
+                        th:text="${category.description}"></option>
+            </select>
+        </div>
+        <div>
+            <button type="button" onclick="searchByCategory()">조회</button>
+        </div>
+    </form>
+</div>
+
+<div>
+    <ul class="posts" style="width: 600px;"></ul>
+</div>
+
+<div>
+    <nav>
+        <ul id="pagination"></ul>
+    </nav>
+</div>
+
+</body>
+</html>

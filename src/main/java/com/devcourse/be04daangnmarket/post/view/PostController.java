@@ -52,4 +52,11 @@ public class PostController {
 
 		return "updatePost";
 	}
+
+	@GetMapping(value = "/posts/category")
+	public String postsByCategory(Model model) {
+		model.addAttribute("categories", Category.values());
+
+		return "categoryPosts";
+	}
 }
