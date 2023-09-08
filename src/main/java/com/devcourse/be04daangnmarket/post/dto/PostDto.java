@@ -70,7 +70,8 @@ public class PostDto {
 		String transactionType,
 		String category,
 		String status,
-		List<ImageResponse> images
+		List<ImageResponse> images,
+		Long buyerId
 	) {
 	}
 

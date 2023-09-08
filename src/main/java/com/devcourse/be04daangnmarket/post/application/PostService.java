@@ -123,15 +123,24 @@ public class PostService {
 		return toResponse(post, images);
 	}
 
-	private Post findPostById(Long id) {
-		return postRepository.findById(id)
-			.orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
-	}
-
 	@Transactional
 	public void delete(Long id) {
 		postRepository.deleteById(id);
 		imageService.deleteAllImages(DomainName.POST, id);
+	}
+
+	@Transactional
+	public PostDto.Response purchaseProduct(Long id, Long buyerId) {
+		Post post = findPostById(id);
+		post.purchased(buyerId);
+		List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+
+		return toResponse(post, images);
+	}
+
+	private Post findPostById(Long id) {
+		return postRepository.findById(id)
+			.orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
 	}
 
 	private PostDto.Response toResponse(Post post, List<ImageResponse> images) {
@@ -145,7 +154,8 @@ public class PostService {
 			post.getTransactionType().getDescription(),
 			post.getCategory().getDescription(),
 			post.getStatus().getDescription(),
-			images
+			images,
+			post.getBuyerId()
 		);
 	}
 
@@ -154,7 +164,7 @@ public class PostService {
 		String cookieValue = Long.toString(id);
 		Cookie[] cookies = req.getCookies();
 
-		if(cookies == null )
+		if (cookies == null)
 			return false;
 
 		for (Cookie cookie : cookies)

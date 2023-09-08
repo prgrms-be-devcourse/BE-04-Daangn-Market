@@ -49,6 +49,8 @@ public class Post extends BaseEntity {
 	@ColumnDefault("'FOR_SALE'")
 	private Status status;
 
+	private Long buyerId;
+
 	@Column(columnDefinition = "TIMESTAMP")
 	private LocalDateTime pullUpAt;
 
@@ -114,6 +116,10 @@ public class Post extends BaseEntity {
 		return status;
 	}
 
+	public Long getBuyerId() {
+		return buyerId;
+	}
+
 	public LocalDateTime getPullUpAt() {
 		return pullUpAt;
 	}
@@ -141,9 +147,13 @@ public class Post extends BaseEntity {
 	public void updateStatus(Status status) {
 		this.status = status;
 	}
-  
+
 	public void updateView() {
 		this.views++;
+	}
+
+	public void purchased(Long buyerId) {
+		this.buyerId = buyerId;
 	}
 
 }
