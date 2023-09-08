@@ -60,6 +60,12 @@ public class PostDto {
 	) {
 	}
 
+	public record BuyerUpdateRequest(
+		@NotNull(message = "구매자 정보는 필수 입니다.")
+		Long buyerId
+	) {
+	}
+
 	public record Response(
 		Long id,
 		Long memberId,
