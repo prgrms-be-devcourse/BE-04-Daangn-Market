@@ -4,6 +4,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -81,6 +82,7 @@ class PostRestControllerTest {
 		PostDto.Response mockResponse = new PostDto.Response(
 			1L,
 			1L,
+			"UserName",
 			"Keyboard",
 			"nice Keyboard",
 			100,
@@ -89,7 +91,8 @@ class PostRestControllerTest {
 			Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(),
 			null,
-			null
+			null,
+			LocalDateTime.now()
 		);
 
 		MockMultipartFile file = new MockMultipartFile(
@@ -129,6 +132,7 @@ class PostRestControllerTest {
 		PostDto.Response mockResponse = new PostDto.Response(
 			1L,
 			1L,
+			"UserName",
 			"Keyboard",
 			"nice Keyboard",
 			100,
@@ -137,7 +141,8 @@ class PostRestControllerTest {
 			Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(),
 			null,
-			null
+			null,
+			LocalDateTime.now()
 		);
 
 		MockHttpServletRequest req = new MockHttpServletRequest();
@@ -160,6 +165,7 @@ class PostRestControllerTest {
 		PostDto.Response postResponse1 = new PostDto.Response(
 			1L,
 			1L,
+			"UserName",
 			"Keyboard",
 			"nice Keyboard",
 			100,
@@ -168,12 +174,14 @@ class PostRestControllerTest {
 			Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(),
 			null,
-			null
+			null,
+			LocalDateTime.now()
 		);
 
 		PostDto.Response postResponse2 = new PostDto.Response(
 			1L,
 			1L,
+			"UserName",
 			"Keyboard",
 			"nice Keyboard",
 			100,
@@ -182,7 +190,8 @@ class PostRestControllerTest {
 			Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(),
 			null,
-			null
+			null,
+			LocalDateTime.now()
 		);
 
 		List<PostDto.Response> fakeResponses = List.of(postResponse1, postResponse2);
@@ -214,6 +223,7 @@ class PostRestControllerTest {
 		PostDto.Response postResponse = new PostDto.Response(
 			1L,
 			1L,
+			"UserName",
 			"Keyboard",
 			"nice Keyboard",
 			100,
@@ -222,7 +232,8 @@ class PostRestControllerTest {
 			Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(),
 			null,
-			null
+			null,
+			LocalDateTime.now()
 		);
 
 		List<PostDto.Response> mockResponses = List.of(postResponse);
@@ -249,6 +260,7 @@ class PostRestControllerTest {
 		PostDto.Response mockResponse = new PostDto.Response(
 			1L,
 			1L,
+			"UserName",
 			"Keyboard",
 			"nice Keyboard",
 			100,
@@ -257,7 +269,8 @@ class PostRestControllerTest {
 			Category.DIGITAL_DEVICES.getDescription(),
 			Status.SOLD.getDescription(),
 			null,
-			null
+			null,
+			LocalDateTime.now()
 		);
 
 		// when
@@ -284,6 +297,7 @@ class PostRestControllerTest {
 		PostDto.Response mockResponse = new PostDto.Response(
 			1L,
 			1L,
+			"UserName",
 			"Keyboard",
 			"nice Keyboard",
 			100,
@@ -292,7 +306,8 @@ class PostRestControllerTest {
 			Category.DIGITAL_DEVICES.getDescription(),
 			Status.SOLD.getDescription(),
 			null,
-			buyerId
+			buyerId,
+			LocalDateTime.now()
 		);
 
 		// when
@@ -327,6 +342,7 @@ class PostRestControllerTest {
 	public void deletePostTest() throws Exception {
 		// given
 		Long postId = 1L;
+
 		// when then
 		mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/posts/" + postId)
 				.contentType(MediaType.APPLICATION_JSON))
