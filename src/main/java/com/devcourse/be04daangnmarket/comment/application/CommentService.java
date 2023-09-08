@@ -126,7 +126,7 @@ public class CommentService {
             List<CommentResponse> replyCommentResponses = getReplyComments(comment);
 
             postCommentResponses.add(new PostCommentResponse(comment.getId(), comment.getMemberId(), commentUsername, comment.getPostId(), postName, comment.getContent(),
-                                commentImages, replyCommentResponses, comment.getCreatedAt(), comment.getUpdatedAt()));
+                    commentImages, replyCommentResponses, comment.getCreatedAt(), comment.getUpdatedAt()));
         }
 
         return new PageImpl<>(postCommentResponses, pageable, postCommentResponses.size());
@@ -159,7 +159,7 @@ public class CommentService {
         comment.update(request.content());
 
         List<ImageResponse> images = imageService.getImages(DomainName.COMMENT, comment.getId());
-        
+
         if (isExistImages(request.files())) {
             imageService.deleteAllImages(DomainName.COMMENT, id);
             images = imageService.uploadImages(request.files(), DomainName.COMMENT, id);
