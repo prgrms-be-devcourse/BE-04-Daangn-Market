@@ -63,7 +63,7 @@ public class CommentRestController {
             pageable = PageRequest.of(page, size, Sort.by(sorted[0]).ascending());
         }
 
-        Page<PostCommentResponse> response = commentService.getPostComment(postId, pageable);
+        Page<PostCommentResponse> response = commentService.getPostComments(postId, pageable);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

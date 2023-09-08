@@ -26,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 import static com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage.NOT_FOUND_COMMENT;
 import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.NOT_FOUND_USER;
@@ -113,7 +112,7 @@ public class CommentService {
                 .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_USER.getMessage()));
     }
 
-    public Page<PostCommentResponse> getPostComment(Long postId, Pageable pageable) {
+    public Page<PostCommentResponse> getPostComments(Long postId, Pageable pageable) {
         List<Comment> postComments = commentRepository.findAllByPostIdToSeqIsZero(postId);
         List<PostCommentResponse> postCommentResponses = new ArrayList<>();
 
@@ -122,21 +121,28 @@ public class CommentService {
             String postName = getPost(comment.getPostId()).getTitle();
             List<ImageResponse> commentImages = imageService.getImages(DomainName.COMMENT, comment.getId());
 
-            List<Comment> replies = commentRepository.findRepliesByCommentGroup(comment.getCommentGroup());
-
-            List<CommentResponse> replyCommentResponses = replies.stream().map(reply -> {
-                String replyUsername = getMember(reply.getMemberId()).getUsername();
-                List<ImageResponse> replyImages = imageService.getImages(DomainName.COMMENT, reply.getId());
-
-                return new CommentResponse(reply.getId(), reply.getMemberId(), replyUsername, reply.getPostId(),
-                        reply.getContent(), replyImages, reply.getCreatedAt(), reply.getUpdatedAt());
-            }).collect(Collectors.toList());
+            List<CommentResponse> replyCommentResponses = getReplyComments(comment);
 
             postCommentResponses.add(new PostCommentResponse(comment.getId(), comment.getMemberId(), commentUsername, comment.getPostId(), postName, comment.getContent(),
                                 commentImages, replyCommentResponses, comment.getCreatedAt(), comment.getUpdatedAt()));
         }
 
         return new PageImpl<>(postCommentResponses, pageable, postCommentResponses.size());
+    }
+
+    private List<CommentResponse> getReplyComments(Comment comment) {
+        List<Comment> replies = commentRepository.findRepliesByCommentGroup(comment.getCommentGroup());
+        List<CommentResponse> replyCommentResponses = new ArrayList<>();
+
+        for (Comment reply : replies) {
+            String replyUsername = getMember(reply.getMemberId()).getUsername();
+            List<ImageResponse> replyImages = imageService.getImages(DomainName.COMMENT, reply.getId());
+            CommentResponse commentResponse = new CommentResponse(reply.getId(), reply.getMemberId(), replyUsername, reply.getPostId(),
+                    reply.getContent(), replyImages, reply.getCreatedAt(), reply.getUpdatedAt());
+            replyCommentResponses.add(commentResponse);
+        }
+
+        return replyCommentResponses;
     }
 
     private Post getPost(Long postId) {
@@ -159,6 +165,6 @@ public class CommentService {
     }
 
     private boolean isExistImages(List<MultipartFile> files) {
-        return files != null;
+        return !files.get(0).isEmpty();
     }
 }
