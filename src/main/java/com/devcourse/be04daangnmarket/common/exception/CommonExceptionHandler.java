@@ -37,4 +37,11 @@ public class CommonExceptionHandler {
 		return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException exception) {
+		String errorMessage = exception.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
+
+		return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);  
+  
 }
