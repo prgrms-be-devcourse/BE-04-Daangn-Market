@@ -34,6 +34,8 @@ import static com.devcourse.be04daangnmarket.post.exception.ErrorMessage.NOT_FOU
 @Transactional(readOnly = true)
 @Service
 public class CommentService {
+    private static final int START_NUMBER = 0;
+
     private final ImageService imageService;
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
@@ -50,7 +52,7 @@ public class CommentService {
     public CommentResponse create(CreateCommentRequest request, Long userId, String username) {
         Comment comment = CommentConverter.toEntity(request, userId);
 
-        Integer groupNumber = commentRepository.findMaxCommentGroup().orElse(0);
+        Integer groupNumber = commentRepository.findMaxCommentGroup().orElse(START_NUMBER);
         comment.addGroup(groupNumber);
 
         Comment saved = commentRepository.save(comment);
@@ -90,13 +92,13 @@ public class CommentService {
         imageService.deleteAllImages(DomainName.COMMENT, id);
     }
 
-    private boolean isGroupComment(Comment comment) {
-        return comment.getSeq() == 0;
-    }
-
     private Comment getOne(Long id) {
         return commentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_COMMENT.getMessage()));
+    }
+
+    private boolean isGroupComment(Comment comment) {
+        return comment.getSeq() == START_NUMBER;
     }
 
     public CommentResponse getDetail(Long id) {
@@ -130,6 +132,11 @@ public class CommentService {
         return new PageImpl<>(postCommentResponses, pageable, postCommentResponses.size());
     }
 
+    private Post getPost(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
+    }
+
     private List<CommentResponse> getReplyComments(Comment comment) {
         List<Comment> replies = commentRepository.findRepliesByCommentGroup(comment.getCommentGroup());
         List<CommentResponse> replyCommentResponses = new ArrayList<>();
@@ -137,6 +144,7 @@ public class CommentService {
         for (Comment reply : replies) {
             String replyUsername = getMember(reply.getMemberId()).getUsername();
             List<ImageResponse> replyImages = imageService.getImages(DomainName.COMMENT, reply.getId());
+
             CommentResponse commentResponse = new CommentResponse(reply.getId(), reply.getMemberId(), replyUsername, reply.getPostId(),
                     reply.getContent(), replyImages, reply.getCreatedAt(), reply.getUpdatedAt());
             replyCommentResponses.add(commentResponse);
@@ -145,15 +153,11 @@ public class CommentService {
         return replyCommentResponses;
     }
 
-    private Post getPost(Long postId) {
-        return postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
-    }
-
     @Transactional
     public CommentResponse update(Long id, UpdateCommentRequest request, String username) {
         Comment comment = getOne(id);
         comment.update(request.content());
+
         List<ImageResponse> images = imageService.getImages(DomainName.COMMENT, comment.getId());
         
         if (isExistImages(request.files())) {
@@ -165,6 +169,6 @@ public class CommentService {
     }
 
     private boolean isExistImages(List<MultipartFile> files) {
-        return !files.get(0).isEmpty();
+        return !files.get(START_NUMBER).isEmpty();
     }
 }
