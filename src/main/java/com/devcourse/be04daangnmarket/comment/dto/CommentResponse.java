@@ -10,7 +10,7 @@ public record CommentResponse(
 
         Long memberId,
 
-        String memberName,
+        String username,
 
         Long postId,
 

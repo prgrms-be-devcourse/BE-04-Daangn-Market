@@ -120,12 +120,12 @@ public class CommentService {
 
         for (Comment comment : postComments) {
             String commentUsername = getMember(comment.getMemberId()).getUsername();
-            String postName = getPost(comment.getPostId()).getTitle();
+            String postTitle = getPost(comment.getPostId()).getTitle();
             List<ImageResponse> commentImages = imageService.getImages(DomainName.COMMENT, comment.getId());
 
             List<CommentResponse> replyCommentResponses = getReplyComments(comment);
 
-            postCommentResponses.add(new PostCommentResponse(comment.getId(), comment.getMemberId(), commentUsername, comment.getPostId(), postName, comment.getContent(),
+            postCommentResponses.add(new PostCommentResponse(comment.getId(), comment.getMemberId(), commentUsername, comment.getPostId(), postTitle, comment.getContent(),
                     commentImages, replyCommentResponses, comment.getCreatedAt(), comment.getUpdatedAt()));
         }
 

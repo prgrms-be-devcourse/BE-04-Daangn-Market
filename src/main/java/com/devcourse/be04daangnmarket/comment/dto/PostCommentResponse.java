@@ -10,11 +10,11 @@ public record PostCommentResponse(
 
     Long memberId,
 
-    String memberName,
+    String username,
 
     Long postId,
 
-    String postName,
+    String postTitle,
 
     String content,
 
