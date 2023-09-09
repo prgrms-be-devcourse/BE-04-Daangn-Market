@@ -9,40 +9,53 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
 
+    const baseUrl = "http://localhost:8080/"
+    const defaultUrl = "images/defaultProfile.png"
+
     document.addEventListener("DOMContentLoaded", function () {
 
         const id = [[${id}]];
 
         axios.get(`/api/v1/members/${id}`)
-            .then(response => {
-                const profileData = response.data;
+            .then(res => {
+                const profileData = res.data;
                 document.getElementById("userName").innerHTML = '사용자 : ' + profileData.username;
-                document.getElementById("phoneNumber").innerHTML = '전화번호 : ' + profileData.phoneNumber;
-                document.getElementById("email").innerHTML = '이메일 : ' + profileData.email;
                 document.getElementById("temperature").innerHTML = '매너온도 : ' + profileData.temperature;
-
+                renderImage(res.data.images)
             })
             .catch(error => {
                 alert("오류가 발생했습니다. \n" + error);
                 console.error(error);
             });
     });
+
+    function renderImage(images) {
+
+        var imageContainer = document.getElementById("image-container");
+        var img = document.createElement("img")
+        img.src = images.length == 0 ? baseUrl + defaultUrl : baseUrl + images[0].path
+        img.alt = "이미지"
+        imageContainer.appendChild(img);
+        console.log(img.src)
+    }
+
+
 </script>
 
 <body>
 <div style="margin-left: auto; margin-right: auto; text-align: center;">
+
     <div>
         <h1>User Profile</h1>
     </div>
+
+    <div id="image-container" style="margin: 0 auto; text-align: center;">
+    </div>
+
     <div>
         <h4 id="userName"></h4>
     </div>
-    <div>
-        <h4 id="phoneNumber"></h4>
-    </div>
-    <div>
-        <h4 id="email"></h4>
-    </div>
+
     <div>
         <h4 id="temperature"></h4>
     </div>
