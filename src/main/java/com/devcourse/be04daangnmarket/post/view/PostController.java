@@ -59,4 +59,10 @@ public class PostController {
 
 		return "categoryPosts";
 	}
+	@GetMapping("/posts/search")
+	public String postsByKeyword(Model model) {
+
+		return "searchPosts";
+	}
+
 }
