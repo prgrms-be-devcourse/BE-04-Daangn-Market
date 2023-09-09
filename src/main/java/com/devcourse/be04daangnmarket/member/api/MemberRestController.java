@@ -39,6 +39,7 @@ public class MemberRestController {
     @PostMapping
     public ResponseEntity<MemberDto.Response> signUp(@RequestBody MemberDto.SignUpRequest request) {
         MemberDto.Response response = memberService.signUp(request);
+
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
@@ -50,12 +51,14 @@ public class MemberRestController {
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Authorization", token);
+
         return new ResponseEntity(response, httpHeaders, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<MemberDto.Response> getProfile(@PathVariable Long id) {
         MemberDto.Response response = memberService.getProfile(id);
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -63,6 +66,7 @@ public class MemberRestController {
     public ResponseEntity<MemberDto.Response> updateProfile(@PathVariable Long id,
                                                             @RequestBody MemberDto.UpdateProfileRequest request) {
         MemberDto.Response response = memberService.updateProfile(id, request.username());
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -70,6 +74,7 @@ public class MemberRestController {
     public ResponseEntity<Page<PostDto.Response>> getSaleList(@PathVariable Long id, @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
         Page<PostDto.Response> saleList = postService.getPostByMemberId(id, pageable);
+
         return new ResponseEntity<>(saleList, HttpStatus.OK);
     }
 }
