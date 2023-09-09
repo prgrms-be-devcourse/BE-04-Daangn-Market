@@ -123,15 +123,17 @@ public class ImageService {
 			return;
 		}
 
-		entities.stream()
-			.map(Image::getPath)
-			.forEach(this::deleteImageToLocalStorage);
-
-		imageRepository.deleteAllByDomainNameAndDomainId(domainName, domainId);
+		for (Image entry : entities) {
+			entry.deleteImage();
+		}
 	}
 
 	private List<Image> getAllImageEntities(DomainName domainName, Long domainId) {
 		return imageRepository.findAllByDomainNameAndDomainId(domainName, domainId);
+	}
+
+	private void deleteImageToDatabase(DomainName domainName, Long domainId) {
+		imageRepository.deleteAllByDomainNameAndDomainId(domainName, domainId);
 	}
 
 	private void deleteImageToLocalStorage(String path) {

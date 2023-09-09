@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "images")
@@ -22,6 +23,10 @@ public class Image extends BaseEntity {
 
     @Column(nullable = false)
     private String path;
+
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'ALIVE'")
+    private DeletedStatus deletedStatus;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -58,6 +63,10 @@ public class Image extends BaseEntity {
         return size;
     }
 
+    public DeletedStatus getDeletedStatus() {
+        return deletedStatus;
+    }
+
     public DomainName getDomainName() {
         return domainName;
     }
@@ -65,4 +74,9 @@ public class Image extends BaseEntity {
     public Long getDomainId() {
         return domainId;
     }
+
+    public void deleteImage() {
+        this.deletedStatus = DeletedStatus.DELETED;
+    }
+
 }
