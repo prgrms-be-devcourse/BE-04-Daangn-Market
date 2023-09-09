@@ -53,7 +53,7 @@ public class ImageService {
 				continue;
 			}
 
-			String originalName = multipartFile.getOriginalFilename();
+			String originalName = multipartFile.getOriginalFilename().replaceAll(" ", "");
 			String uniqueName = createUniqueName(originalName);
 
 			saveImageToLocalStorage(multipartFile, uniqueName);
