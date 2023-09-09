@@ -1,5 +1,6 @@
 package com.devcourse.be04daangnmarket.image.application;
 
+import com.devcourse.be04daangnmarket.image.domain.DeletedStatus;
 import com.devcourse.be04daangnmarket.image.domain.DomainName;
 import com.devcourse.be04daangnmarket.image.domain.Image;
 import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
@@ -43,33 +44,36 @@ public class ImageService {
 	public List<ImageResponse> uploadImages(List<MultipartFile> multipartFiles, DomainName domainName, Long domainId) {
 		List<ImageResponse> imageResponses = new ArrayList<>();
 
-		if (isExistImages(multipartFiles)) {
-			for (MultipartFile multipartFile : multipartFiles) {
-				if(multipartFile.isEmpty()) continue;
+		if (isEmptyImages(multipartFiles)) {
+			return imageResponses;
+		}
 
-				String originalName = multipartFile.getOriginalFilename();
-				String uniqueName = createUniqueName(originalName);
+		for (MultipartFile multipartFile : multipartFiles) {
+			if (multipartFile.isEmpty()) {
+				continue;
+			}
 
-				saveImageToLocalStorage(multipartFile, uniqueName);
+			String originalName = multipartFile.getOriginalFilename();
+			String uniqueName = createUniqueName(originalName);
 
-				Image image = new Image(multipartFile.getOriginalFilename(), multipartFile.getContentType(),
+			saveImageToLocalStorage(multipartFile, uniqueName);
+
+			Image image = new Image(multipartFile.getOriginalFilename(), multipartFile.getContentType(),
 					multipartFile.getSize(), getRelativePath(uniqueName), domainName, domainId);
 
-				imageRepository.save(image);
-				imageResponses.add(toDto(image));
-			}
+			imageRepository.save(image);
+			imageResponses.add(toDto(image));
 		}
 
 		return imageResponses;
 	}
 
-	private boolean isExistImages(List<MultipartFile> multipartFiles) {
-		return !multipartFiles.isEmpty();
+	private boolean isEmptyImages(List<MultipartFile> multipartFiles) {
+		return multipartFiles == null;
 	}
 
 	private String createUniqueName(String originalName) {
 		return UUID.randomUUID() + "-" + StringUtils.cleanPath(originalName);
-
 	}
 
 	private void saveImageToLocalStorage(MultipartFile multipartFile, String uniqueName) {
@@ -85,7 +89,7 @@ public class ImageService {
 		}
 	}
 
-	private static boolean isEmptyFile(java.io.File file) {
+	private boolean isEmptyFile(java.io.File file) {
 		return !file.exists();
 	}
 
@@ -101,8 +105,9 @@ public class ImageService {
 		List<Image> images = imageRepository.findAllByDomainNameAndDomainId(domainName, domainId);
 
 		return images.stream()
-			.map(this::toDto)
-			.collect(Collectors.toList());
+				.filter(image -> image.getDeletedStatus().equals(DeletedStatus.ALIVE))
+				.map(this::toDto)
+				.collect(Collectors.toList());
 	}
 
 	private ImageResponse toDto(Image image) {
