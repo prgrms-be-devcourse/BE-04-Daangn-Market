@@ -147,11 +147,6 @@ public class PostService {
 		return toResponse(post, images);
 	}
 
-	private Post findPostById(Long id) {
-		return postRepository.findById(id)
-			.orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
-	}
-
 	private PostDto.Response toResponse(Post post, List<ImageResponse> images) {
 		MemberDto.Response member = memberService.getProfile(post.getMemberId());
 
