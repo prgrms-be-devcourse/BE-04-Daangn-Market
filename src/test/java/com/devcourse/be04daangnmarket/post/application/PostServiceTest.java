@@ -361,4 +361,29 @@ class PostServiceTest {
 		verify(postRepository, times(1)).deleteById(postId);
 	}
 
+	@Test
+	@DisplayName("게시글 상품 구매시 게시글 구매자 ID 컬럼 저장")
+	void PostServiceTest() {
+	    // given
+	    Long postId =1L;
+		Long buyerId = 1L;
+		Post post = new Post(
+			1L,
+			"keyboard~!",
+			"this keyboard is good",
+			50000, TransactionType.SALE,
+			Category.DIGITAL_DEVICES
+		);
+
+		when(postRepository.findById(1L)).thenReturn(Optional.of(post));
+
+	    // when
+	    PostDto.Response response = postService.purchaseProduct(postId, buyerId);
+
+		// then
+		assertEquals(buyerId, response.buyerId());
+		verify(postRepository, times(1)).findById(1L);
+
+	}
+
 }

@@ -4,6 +4,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,18 +30,17 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.web.servlet.resource.ResourceUrlEncodingFilter;
 
 import com.devcourse.be04daangnmarket.common.auth.User;
 import com.devcourse.be04daangnmarket.common.config.SecurityConfig;
 import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
-import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.member.domain.Member;
 import com.devcourse.be04daangnmarket.post.application.PostService;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Status;
 import com.devcourse.be04daangnmarket.post.domain.TransactionType;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(PostRestController.class)
 @MockBean(JpaMetamodelMappingContext.class)
@@ -55,6 +55,9 @@ class PostRestControllerTest {
 
 	@MockBean
 	private JwtTokenProvider jwtTokenProvider;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@BeforeEach
 	public void setup() {
@@ -79,6 +82,7 @@ class PostRestControllerTest {
 		PostDto.Response mockResponse = new PostDto.Response(
 			1L,
 			1L,
+			"UserName",
 			"Keyboard",
 			"nice Keyboard",
 			100,
@@ -86,7 +90,9 @@ class PostRestControllerTest {
 			TransactionType.SALE.getDescription(),
 			Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(),
-			null
+			null,
+			null,
+			LocalDateTime.now()
 		);
 
 		MockMultipartFile file = new MockMultipartFile(
@@ -126,6 +132,7 @@ class PostRestControllerTest {
 		PostDto.Response mockResponse = new PostDto.Response(
 			1L,
 			1L,
+			"UserName",
 			"Keyboard",
 			"nice Keyboard",
 			100,
@@ -133,7 +140,9 @@ class PostRestControllerTest {
 			TransactionType.SALE.getDescription(),
 			Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(),
-			null
+			null,
+			null,
+			LocalDateTime.now()
 		);
 
 		MockHttpServletRequest req = new MockHttpServletRequest();
@@ -156,6 +165,7 @@ class PostRestControllerTest {
 		PostDto.Response postResponse1 = new PostDto.Response(
 			1L,
 			1L,
+			"UserName",
 			"Keyboard",
 			"nice Keyboard",
 			100,
@@ -163,12 +173,15 @@ class PostRestControllerTest {
 			TransactionType.SALE.getDescription(),
 			Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(),
-			null
+			null,
+			null,
+			LocalDateTime.now()
 		);
 
 		PostDto.Response postResponse2 = new PostDto.Response(
 			1L,
 			1L,
+			"UserName",
 			"Keyboard",
 			"nice Keyboard",
 			100,
@@ -176,7 +189,9 @@ class PostRestControllerTest {
 			TransactionType.SALE.getDescription(),
 			Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(),
-			null
+			null,
+			null,
+			LocalDateTime.now()
 		);
 
 		List<PostDto.Response> fakeResponses = List.of(postResponse1, postResponse2);
@@ -208,6 +223,7 @@ class PostRestControllerTest {
 		PostDto.Response postResponse = new PostDto.Response(
 			1L,
 			1L,
+			"UserName",
 			"Keyboard",
 			"nice Keyboard",
 			100,
@@ -215,7 +231,9 @@ class PostRestControllerTest {
 			TransactionType.SALE.getDescription(),
 			Category.DIGITAL_DEVICES.getDescription(),
 			Status.FOR_SALE.getDescription(),
-			null
+			null,
+			null,
+			LocalDateTime.now()
 		);
 
 		List<PostDto.Response> mockResponses = List.of(postResponse);
@@ -230,7 +248,6 @@ class PostRestControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.content[0].title").value("Keyboard"))
 			.andExpect(jsonPath("$.content[0].description").value("nice Keyboard"));
-
 	}
 
 	@Test
@@ -243,22 +260,67 @@ class PostRestControllerTest {
 		PostDto.Response mockResponse = new PostDto.Response(
 			1L,
 			1L,
+			"UserName",
 			"Keyboard",
 			"nice Keyboard",
 			100,
 			1000,
 			TransactionType.SALE.getDescription(),
 			Category.DIGITAL_DEVICES.getDescription(),
-			Status.FOR_SALE.getDescription(),
-			null);
+			Status.SOLD.getDescription(),
+			null,
+			null,
+			LocalDateTime.now()
+		);
 
 		// when
 		when(postService.updateStatus(postId, mockRequest.status())).thenReturn(mockResponse);
 
-		// Send PATCH request
+		// then
 		mockMvc.perform(patch("/api/v1/posts/{id}/status", postId)
+				.content(objectMapper.writeValueAsString(mockRequest))
 				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk());
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.status").value(Status.SOLD.getDescription()));
+
+		verify(postService, times(1)).updateStatus(postId, mockRequest.status());
+	}
+
+	@Test
+	@DisplayName("상품 구매시 게시글에 구매자 정보 저장 REST API 성공")
+	void purchaseProductTest() throws Exception {
+		// given
+		Long postId = 1L;
+		Long buyerId = 1L;
+		PostDto.BuyerUpdateRequest mockRequest = new PostDto.BuyerUpdateRequest(buyerId);
+
+		PostDto.Response mockResponse = new PostDto.Response(
+			1L,
+			1L,
+			"UserName",
+			"Keyboard",
+			"nice Keyboard",
+			100,
+			1000,
+			TransactionType.SALE.getDescription(),
+			Category.DIGITAL_DEVICES.getDescription(),
+			Status.SOLD.getDescription(),
+			null,
+			buyerId,
+			LocalDateTime.now()
+		);
+
+		// when
+		when(postService.purchaseProduct(postId, mockRequest.buyerId())).thenReturn(mockResponse);
+
+		// then
+		mockMvc.perform(patch("/api/v1/posts/{id}/purchase", postId)
+				.content(objectMapper.writeValueAsString(mockRequest))
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.buyerId").value(buyerId));
+
+		verify(postService, times(1)).purchaseProduct(postId, buyerId);
 	}
 
 	@Test
@@ -280,10 +342,12 @@ class PostRestControllerTest {
 	public void deletePostTest() throws Exception {
 		// given
 		Long postId = 1L;
+
 		// when then
 		mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/posts/" + postId)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
+
 		verify(postService, times(1)).delete(postId);
 	}
 

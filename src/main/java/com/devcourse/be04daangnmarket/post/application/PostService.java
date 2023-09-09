@@ -15,6 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.image.domain.DomainName;
 import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
+import com.devcourse.be04daangnmarket.member.application.MemberService;
+import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
 import com.devcourse.be04daangnmarket.post.domain.Status;
@@ -32,10 +34,12 @@ public class PostService {
 
 	private final PostRepository postRepository;
 	private final ImageService imageService;
+	private final MemberService memberService;
 
-	public PostService(PostRepository postRepository, ImageService imageService) {
+	public PostService(PostRepository postRepository, ImageService imageService, MemberService memberService) {
 		this.postRepository = postRepository;
 		this.imageService = imageService;
+		this.memberService = memberService;
 	}
 
 	@Transactional
@@ -134,10 +138,27 @@ public class PostService {
 		imageService.deleteAllImages(DomainName.POST, id);
 	}
 
+	@Transactional
+	public PostDto.Response purchaseProduct(Long id, Long buyerId) {
+		Post post = findPostById(id);
+		post.purchased(buyerId);
+		List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+
+		return toResponse(post, images);
+	}
+
+	private Post findPostById(Long id) {
+		return postRepository.findById(id)
+			.orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
+	}
+
 	private PostDto.Response toResponse(Post post, List<ImageResponse> images) {
+		MemberDto.Response member = memberService.getProfile(post.getMemberId());
+
 		return new PostDto.Response(
 			post.getId(),
 			post.getMemberId(),
+			member.username(),
 			post.getTitle(),
 			post.getDescription(),
 			post.getPrice(),
@@ -145,7 +166,9 @@ public class PostService {
 			post.getTransactionType().getDescription(),
 			post.getCategory().getDescription(),
 			post.getStatus().getDescription(),
-			images
+			images,
+			post.getBuyerId(),
+			post.getCreatedAt()
 		);
 	}
 
@@ -154,7 +177,7 @@ public class PostService {
 		String cookieValue = Long.toString(id);
 		Cookie[] cookies = req.getCookies();
 
-		if(cookies == null )
+		if (cookies == null)
 			return false;
 
 		for (Cookie cookie : cookies)

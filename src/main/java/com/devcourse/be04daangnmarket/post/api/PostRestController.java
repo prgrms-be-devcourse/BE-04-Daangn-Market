@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +26,9 @@ import com.devcourse.be04daangnmarket.post.dto.PostDto;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("api/v1/posts")
@@ -39,7 +43,7 @@ public class PostRestController {
 
 	@PostMapping
 	public ResponseEntity<PostDto.Response> createPost(
-		PostDto.CreateRequest request,
+		@Valid PostDto.CreateRequest request,
 		@AuthenticationPrincipal User user
 	) throws IOException {
 
@@ -58,7 +62,7 @@ public class PostRestController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<PostDto.Response> getPost(
-		@PathVariable Long id,
+		@PathVariable @NotNull Long id,
 		HttpServletRequest req,
 		HttpServletResponse res
 	) {
@@ -79,7 +83,7 @@ public class PostRestController {
 
 	@GetMapping("/category")
 	public ResponseEntity<Page<PostDto.Response>> getPostByCategory(
-		@RequestParam Category category,
+		@RequestParam @NotNull Category category,
 		@RequestParam(defaultValue = "0") int page
 	) {
 		Pageable pageable = PageRequest.of(page, PAGE_SIZE);
@@ -89,8 +93,8 @@ public class PostRestController {
 	}
 
 	@GetMapping("/member/{memberId}")
-	public ResponseEntity<Page<PostDto.Response>> getPostByCategory(
-		@PathVariable Long memberId,
+	public ResponseEntity<Page<PostDto.Response>> getPostByMemberId(
+		@PathVariable @NotNull Long memberId,
 		@RequestParam(defaultValue = "0") int page
 	) {
 		Pageable pageable = PageRequest.of(page, PAGE_SIZE);
@@ -101,7 +105,7 @@ public class PostRestController {
 
 	@GetMapping("/search")
 	public ResponseEntity<Page<PostDto.Response>> getPostByKeyword(
-		@RequestParam String keyword,
+		@RequestParam @NotBlank String keyword,
 		@RequestParam(defaultValue = "0") int page
 	) {
 		Pageable pageable = PageRequest.of(page, PAGE_SIZE);
@@ -112,8 +116,8 @@ public class PostRestController {
 
 	@PutMapping("/{id}")
 	public ResponseEntity<PostDto.Response> updatePost(
-		@PathVariable Long id,
-		PostDto.UpdateRequest request
+		@PathVariable @NotNull Long id,
+		@Valid PostDto.UpdateRequest request
 	) {
 		PostDto.Response response = postService.update(
 			id,
@@ -130,10 +134,20 @@ public class PostRestController {
 
 	@PatchMapping("/{id}/status")
 	public ResponseEntity<PostDto.Response> updatePostStatus(
-		@PathVariable Long id,
-		PostDto.StatusUpdateRequest request
+		@PathVariable @NotNull Long id,
+		@RequestBody @Valid PostDto.StatusUpdateRequest request
 	) {
 		PostDto.Response response = postService.updateStatus(id, request.status());
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@PatchMapping("/{id}/purchase")
+	public ResponseEntity<PostDto.Response> purchaseProduct(
+		@PathVariable @NotNull Long id,
+		@RequestBody @Valid PostDto.BuyerUpdateRequest request
+	) {
+		PostDto.Response response = postService.purchaseProduct(id, request.buyerId());
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
