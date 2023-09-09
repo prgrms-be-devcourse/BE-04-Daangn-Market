@@ -29,28 +29,28 @@ public class CommentRestController {
     public ResponseEntity<CommentResponse> create(CreateCommentRequest request, @AuthenticationPrincipal User user) {
         CommentResponse response = commentService.create(request, user.getId(), user.getUsername());
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/reply")
     public ResponseEntity<CommentResponse> createReply(CreateReplyCommentRequest request, @AuthenticationPrincipal User user) {
         CommentResponse response = commentService.createReply(request, user.getId(), user.getUsername());
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable Long id) {
         commentService.delete(id);
 
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CommentResponse> getDetail(@PathVariable Long id) {
         CommentResponse response = commentService.getDetail(id);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/post/{postId}")
@@ -58,13 +58,13 @@ public class CommentRestController {
                                                                      @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<PostCommentResponse> response = commentService.getPostComments(postId, pageable);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CommentResponse> update(@PathVariable Long id, UpdateCommentRequest request, @AuthenticationPrincipal User user) {
         CommentResponse response = commentService.update(id, request, user.getUsername());
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
