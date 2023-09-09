@@ -36,11 +36,6 @@ public class Comment extends BaseEntity {
 
     }
 
-    public Comment(String content) {//테스트를 막기 위한 임시
-            validateContent(content);
-            this.content = content;
-    }
-
     public Comment(String content, Long memberId, Long postId) {
         validateContent(content);
         this.content = content;

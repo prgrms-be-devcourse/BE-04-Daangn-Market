@@ -127,6 +127,11 @@ public class PostService {
 		return toResponse(post, images);
 	}
 
+	public Post findPostById(Long id) {
+		return postRepository.findById(id)
+			.orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
+	}
+
 	@Transactional
 	public void delete(Long id) {
 		postRepository.deleteById(id);
