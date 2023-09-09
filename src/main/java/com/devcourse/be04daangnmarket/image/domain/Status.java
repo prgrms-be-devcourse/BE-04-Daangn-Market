@@ -1,6 +1,6 @@
 package com.devcourse.be04daangnmarket.image.domain;
 
-public enum DeletedStatus {
+public enum Status {
     ALIVE,
     DELETED
 }

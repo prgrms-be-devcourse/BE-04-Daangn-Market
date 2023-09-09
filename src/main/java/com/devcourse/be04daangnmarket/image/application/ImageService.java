@@ -1,6 +1,6 @@
 package com.devcourse.be04daangnmarket.image.application;
 
-import com.devcourse.be04daangnmarket.image.domain.DeletedStatus;
+import com.devcourse.be04daangnmarket.image.domain.Status;
 import com.devcourse.be04daangnmarket.image.domain.DomainName;
 import com.devcourse.be04daangnmarket.image.domain.Image;
 import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
@@ -105,7 +105,7 @@ public class ImageService {
 		List<Image> images = imageRepository.findAllByDomainNameAndDomainId(domainName, domainId);
 
 		return images.stream()
-				.filter(image -> image.getDeletedStatus().equals(DeletedStatus.ALIVE))
+				.filter(image -> image.getStatus().equals(Status.ALIVE))
 				.map(this::toDto)
 				.collect(Collectors.toList());
 	}
@@ -122,18 +122,18 @@ public class ImageService {
 
 	@Transactional
 	public void deleteAllImages(DomainName domainName, Long domainId) {
-		List<Image> entities = getAllImageEntities(domainName, domainId);
+		List<Image> images = getAllImages(domainName, domainId);
 
-		if (entities.isEmpty()) {
+		if (images.isEmpty()) {
 			return;
 		}
 
-		for (Image entry : entities) {
-			entry.deleteImage();
+		for (Image image : images) {
+			image.changeStatus();
 		}
 	}
 
-	private List<Image> getAllImageEntities(DomainName domainName, Long domainId) {
+	private List<Image> getAllImages(DomainName domainName, Long domainId) {
 		return imageRepository.findAllByDomainNameAndDomainId(domainName, domainId);
 	}
 

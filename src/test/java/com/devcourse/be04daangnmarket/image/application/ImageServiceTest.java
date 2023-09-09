@@ -1,6 +1,6 @@
 package com.devcourse.be04daangnmarket.image.application;
 
-import com.devcourse.be04daangnmarket.image.domain.DeletedStatus;
+import com.devcourse.be04daangnmarket.image.domain.Status;
 import com.devcourse.be04daangnmarket.image.domain.DomainName;
 import com.devcourse.be04daangnmarket.image.domain.Image;
 import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
@@ -36,14 +36,23 @@ class ImageServiceTest {
     void 저장_성공() {
         //given
         List<MultipartFile> multipartFiles = new ArrayList<>();
-        MockMultipartFile imageFile = new MockMultipartFile("구직_공고문", "구직_공고문.png", MediaType.IMAGE_JPEG_VALUE, "test".getBytes());
+        MockMultipartFile imageFile = new MockMultipartFile(
+                "구직_공고문",
+                "구직_공고문.png",
+                MediaType.IMAGE_JPEG_VALUE,
+                "test".getBytes());
         multipartFiles.add(imageFile);
 
         DomainName domainName = DomainName.COMMENT;
         Long domainId = 1L;
 
-        Image image = new Image(imageFile.getOriginalFilename(), imageFile.getContentType(),
-                imageFile.getSize(), "images/randomPath-" + imageFile.getOriginalFilename(), domainName, domainId);
+        Image image = new Image(
+                imageFile.getOriginalFilename(),
+                imageFile.getContentType(),
+                imageFile.getSize(),
+                "images/randomPath-" + imageFile.getOriginalFilename(),
+                domainName,
+                domainId);
 
         given(imageRepository.save(any())).willReturn(image);
 
@@ -66,8 +75,13 @@ class ImageServiceTest {
         DomainName domainName = DomainName.COMMENT;
         Long domainId = 1L;
 
-        Image image = new Image(imageFile.getOriginalFilename(), imageFile.getContentType(),
-                imageFile.getSize(), "images/randomPath-" + imageFile.getOriginalFilename(), domainName, domainId);
+        Image image = new Image(
+                imageFile.getOriginalFilename(),
+                imageFile.getContentType(),
+                imageFile.getSize(),
+                "images/randomPath-" + imageFile.getOriginalFilename(),
+                domainName,
+                domainId);
         List<Image> images = List.of(image);
 
         given(imageRepository.findAllByDomainNameAndDomainId(domainName, domainId))
@@ -86,7 +100,11 @@ class ImageServiceTest {
     void 삭제시_삭제상태변경_확인() {
         //given
         List<MultipartFile> multipartFiles = new ArrayList<>();
-        MockMultipartFile imageFile = new MockMultipartFile("구직_공고문", "구직_공고문.png", MediaType.IMAGE_JPEG_VALUE, "test".getBytes());
+        MockMultipartFile imageFile = new MockMultipartFile(
+                "구직_공고문",
+                "구직_공고문.png",
+                MediaType.IMAGE_JPEG_VALUE,
+                "test".getBytes());
         multipartFiles.add(imageFile);
 
         DomainName domainName = DomainName.COMMENT;
@@ -103,7 +121,7 @@ class ImageServiceTest {
         imageService.deleteAllImages(domainName, domainId);
 
         // then
-        assertThat(image.getDeletedStatus()).isEqualTo(DeletedStatus.DELETED);
+        assertThat(image.getStatus()).isEqualTo(Status.DELETED);
         verify(imageRepository, times(1)).findAllByDomainNameAndDomainId(domainName, domainId);
     }
 }
