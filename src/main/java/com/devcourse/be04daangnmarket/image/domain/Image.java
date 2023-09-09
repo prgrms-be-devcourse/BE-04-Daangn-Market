@@ -25,8 +25,7 @@ public class Image extends BaseEntity {
     private String path;
 
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'ALIVE'")
-    private DeletedStatus deletedStatus;
+    private DeletedStatus deletedStatus = DeletedStatus.ALIVE;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
