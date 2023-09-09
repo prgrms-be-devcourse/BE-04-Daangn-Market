@@ -12,10 +12,8 @@ import com.devcourse.be04daangnmarket.comment.dto.UpdateCommentRequest;
 import com.devcourse.be04daangnmarket.comment.exception.NotFoundException;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.comment.util.CommentConverter;
-import com.devcourse.be04daangnmarket.member.domain.Member;
-import com.devcourse.be04daangnmarket.member.repository.MemberRepository;
-import com.devcourse.be04daangnmarket.post.domain.Post;
-import com.devcourse.be04daangnmarket.post.repository.PostRepository;
+import com.devcourse.be04daangnmarket.member.application.MemberService;
+import com.devcourse.be04daangnmarket.post.application.PostService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -25,12 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage.NOT_FOUND_COMMENT;
-import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.NOT_FOUND_USER;
-import static com.devcourse.be04daangnmarket.post.exception.ErrorMessage.NOT_FOUND_POST;
-
 @Transactional(readOnly = true)
 @Service
 public class CommentService {
@@ -38,14 +32,14 @@ public class CommentService {
 
     private final ImageService imageService;
     private final CommentRepository commentRepository;
-    private final MemberRepository memberRepository;
-    private final PostRepository postRepository;
+    private final MemberService memberService;
+    private final PostService postService;
 
-    public CommentService(ImageService imageService, CommentRepository commentRepository, MemberRepository memberRepository, PostRepository postRepository) {
+    public CommentService(ImageService imageService, CommentRepository commentRepository, MemberService memberService, PostService postService) {
         this.imageService = imageService;
         this.commentRepository = commentRepository;
-        this.memberRepository = memberRepository;
-        this.postRepository = postRepository;
+        this.memberService = memberService;
+        this.postService = postService;
     }
 
     @Transactional
@@ -103,15 +97,11 @@ public class CommentService {
 
     public CommentResponse getDetail(Long id) {
         Comment comment = getOne(id);
-        String username = getMember(comment.getMemberId()).getUsername();
+
+        String username = memberService.getMember(comment.getMemberId()).getUsername();
         List<ImageResponse> images = imageService.getImages(DomainName.COMMENT, id);
 
         return CommentConverter.toResponse(comment, images, username);
-    }
-
-    private Member getMember(Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_USER.getMessage()));
     }
 
     public Page<PostCommentResponse> getPostComments(Long postId, Pageable pageable) {
@@ -119,8 +109,8 @@ public class CommentService {
         List<PostCommentResponse> postCommentResponses = new ArrayList<>();
 
         for (Comment comment : postComments) {
-            String commentUsername = getMember(comment.getMemberId()).getUsername();
-            String postTitle = getPost(comment.getPostId()).getTitle();
+            String commentUsername = memberService.getMember(comment.getMemberId()).getUsername();
+            String postTitle = postService.findPostById(comment.getPostId()).getTitle();
             List<ImageResponse> commentImages = imageService.getImages(DomainName.COMMENT, comment.getId());
 
             List<CommentResponse> replyCommentResponses = getReplyComments(comment);
@@ -132,17 +122,12 @@ public class CommentService {
         return new PageImpl<>(postCommentResponses, pageable, postCommentResponses.size());
     }
 
-    private Post getPost(Long postId) {
-        return postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
-    }
-
     private List<CommentResponse> getReplyComments(Comment comment) {
         List<Comment> replies = commentRepository.findRepliesByCommentGroup(comment.getCommentGroup());
         List<CommentResponse> replyCommentResponses = new ArrayList<>();
 
         for (Comment reply : replies) {
-            String replyUsername = getMember(reply.getMemberId()).getUsername();
+            String replyUsername = memberService.getMember(comment.getMemberId()).getUsername();
             List<ImageResponse> replyImages = imageService.getImages(DomainName.COMMENT, reply.getId());
 
             CommentResponse commentResponse = new CommentResponse(reply.getId(), reply.getMemberId(), replyUsername, reply.getPostId(),

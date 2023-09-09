@@ -123,7 +123,7 @@ public class PostService {
 		return toResponse(post, images);
 	}
 
-	private Post findPostById(Long id) {
+	public Post findPostById(Long id) {
 		return postRepository.findById(id)
 			.orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
 	}
