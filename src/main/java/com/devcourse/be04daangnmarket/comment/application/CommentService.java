@@ -71,7 +71,7 @@ public class CommentService {
 
     @Transactional
     public void delete(Long id) {
-        Comment comment = getOne(id);
+        Comment comment = getComment(id);
 
         if (isGroupComment(comment)) {
             List<Comment> sameGroupComments = commentRepository.findAllByCommentGroup(comment.getCommentGroup());
@@ -86,7 +86,7 @@ public class CommentService {
         imageService.deleteAllImages(DomainName.COMMENT, id);
     }
 
-    private Comment getOne(Long id) {
+    private Comment getComment(Long id) {
         return commentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_COMMENT.getMessage()));
     }
@@ -96,7 +96,7 @@ public class CommentService {
     }
 
     public CommentResponse getDetail(Long id) {
-        Comment comment = getOne(id);
+        Comment comment = getComment(id);
 
         String username = memberService.getMember(comment.getMemberId()).getUsername();
         List<ImageResponse> images = imageService.getImages(DomainName.COMMENT, id);
@@ -123,10 +123,10 @@ public class CommentService {
     }
 
     private List<CommentResponse> getReplyComments(Comment comment) {
-        List<Comment> replies = commentRepository.findRepliesByCommentGroup(comment.getCommentGroup());
+        List<Comment> replyComments = commentRepository.findRepliesByCommentGroup(comment.getCommentGroup());
         List<CommentResponse> replyCommentResponses = new ArrayList<>();
 
-        for (Comment reply : replies) {
+        for (Comment reply : replyComments) {
             String replyUsername = memberService.getMember(comment.getMemberId()).getUsername();
             List<ImageResponse> replyImages = imageService.getImages(DomainName.COMMENT, reply.getId());
 
@@ -140,7 +140,7 @@ public class CommentService {
 
     @Transactional
     public CommentResponse update(Long id, UpdateCommentRequest request, String username) {
-        Comment comment = getOne(id);
+        Comment comment = getComment(id);
         comment.update(request.content());
 
         List<ImageResponse> images = imageService.getImages(DomainName.COMMENT, comment.getId());
