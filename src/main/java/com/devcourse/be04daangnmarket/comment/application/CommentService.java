@@ -13,6 +13,8 @@ import com.devcourse.be04daangnmarket.comment.exception.NotFoundException;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.comment.util.CommentConverter;
 import com.devcourse.be04daangnmarket.member.application.MemberService;
+import com.devcourse.be04daangnmarket.member.domain.Member;
+import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import com.devcourse.be04daangnmarket.post.application.PostService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage.NOT_FOUND_COMMENT;
 @Transactional(readOnly = true)
@@ -155,5 +158,29 @@ public class CommentService {
 
     private boolean isExistImages(List<MultipartFile> files) {
         return !files.get(START_NUMBER).isEmpty();
+    }
+
+    public Page<MemberDto.Response> getMemberByPostId(Long postId, Pageable pageable) {
+        Long writerId = postService.findPostById(postId).getMemberId();
+
+        List<MemberDto.Response> responses = commentRepository.findDistinctMemberIdsByPostId(postId).stream()
+                .filter(memberId -> !memberId.equals(writerId))
+                .map(memberId -> {
+                    Member member = memberService.getMember(memberId);
+
+                    return new MemberDto.Response(
+                            member.getId(),
+                            member.getUsername(),
+                            member.getPhoneNumber(),
+                            member.getEmail(),
+                            member.getTemperature(),
+                            member.getStatus(),
+                            member.getCreatedAt(),
+                            member.getUpdatedAt()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(responses, pageable, responses.size());
     }
 }

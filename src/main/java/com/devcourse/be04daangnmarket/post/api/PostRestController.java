@@ -2,9 +2,13 @@ package com.devcourse.be04daangnmarket.post.api;
 
 import java.io.IOException;
 
+import com.devcourse.be04daangnmarket.comment.application.CommentService;
+import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,9 +40,11 @@ public class PostRestController {
 
 	private final int PAGE_SIZE = 10;
 	private final PostService postService;
+	private final CommentService commentService;
 
-	public PostRestController(PostService postService) {
+	public PostRestController(PostService postService, CommentService commentService) {
 		this.postService = postService;
+		this.commentService = commentService;
 	}
 
 	@PostMapping
@@ -159,4 +165,11 @@ public class PostRestController {
 		return ResponseEntity.noContent().build();
 	}
 
+	@GetMapping("/{id}/communicationMembers")
+ 	public ResponseEntity<Page<MemberDto.Response>> getCommunicationMembers(@PathVariable Long id,
+																	@PageableDefault(page = 0, size = 10) Pageable pageable) {
+		Page<MemberDto.Response> responses = commentService.getMemberByPostId(id, pageable);
+
+		return ResponseEntity.status(HttpStatus.OK).body(responses);
+	}
 }
