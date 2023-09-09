@@ -77,4 +77,12 @@ public class MemberRestController {
 
         return new ResponseEntity<>(saleList, HttpStatus.OK);
     }
+
+    @GetMapping("/{id}/purchase")
+    public ResponseEntity<Page<PostDto.Response>> getPurchaseList(@PathVariable Long id, @RequestParam(defaultValue = "0") int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
+        Page<PostDto.Response> purchaseList = postService.getPostByBuyerId(id, pageable);
+
+        return new ResponseEntity<>(purchaseList, HttpStatus.OK);
+    }
 }
