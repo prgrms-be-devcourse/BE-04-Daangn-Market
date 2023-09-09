@@ -124,10 +124,6 @@ public class ImageService {
 	public void deleteAllImages(DomainName domainName, Long domainId) {
 		List<Image> images = getAllImages(domainName, domainId);
 
-		if (images.isEmpty()) {
-			return;
-		}
-
 		for (Image image : images) {
 			image.changeStatus();
 		}
