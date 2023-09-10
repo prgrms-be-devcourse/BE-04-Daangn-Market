@@ -24,6 +24,7 @@
 
     const renderPost = (post) => {
         document.getElementById("post-id").innerHTML = '게시글 번호 ' + post.id;
+        document.getElementById("username").innerHTML = `작성자 <a href="/profile/${post.memberId}">${post.username}</a>`;
         document.getElementById("title").innerHTML = post.title;
         document.getElementById("description").innerHTML = post.description;
         document.getElementById("price").innerHTML = '가격(₩) ' + post.price + '원';
@@ -55,6 +56,9 @@
     <div>
         <h6 id="post-id"></h6>
     </div>
+
+    <div id="username"></div>
+
     <div>
         <h1 id="title"></h1>
     </div>
