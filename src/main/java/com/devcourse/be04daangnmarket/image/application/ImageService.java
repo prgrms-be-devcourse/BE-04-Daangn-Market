@@ -4,7 +4,6 @@ import com.devcourse.be04daangnmarket.image.domain.Status;
 import com.devcourse.be04daangnmarket.image.domain.DomainName;
 import com.devcourse.be04daangnmarket.image.domain.Image;
 import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
-import com.devcourse.be04daangnmarket.image.exception.FileDeleteException;
 import com.devcourse.be04daangnmarket.image.exception.FileUploadException;
 import com.devcourse.be04daangnmarket.image.repository.ImageRepository;
 
@@ -15,15 +14,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.devcourse.be04daangnmarket.image.exception.ExceptionMessage.FILE_DELETE_EXCEPTION;
 import static com.devcourse.be04daangnmarket.image.exception.ExceptionMessage.FILE_UPLOAD_EXCEPTION;
 
 @Transactional(readOnly = true)
@@ -123,6 +118,10 @@ public class ImageService {
 	@Transactional
 	public void deleteAllImages(DomainName domainName, Long domainId) {
 		List<Image> images = getAllImages(domainName, domainId);
+
+		if (images.isEmpty()) {
+			return;
+		}
 
 		for (Image image : images) {
 			image.changeStatus();
