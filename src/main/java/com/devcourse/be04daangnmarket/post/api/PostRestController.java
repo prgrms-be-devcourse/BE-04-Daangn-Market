@@ -7,7 +7,6 @@ import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -168,7 +167,7 @@ public class PostRestController {
 	@GetMapping("/{id}/communicationMembers")
  	public ResponseEntity<Page<MemberDto.Response>> getCommunicationMembers(@PathVariable Long id,
 																	@PageableDefault(page = 0, size = 10) Pageable pageable) {
-		Page<MemberDto.Response> responses = commentService.getMemberByPostId(id, pageable);
+		Page<MemberDto.Response> responses = commentService.getCommenterByPostId(id, pageable);
 
 		return ResponseEntity.status(HttpStatus.OK).body(responses);
 	}

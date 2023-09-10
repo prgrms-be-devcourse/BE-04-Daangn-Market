@@ -25,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage.NOT_FOUND_COMMENT;
 @Transactional(readOnly = true)
@@ -160,11 +159,10 @@ public class CommentService {
         return !files.get(START_NUMBER).isEmpty();
     }
 
-    public Page<MemberDto.Response> getMemberByPostId(Long postId, Pageable pageable) {
+    public Page<MemberDto.Response> getCommenterByPostId(Long postId, Pageable pageable) {
         Long writerId = postService.findPostById(postId).getMemberId();
 
-        List<MemberDto.Response> responses = commentRepository.findDistinctMemberIdsByPostId(postId).stream()
-                .filter(memberId -> !memberId.equals(writerId))
+         return commentRepository.findDistinctMemberIdsByPostIdAndNotInWriterId(postId, writerId, pageable)
                 .map(memberId -> {
                     Member member = memberService.getMember(memberId);
 
@@ -178,9 +176,6 @@ public class CommentService {
                             member.getCreatedAt(),
                             member.getUpdatedAt()
                     );
-                })
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(responses, pageable, responses.size());
+                });
     }
 }

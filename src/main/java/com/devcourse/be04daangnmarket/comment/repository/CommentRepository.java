@@ -26,6 +26,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT c FROM Comment c WHERE c.commentGroup=:commentGroup AND c.seq > 0 ORDER BY c.seq ASC")
     List<Comment> findRepliesByCommentGroup(@Param("commentGroup") int commentGroup);
 
-    @Query("SELECT DISTINCT c.memberId FROM Comment c WHERE c.postId=:postId")
-    List<Long> findDistinctMemberIdsByPostId (@Param("postId") Long postId);
+    @Query("SELECT DISTINCT c.memberId FROM Comment c WHERE c.postId=:postId AND c.memberId <> :writerId")
+    Page<Long> findDistinctMemberIdsByPostIdAndNotInWriterId(@Param("postId") Long postId, @Param("writerId") Long writerId, Pageable pageable);
 }
