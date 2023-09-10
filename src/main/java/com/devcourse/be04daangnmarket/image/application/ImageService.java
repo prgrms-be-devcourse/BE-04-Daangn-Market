@@ -132,18 +132,4 @@ public class ImageService {
 	private List<Image> getAllImages(DomainName domainName, Long domainId) {
 		return imageRepository.findAllByDomainNameAndDomainId(domainName, domainId);
 	}
-
-	private void deleteImageToDatabase(DomainName domainName, Long domainId) {
-		imageRepository.deleteAllByDomainNameAndDomainId(domainName, domainId);
-	}
-
-	private void deleteImageToLocalStorage(String path) {
-		Path fullPath = Paths.get(FOLDER_PATH + path);
-
-		try {
-			Files.delete(fullPath);
-		} catch (IOException e) {
-			throw new FileDeleteException(FILE_DELETE_EXCEPTION.getMessage());
-		}
-	}
 }
