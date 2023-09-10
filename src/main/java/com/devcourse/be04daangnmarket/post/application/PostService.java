@@ -105,6 +105,14 @@ public class PostService {
 		});
 	}
 
+	public Page<PostDto.Response> getPostByBuyerId(Long buyerId, Pageable pageable) {
+		return postRepository.findByBuyerId(buyerId, pageable).map(post -> {
+			List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+
+			return toResponse(post, images);
+		});
+	}
+
 	@Transactional
 	public PostDto.Response update(Long id, String title, String description, int price,
 		TransactionType transactionType, Category category, List<MultipartFile> files) {
