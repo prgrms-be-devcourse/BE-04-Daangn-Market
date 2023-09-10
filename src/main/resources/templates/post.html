@@ -73,6 +73,7 @@
     <div>
         <a style="margin-right: 20px; margin-left: 20px" th:href="@{/posts/update/{id}(id=${id})}">수정하기</a>
         <a onclick="deletePost()">삭제하기</a>
+        <a style="margin-right: 20px; margin-left: 20px" th:href="@{/posts/{id}/comments(id=${id})}">댓글 보기</a>
     </div>
 </div>
 
