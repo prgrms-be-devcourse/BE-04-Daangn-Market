@@ -46,4 +46,11 @@ public class MemberViewController {
 
         return "purchasePost";
     }
+
+    @GetMapping(value = "/members/{id}/sale")
+    public String salePost(@PathVariable Long id, Model model) {
+        model.addAttribute("id", id);
+
+        return "saleList";
+    }
 }
