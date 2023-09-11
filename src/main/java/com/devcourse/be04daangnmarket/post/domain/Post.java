@@ -21,7 +21,6 @@ import jakarta.persistence.Table;
 @DynamicInsert
 @Table(name = "posts")
 public class Post extends BaseEntity {
-
 	@Column(nullable = false)
 	private Long memberId;
 
@@ -158,5 +157,4 @@ public class Post extends BaseEntity {
 	public void purchased(Long buyerId) {
 		this.buyerId = buyerId;
 	}
-
 }

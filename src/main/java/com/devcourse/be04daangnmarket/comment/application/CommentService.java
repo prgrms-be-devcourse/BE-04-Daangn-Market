@@ -5,7 +5,7 @@ import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
-import com.devcourse.be04daangnmarket.comment.exception.NotFoundException;
+import com.devcourse.be04daangnmarket.comment.exception.NotFoundCommentException;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.comment.util.CommentConverter;
 import com.devcourse.be04daangnmarket.member.application.MemberService;
@@ -22,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage.NOT_FOUND_COMMENT;
+import static com.devcourse.be04daangnmarket.comment.exception.ErrorMessage.NOT_FOUND_COMMENT;
 @Transactional(readOnly = true)
 @Service
 public class CommentService {
@@ -86,7 +86,7 @@ public class CommentService {
 
     private Comment getComment(Long id) {
         return commentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_COMMENT.getMessage()));
+                .orElseThrow(() -> new NotFoundCommentException(NOT_FOUND_COMMENT.getMessage()));
     }
 
     private boolean isGroupComment(Comment comment) {

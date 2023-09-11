@@ -1,11 +1,13 @@
 package com.devcourse.be04daangnmarket.comment.exception;
 
-public enum ExceptionMessage {
-    INVALID_CONTENT("댓글의 값이 올바르지 않습니다."),
-    NOT_FOUND_COMMENT("댓글을 찾지 못했습니다.");
+public enum ErrorMessage {
+    INVALID_CONTENT("올바르지 않은 댓글입니다."),
+    NOT_FOUND_COMMENT("댓글이 존재하지 않습니다.")
+    ;
+
     private final String message;
 
-    ExceptionMessage(String message) {
+    ErrorMessage(String message) {
         this.message = message;
     }
 

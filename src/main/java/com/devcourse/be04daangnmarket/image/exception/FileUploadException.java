@@ -1,6 +1,8 @@
 package com.devcourse.be04daangnmarket.image.exception;
 
-public class FileUploadException extends RuntimeException {
+import com.devcourse.be04daangnmarket.common.exception.FileException;
+
+public class FileUploadException extends FileException {
     public FileUploadException(String message) {
         super(message);
     }

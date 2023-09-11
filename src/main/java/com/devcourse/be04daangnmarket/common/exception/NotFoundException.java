@@ -1,4 +1,4 @@
-package com.devcourse.be04daangnmarket.comment.exception;
+package com.devcourse.be04daangnmarket.common.exception;
 
 public class NotFoundException extends RuntimeException {
     public NotFoundException(String message) {

@@ -1,7 +1,6 @@
 package com.devcourse.be04daangnmarket.post.domain.constant;
 
 public enum Category {
-
 	DIGITAL_DEVICES("디지털 기기"),
 	HOME_APPLIANCES("가전 제품"),
 	MEN_CLOTHING("남성 의류"),
@@ -15,12 +14,11 @@ public enum Category {
 
 	private final String description;
 
-	private Category(String description) {
+	Category(String description) {
 		this.description = description;
 	}
 
 	public String getDescription() {
 		return description;
 	}
-
 }

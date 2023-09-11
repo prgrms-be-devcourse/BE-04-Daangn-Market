@@ -7,10 +7,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
-import static com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage.*;
+import static com.devcourse.be04daangnmarket.comment.exception.ErrorMessage.*;
 
 @Entity
 @Table(name = "comments")
