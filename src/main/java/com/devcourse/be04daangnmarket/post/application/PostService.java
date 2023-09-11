@@ -15,6 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.image.domain.DomainName;
 import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
+import com.devcourse.be04daangnmarket.member.application.MemberService;
+import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import com.devcourse.be04daangnmarket.post.domain.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
 import com.devcourse.be04daangnmarket.post.domain.Status;
@@ -32,10 +34,12 @@ public class PostService {
 
 	private final PostRepository postRepository;
 	private final ImageService imageService;
+	private final MemberService memberService;
 
-	public PostService(PostRepository postRepository, ImageService imageService) {
+	public PostService(PostRepository postRepository, ImageService imageService, MemberService memberService) {
 		this.postRepository = postRepository;
 		this.imageService = imageService;
+		this.memberService = memberService;
 	}
 
 	@Transactional
@@ -101,6 +105,14 @@ public class PostService {
 		});
 	}
 
+	public Page<PostDto.Response> getPostByBuyerId(Long buyerId, Pageable pageable) {
+		return postRepository.findByBuyerId(buyerId, pageable).map(post -> {
+			List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+
+			return toResponse(post, images);
+		});
+	}
+
 	@Transactional
 	public PostDto.Response update(Long id, String title, String description, int price,
 		TransactionType transactionType, Category category, List<MultipartFile> files) {
@@ -123,6 +135,11 @@ public class PostService {
 		return toResponse(post, images);
 	}
 
+	public Post findPostById(Long id) {
+		return postRepository.findById(id)
+			.orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
+	}
+
 	@Transactional
 	public void delete(Long id) {
 		postRepository.deleteById(id);
@@ -138,15 +155,13 @@ public class PostService {
 		return toResponse(post, images);
 	}
 
-	private Post findPostById(Long id) {
-		return postRepository.findById(id)
-			.orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
-	}
-
 	private PostDto.Response toResponse(Post post, List<ImageResponse> images) {
+		MemberDto.Response member = memberService.getProfile(post.getMemberId());
+
 		return new PostDto.Response(
 			post.getId(),
 			post.getMemberId(),
+			member.username(),
 			post.getTitle(),
 			post.getDescription(),
 			post.getPrice(),
@@ -155,7 +170,8 @@ public class PostService {
 			post.getCategory().getDescription(),
 			post.getStatus().getDescription(),
 			images,
-			post.getBuyerId()
+			post.getBuyerId(),
+			post.getCreatedAt()
 		);
 	}
 

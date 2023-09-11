@@ -1,5 +1,6 @@
 package com.devcourse.be04daangnmarket.post.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -69,6 +70,7 @@ public class PostDto {
 	public record Response(
 		Long id,
 		Long memberId,
+		String userName,
 		String title,
 		String description,
 		int price,
@@ -77,7 +79,8 @@ public class PostDto {
 		String category,
 		String status,
 		List<ImageResponse> images,
-		Long buyerId
+		Long buyerId,
+		LocalDateTime createdAt
 	) {
 	}
 

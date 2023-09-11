@@ -17,8 +17,8 @@ public class CommentConverter {
         return new Comment(dto.content(), userId, dto.postId(), dto.commentGroup());
     }
 
-    public static CommentResponse toResponse(Comment comment, List<ImageResponse> images) {
-        return new CommentResponse(comment.getContent(), comment.getMemberId(),
-                comment.getPostId(), comment.getCommentGroup(), comment.getSeq(), images);
+    public static CommentResponse toResponse(Comment comment, List<ImageResponse> images, String username) {
+        return new CommentResponse(comment.getId(), comment.getMemberId(), username,
+                comment.getPostId(), comment.getContent(), images, comment.getCreatedAt(), comment.getUpdatedAt());
     }
 }

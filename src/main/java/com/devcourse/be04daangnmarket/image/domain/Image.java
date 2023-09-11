@@ -5,17 +5,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "images")
-public class File extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Image extends BaseEntity {
 
     @Column(nullable = false)
     private String name;
@@ -29,6 +23,10 @@ public class File extends BaseEntity {
     @Column(nullable = false)
     private String path;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status = Status.ALIVE;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private DomainName domainName;
@@ -36,20 +34,16 @@ public class File extends BaseEntity {
     @Column(nullable = false)
     private Long domainId;
 
-    protected File() {
+    protected Image() {
     }
 
-    public File(String name, String type, long size, String path, DomainName domainName, Long domainId) {
+    public Image(String name, String type, long size, String path, DomainName domainName, Long domainId) {
         this.name = name;
         this.type = type;
         this.size = size;
         this.path = path;
         this.domainName = domainName;
         this.domainId = domainId;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public String getName() {
@@ -68,6 +62,10 @@ public class File extends BaseEntity {
         return size;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
     public DomainName getDomainName() {
         return domainName;
     }
@@ -75,4 +73,9 @@ public class File extends BaseEntity {
     public Long getDomainId() {
         return domainId;
     }
+
+    public void changeStatus() {
+        this.status = Status.DELETED;
+    }
+
 }
