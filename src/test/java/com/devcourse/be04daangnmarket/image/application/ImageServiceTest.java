@@ -3,7 +3,7 @@ package com.devcourse.be04daangnmarket.image.application;
 import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 import com.devcourse.be04daangnmarket.image.domain.Image;
-import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
+import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.image.repository.ImageRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +25,6 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ImageServiceTest {
-
     @InjectMocks
     private ImageService imageService;
 
@@ -57,7 +56,7 @@ class ImageServiceTest {
         given(imageRepository.save(any())).willReturn(image);
 
         //when
-        List<ImageResponse> responses = imageService.uploadImages(multipartFiles, domainName, domainId);
+        List<ImageDto.ImageResponse> responses = imageService.uploadImages(multipartFiles, domainName, domainId);
 
         // then
         assertThat(responses.get(0).name()).isEqualTo(image.getName());
@@ -88,7 +87,7 @@ class ImageServiceTest {
                 .willReturn(images);
 
         //when
-        List<ImageResponse> responses = imageService.getImages(domainName, domainId);
+        List<ImageDto.ImageResponse> responses = imageService.getImages(domainName, domainId);
 
         // then
         assertThat(responses.get(0).name()).isEqualTo(image.getName());

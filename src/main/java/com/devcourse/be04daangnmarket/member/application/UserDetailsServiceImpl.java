@@ -12,7 +12,6 @@ import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.NOT_F
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-
     private final MemberRepository memberRepository;
 
     public UserDetailsServiceImpl(MemberRepository memberRepository) {

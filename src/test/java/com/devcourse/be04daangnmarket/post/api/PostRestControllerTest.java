@@ -46,7 +46,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @MockBean(JpaMetamodelMappingContext.class)
 @Import(SecurityConfig.class)
 class PostRestControllerTest {
-
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -350,5 +349,4 @@ class PostRestControllerTest {
 
 		verify(postService, times(1)).delete(postId);
 	}
-
 }

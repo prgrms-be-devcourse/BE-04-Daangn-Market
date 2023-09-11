@@ -3,9 +3,9 @@ package com.devcourse.be04daangnmarket.post.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.domain.constant.Status;
 import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
@@ -16,7 +16,6 @@ import jakarta.validation.constraints.Positive;
 
 public class PostDto {
     public record CreateRequest(
-
             @NotBlank(message = "제목은 필수 입니다")
             String title,
 
@@ -77,7 +76,7 @@ public class PostDto {
             String transactionType,
             String category,
             String status,
-            List<ImageResponse> images,
+            List<ImageDto.ImageResponse> images,
             Long buyerId,
             LocalDateTime createdAt
     ) {

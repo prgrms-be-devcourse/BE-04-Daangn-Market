@@ -12,7 +12,6 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "images")
 public class Image extends BaseEntity {
-
     @Column(nullable = false)
     private String name;
 
@@ -79,5 +78,4 @@ public class Image extends BaseEntity {
     public void changeStatus() {
         this.status = Status.DELETED;
     }
-
 }

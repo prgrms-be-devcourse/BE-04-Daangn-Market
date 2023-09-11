@@ -1,6 +1,6 @@
 package com.devcourse.be04daangnmarket.comment.dto;
 
-import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
+import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -47,7 +47,7 @@ public class CommentDto {
 
             String content,
 
-            List<ImageResponse> images,
+            List<ImageDto.ImageResponse> images,
 
             LocalDateTime createdAt,
 
@@ -68,7 +68,7 @@ public class CommentDto {
 
             String content,
 
-            List<ImageResponse> images,
+            List<ImageDto.ImageResponse> images,
 
             List<CommentResponse> replyComments,
 

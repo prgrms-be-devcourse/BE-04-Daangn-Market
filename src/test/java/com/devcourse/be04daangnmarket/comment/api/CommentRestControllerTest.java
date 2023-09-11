@@ -5,7 +5,7 @@ import com.devcourse.be04daangnmarket.common.auth.User;
 import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
-import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
+import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.comment.application.CommentService;
 import com.devcourse.be04daangnmarket.common.config.SecurityConfig;
 import com.devcourse.be04daangnmarket.member.domain.Member;
@@ -83,8 +83,8 @@ class CommentRestControllerTest {
         images.add(imageFile);
         CommentDto.CreateCommentRequest request = new CommentDto.CreateCommentRequest("댓글", 1L, null);
 
-        List<ImageResponse> mockImageResponseList = new ArrayList<>();
-        ImageResponse mockImageResponse = new ImageResponse("예시.png", "images/a8f468c1-d234-4c08-8235-63cc59f73a15-예시.png", "image/png",
+        List<ImageDto.ImageResponse> mockImageResponseList = new ArrayList<>();
+        ImageDto.ImageResponse mockImageResponse = new ImageDto.ImageResponse("예시.png", "images/a8f468c1-d234-4c08-8235-63cc59f73a15-예시.png", "image/png",
                 898066, DomainName.COMMENT, 1L);
         mockImageResponseList.add(mockImageResponse);
 
@@ -120,8 +120,8 @@ class CommentRestControllerTest {
         images.add(imageFile);
         CommentDto.CreateReplyCommentRequest request = new CommentDto.CreateReplyCommentRequest("댓글", 1L, 1, null);
 
-        List<ImageResponse> mockImageResponseList = new ArrayList<>();
-        ImageResponse mockImageResponse = new ImageResponse("예시.png", "images/a8f468c1-d234-4c08-8235-63cc59f73a15-예시.png", "image/png",
+        List<ImageDto.ImageResponse> mockImageResponseList = new ArrayList<>();
+        ImageDto.ImageResponse mockImageResponse = new ImageDto.ImageResponse("예시.png", "images/a8f468c1-d234-4c08-8235-63cc59f73a15-예시.png", "image/png",
                 898066, DomainName.COMMENT, 1L);
         mockImageResponseList.add(mockImageResponse);
 

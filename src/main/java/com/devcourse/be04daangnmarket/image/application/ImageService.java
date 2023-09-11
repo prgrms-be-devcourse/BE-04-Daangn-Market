@@ -3,7 +3,7 @@ package com.devcourse.be04daangnmarket.image.application;
 import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 import com.devcourse.be04daangnmarket.image.domain.Image;
-import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
+import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.image.exception.FileUploadException;
 import com.devcourse.be04daangnmarket.image.repository.ImageRepository;
 
@@ -26,18 +26,20 @@ import static com.devcourse.be04daangnmarket.image.exception.ExceptionMessage.FI
 public class ImageService {
 	private static final String RELATIVE_PATH = "images/";
 
+	private final ImageRepository imageRepository;
+
 	@Value("${custom.base-path.image}")
 	private String FOLDER_PATH;
-
-	private final ImageRepository imageRepository;
 
 	public ImageService(ImageRepository imageRepository) {
 		this.imageRepository = imageRepository;
 	}
 
 	@Transactional
-	public List<ImageResponse> uploadImages(List<MultipartFile> multipartFiles, DomainName domainName, Long domainId) {
-		List<ImageResponse> imageResponses = new ArrayList<>();
+	public List<ImageDto.ImageResponse> uploadImages(List<MultipartFile> multipartFiles,
+													 DomainName domainName,
+													 Long domainId) {
+		List<ImageDto.ImageResponse> imageResponses = new ArrayList<>();
 
 		if (isEmptyImages(multipartFiles)) {
 			return imageResponses;
@@ -96,8 +98,8 @@ public class ImageService {
 		return FOLDER_PATH + RELATIVE_PATH + uniqueName;
 	}
 
-	public List<ImageResponse> getImages(DomainName domainName, Long domainId) {
-		List<Image> images = imageRepository.findAllByDomainNameAndDomainId(domainName, domainId);
+	public List<ImageDto.ImageResponse> getImages(DomainName domainName, Long domainId) {
+		List<Image> images = getAllImages(domainName, domainId);
 
 		return images.stream()
 				.filter(image -> image.getStatus().equals(Status.ALIVE))
@@ -105,14 +107,15 @@ public class ImageService {
 				.collect(Collectors.toList());
 	}
 
-	private ImageResponse toDto(Image image) {
-		return new ImageResponse(
-			image.getName(),
-			image.getPath(),
-			image.getType(),
-			image.getSize(),
-			image.getDomainName(),
-			image.getDomainId());
+	private ImageDto.ImageResponse toDto(Image image) {
+		return new ImageDto.ImageResponse(
+				image.getName(),
+				image.getPath(),
+				image.getType(),
+				image.getSize(),
+				image.getDomainName(),
+				image.getDomainId()
+		);
 	}
 
 	@Transactional

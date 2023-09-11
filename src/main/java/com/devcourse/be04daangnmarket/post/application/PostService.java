@@ -5,6 +5,7 @@ import static com.devcourse.be04daangnmarket.post.exception.ErrorMessage.*;
 import java.io.IOException;
 import java.util.List;
 
+import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.post.exception.NotFoundPostException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
-import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
 import com.devcourse.be04daangnmarket.member.application.MemberService;
 import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
@@ -31,7 +31,6 @@ import jakarta.servlet.http.HttpServletResponse;
 @Service
 @Transactional(readOnly = true)
 public class PostService {
-
 	private final PostRepository postRepository;
 	private final ImageService imageService;
 	private final MemberService memberService;
@@ -43,8 +42,13 @@ public class PostService {
 	}
 
 	@Transactional
-	public PostDto.Response create(Long memberId, String title, String description, int price,
-		TransactionType transactionType, Category category, List<MultipartFile> files) throws IOException {
+	public PostDto.Response create(Long memberId,
+								   String title,
+								   String description,
+								   int price,
+								   TransactionType transactionType,
+								   Category category,
+								   List<MultipartFile> files) throws IOException {
 		Post post = new Post(
 			memberId,
 			title,
@@ -56,7 +60,7 @@ public class PostService {
 
 		postRepository.save(post);
 
-		List<ImageResponse> images = imageService.uploadImages(files, DomainName.POST, post.getId());
+		List<ImageDto.ImageResponse> images = imageService.uploadImages(files, DomainName.POST, post.getId());
 
 		return toResponse(post, images);
 	}
@@ -68,14 +72,14 @@ public class PostService {
 		if (!isViewed(id, req, res))
 			post.updateView();
 
-		List<ImageResponse> images = imageService.getImages(DomainName.POST, id);
+		List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, id);
 
 		return toResponse(post, images);
 	}
 
 	public Page<PostDto.Response> getAllPost(Pageable pageable) {
 		return postRepository.findAll(pageable).map(post -> {
-			List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+			List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
 
 			return toResponse(post, images);
 		});
@@ -83,7 +87,7 @@ public class PostService {
 
 	public Page<PostDto.Response> getPostByCategory(Category category, Pageable pageable) {
 		return postRepository.findByCategory(category, pageable).map(post -> {
-			List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+			List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
 
 			return toResponse(post, images);
 		});
@@ -91,7 +95,7 @@ public class PostService {
 
 	public Page<PostDto.Response> getPostByMemberId(Long memberId, Pageable pageable) {
 		return postRepository.findByMemberId(memberId, pageable).map(post -> {
-			List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+			List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
 
 			return toResponse(post, images);
 		});
@@ -99,7 +103,7 @@ public class PostService {
 
 	public Page<PostDto.Response> getPostByKeyword(String keyword, Pageable pageable) {
 		return postRepository.findByTitleContaining(keyword, pageable).map(post -> {
-			List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+			List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
 
 			return toResponse(post, images);
 		});
@@ -107,7 +111,7 @@ public class PostService {
 
 	public Page<PostDto.Response> getPostByBuyerId(Long buyerId, Pageable pageable) {
 		return postRepository.findByBuyerId(buyerId, pageable).map(post -> {
-			List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+			List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
 
 			return toResponse(post, images);
 		});
@@ -121,7 +125,7 @@ public class PostService {
 		post.update(title, description, price, transactionType, category);
 		imageService.deleteAllImages(DomainName.POST, id);
 
-		List<ImageResponse> images = imageService.uploadImages(files, DomainName.POST, id);
+		List<ImageDto.ImageResponse> images = imageService.uploadImages(files, DomainName.POST, id);
 
 		return toResponse(post, images);
 	}
@@ -130,7 +134,8 @@ public class PostService {
 	public PostDto.Response updateStatus(Long id, Status status) {
 		Post post = findPostById(id);
 		post.updateStatus(status);
-		List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+
+		List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
 
 		return toResponse(post, images);
 	}
@@ -150,12 +155,13 @@ public class PostService {
 	public PostDto.Response purchaseProduct(Long id, Long buyerId) {
 		Post post = findPostById(id);
 		post.purchased(buyerId);
-		List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+
+		List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
 
 		return toResponse(post, images);
 	}
 
-	private PostDto.Response toResponse(Post post, List<ImageResponse> images) {
+	private PostDto.Response toResponse(Post post, List<ImageDto.ImageResponse> images) {
 		MemberDto.Response member = memberService.getProfile(post.getMemberId());
 
 		return new PostDto.Response(
@@ -180,12 +186,15 @@ public class PostService {
 		String cookieValue = Long.toString(id);
 		Cookie[] cookies = req.getCookies();
 
-		if (cookies == null)
+		if (cookies == null) {
 			return false;
+		}
 
-		for (Cookie cookie : cookies)
-			if (cookie.getName().contains(cookieName))
+		for (Cookie cookie : cookies) {
+			if (cookie.getName().contains(cookieName)) {
 				return true;
+			}
+		}
 
 		Cookie cookie = new Cookie(cookieName, cookieValue);
 		cookie.setPath("/");

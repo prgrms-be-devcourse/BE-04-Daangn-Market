@@ -4,4 +4,5 @@ public enum DomainName {
     USER,
     POST,
     COMMENT
+    ;
 }

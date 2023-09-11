@@ -24,14 +24,16 @@ public class CommentRestController {
     }
 
     @PostMapping
-    public ResponseEntity<CommentDto.CommentResponse> create(CommentDto.CreateCommentRequest request, @AuthenticationPrincipal User user) {
+    public ResponseEntity<CommentDto.CommentResponse> create(CommentDto.CreateCommentRequest request,
+                                                             @AuthenticationPrincipal User user) {
         CommentDto.CommentResponse response = commentService.create(request, user.getId(), user.getUsername());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/reply")
-    public ResponseEntity<CommentDto.CommentResponse> createReply(CommentDto.CreateReplyCommentRequest request, @AuthenticationPrincipal User user) {
+    public ResponseEntity<CommentDto.CommentResponse> createReply(CommentDto.CreateReplyCommentRequest request,
+                                                                  @AuthenticationPrincipal User user) {
         CommentDto.CommentResponse response = commentService.createReply(request, user.getId(), user.getUsername());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -61,7 +63,9 @@ public class CommentRestController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CommentDto.CommentResponse> update(@PathVariable Long id, CommentDto.UpdateCommentRequest request, @AuthenticationPrincipal User user) {
+    public ResponseEntity<CommentDto.CommentResponse> update(@PathVariable Long id,
+                                                             CommentDto.UpdateCommentRequest request,
+                                                             @AuthenticationPrincipal User user) {
         CommentDto.CommentResponse response = commentService.update(id, request, user.getUsername());
 
         return ResponseEntity.status(HttpStatus.OK).body(response);

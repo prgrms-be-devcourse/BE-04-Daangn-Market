@@ -18,7 +18,6 @@ import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 
 @DataJpaTest
 class PostRepositoryTest {
-
 	@Autowired
 	private PostRepository postRepository;
 
@@ -45,5 +44,4 @@ class PostRepositoryTest {
 		// then
 		assertEquals(2, selectedPost.getTotalPages());
 	}
-
 }

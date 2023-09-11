@@ -1,7 +1,7 @@
 package com.devcourse.be04daangnmarket.comment.util;
 
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
-import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
+import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
 
 import java.util.List;
@@ -15,7 +15,7 @@ public class CommentConverter {
         return new Comment(dto.content(), userId, dto.postId(), dto.commentGroup());
     }
 
-    public static CommentDto.CommentResponse toResponse(Comment comment, List<ImageResponse> images, String username) {
+    public static CommentDto.CommentResponse toResponse(Comment comment, List<ImageDto.ImageResponse> images, String username) {
         return new CommentDto.CommentResponse(comment.getId(), comment.getMemberId(), username,
                 comment.getPostId(), comment.getContent(), images, comment.getCreatedAt(), comment.getUpdatedAt());
     }

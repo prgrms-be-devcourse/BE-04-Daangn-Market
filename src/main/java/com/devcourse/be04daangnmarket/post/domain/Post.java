@@ -132,15 +132,19 @@ public class Post extends BaseEntity {
 		if (title != null) {
 			this.title = title;
 		}
+
 		if (description != null) {
 			this.description = description;
 		}
+
 		if (price >= 0) {
 			this.price = price;
 		}
+
 		if (transactionType != null) {
 			this.transactionType = transactionType;
 		}
+
 		if (category != null) {
 			this.category = category;
 		}

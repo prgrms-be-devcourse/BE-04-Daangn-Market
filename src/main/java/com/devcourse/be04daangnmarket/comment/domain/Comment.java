@@ -33,7 +33,6 @@ public class Comment extends BaseEntity {
     private int seq;//댓글의 순서 1번이 댓글 주인, 뒤로 대댓글
 
     protected Comment() {
-
     }
 
     public Comment(String content, Long memberId, Long postId) {

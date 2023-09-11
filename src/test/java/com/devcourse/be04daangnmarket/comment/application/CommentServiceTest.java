@@ -39,7 +39,6 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class CommentServiceTest {
-
     @InjectMocks
     private CommentService commentService;
 

@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import java.util.List;
 
 public interface ImageRepository extends JpaRepository<Image, Long> {
-
     List<Image> findAllByDomainNameAndDomainId(DomainName domainName, Long domainId);
 
     @Modifying(clearAutomatically = true)

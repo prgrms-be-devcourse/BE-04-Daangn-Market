@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -27,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
-import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
 import com.devcourse.be04daangnmarket.post.domain.constant.Status;
@@ -39,7 +39,6 @@ import jakarta.servlet.http.Cookie;
 
 @SpringBootTest
 class PostServiceTest {
-
 	@InjectMocks
 	private PostService postService;
 
@@ -65,8 +64,8 @@ class PostServiceTest {
 		);
 		when(postRepository.save(any(Post.class))).thenReturn(post);
 
-		List<ImageResponse> imageResponses = List.of(
-			new ImageResponse(
+		List<ImageDto.ImageResponse> imageResponses = List.of(
+			new ImageDto.ImageResponse(
 				"name",
 				"type",
 				"type",
@@ -277,7 +276,6 @@ class PostServiceTest {
 		assertEquals(page.getTotalElements(), response.getTotalElements());
 		assertEquals(page.getNumber(), response.getNumber());
 		verify(postRepository, times(1)).findByMemberId(memberId, pageable);
-
 	}
 
 	@Test
@@ -345,7 +343,6 @@ class PostServiceTest {
 		// then
 		assertNotNull(response);
 		assertEquals(updateStatus.getDescription(), response.status());
-
 	}
 
 	@Test
@@ -383,7 +380,5 @@ class PostServiceTest {
 		// then
 		assertEquals(buyerId, response.buyerId());
 		verify(postRepository, times(1)).findById(1L);
-
 	}
-
 }

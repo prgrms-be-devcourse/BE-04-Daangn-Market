@@ -5,7 +5,6 @@ import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import com.devcourse.be04daangnmarket.member.exception.DuplicatedUsernameException;
 import com.devcourse.be04daangnmarket.member.exception.NotFoundMemberException;
 import com.devcourse.be04daangnmarket.member.repository.MemberRepository;
-import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -56,6 +55,7 @@ public class MemberService {
 
         if (isAvailableUsername(username)) {
             member.updateProfile(username);
+
             return toResponse(member);
         }
 

@@ -16,7 +16,6 @@ import com.devcourse.be04daangnmarket.image.exception.FileUploadException;
 
 @RestControllerAdvice
 public class CommonExceptionHandler {
-
 	@ExceptionHandler(IllegalArgumentException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ResponseEntity<String> invalidHandle(IllegalArgumentException exception) {

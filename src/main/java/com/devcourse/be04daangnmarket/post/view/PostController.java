@@ -15,60 +15,60 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 public class PostController {
+    private final PostService postService;
 
-	private final PostService postService;
+    public PostController(PostService postService) {
+        this.postService = postService;
+    }
 
-	public PostController(PostService postService) {
-		this.postService = postService;
-	}
+    @GetMapping
+    public String getAllPosts() {
+        return "main";
+    }
 
-  @GetMapping
-  public String getAllPosts() {
-      return "main";
-  }
+    @GetMapping(value = "/posts/new")
+    public String newPost(Model model) {
+        model.addAttribute("categories", Category.values());
+        model.addAttribute("transactionTypes", TransactionType.values());
 
-  @GetMapping(value = "/posts/new")
-  public String newPost(Model model) {
-      model.addAttribute("categories", Category.values());
-      model.addAttribute("transactionTypes", TransactionType.values());
+        return "newPost";
+    }
 
-		return "newPost";
-	}
+    @GetMapping(value = "/posts/{id}")
+    public String getPost(@PathVariable Long id, Model model) {
+        model.addAttribute("id", id);
 
-	@GetMapping(value = "/posts/{id}")
-	public String getPost(@PathVariable Long id, Model model) {
-		model.addAttribute("id", id);
+        return "post";
+    }
 
-		return "post";
-	}
+    @GetMapping(value = "/posts/update/{id}")
+    public String updatePost(@PathVariable Long id, Model model, HttpServletRequest req, HttpServletResponse res) {
+        PostDto.Response post = postService.getPost(id, req, res);
 
-	@GetMapping(value = "/posts/update/{id}")
-	public String updatePost(@PathVariable Long id, Model model, HttpServletRequest req, HttpServletResponse res) {
-		PostDto.Response post = postService.getPost(id, req, res);
+        model.addAttribute("post", post);
+        model.addAttribute("categories", Category.values());
+        model.addAttribute("transactionTypes", TransactionType.values());
 
-		model.addAttribute("post", post);
-		model.addAttribute("categories", Category.values());
-		model.addAttribute("transactionTypes", TransactionType.values());
+        return "updatePost";
+    }
 
-		return "updatePost";
-	}
+    @GetMapping(value = "/posts/category")
+    public String postsByCategory(Model model) {
+        model.addAttribute("categories", Category.values());
 
-	@GetMapping(value = "/posts/category")
-	public String postsByCategory(Model model) {
-		model.addAttribute("categories", Category.values());
+        return "categoryPosts";
+    }
 
-		return "categoryPosts";
-	}
-	@GetMapping("/posts/search")
-	public String postsByKeyword(Model model) {
+    @GetMapping("/posts/search")
+    public String postsByKeyword(Model model) {
 
-		return "searchPosts";
-	}
+        return "searchPosts";
+    }
 
-	@GetMapping("/posts/{id}/communication")
-	public String communicationMembers(@PathVariable Long id, Model model) {
-		model.addAttribute("id", id);
+    @GetMapping("/posts/{id}/communication")
+    public String communicationMembers(@PathVariable Long id, Model model) {
+        model.addAttribute("id", id);
 
-		return "communicationList";
-	}
+        return "communicationList";
+    }
 }

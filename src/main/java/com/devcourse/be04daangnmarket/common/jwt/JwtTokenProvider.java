@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class JwtTokenProvider {
-
     private final UserDetailsService userDetailsService;
 
     @Value("${jwt.secret}")
@@ -74,6 +73,7 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;

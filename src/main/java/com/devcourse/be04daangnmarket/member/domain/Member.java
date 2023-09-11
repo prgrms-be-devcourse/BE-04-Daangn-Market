@@ -13,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Entity
 @Table(name = "members")
 public class Member extends BaseEntity {
-
     @Column(unique = true, nullable = false)
     private String username;
 
@@ -34,7 +33,6 @@ public class Member extends BaseEntity {
     private Status status = Status.ALIVE;
 
     protected Member() {
-
     }
 
     public Member(String username, String phoneNumber, String email, String password) {
