@@ -4,9 +4,9 @@ import com.devcourse.be04daangnmarket.comment.application.CommentService;
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.common.auth.User;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/comments")
 public class CommentRestController {
+    private final int PAGE_SIZE = 5;
+
     private final CommentService commentService;
 
     public CommentRestController(CommentService commentService) {
@@ -51,7 +53,8 @@ public class CommentRestController {
 
     @GetMapping("/post/{postId}")
     public ResponseEntity<Page<CommentDto.PostCommentResponse>> getPostComments(@PathVariable Long postId,
-                                                                                @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+                                                                                @RequestParam(defaultValue = "0") int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("createdAt").descending());
         Page<CommentDto.PostCommentResponse> response = commentService.getPostComments(postId, pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
