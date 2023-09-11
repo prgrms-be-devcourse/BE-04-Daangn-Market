@@ -18,7 +18,7 @@ public class MemberViewController {
         return "signIn";
     }
 
-    @GetMapping(value = "/mypage/{id}")
+    @GetMapping(value = "/members/{id}/mypage")
     public String mypage(@PathVariable Long id, Model model) {
         model.addAttribute("id", id);
 
@@ -40,10 +40,10 @@ public class MemberViewController {
         return "editProfile";
     }
 
-    @GetMapping(value = "/mypage/purchase/{id}")
+    @GetMapping(value = "/members/{id}/purchase")
     public String purchasePost(@PathVariable Long id, Model model) {
         model.addAttribute("id", id);
 
-        return "purchasePost";
+        return "puchaseList";
     }
 }
