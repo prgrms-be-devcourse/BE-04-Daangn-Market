@@ -65,4 +65,10 @@ public class PostController {
 		return "searchPosts";
 	}
 
+	@GetMapping("/posts/{id}/communication")
+	public String communicationMembers(@PathVariable Long id, Model model) {
+		model.addAttribute("id", id);
+
+		return "communicationList";
+	}
 }

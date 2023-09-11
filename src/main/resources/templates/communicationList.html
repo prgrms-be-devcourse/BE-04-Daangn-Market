@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<script th:src="@{https://unpkg.com/axios/dist/axios.min.js}"></script>
+<head>
+    <meta charset="utf-8">
+    <title>게시글에 댓글을 남긴 유저 목록</title>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css">
+    <style>
+        .nav-link {
+            margin-right: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div>
+    <div>
+        <h1>게시글에 댓글을 남긴 유저 목록</h1>
+    </div>
+    <div>
+        <a th:href="|/posts/${id}|">
+            <button>뒤로 가기</button>
+        </a>
+    </div>
+    <div>
+        <ul class="posts" style="width: 600px;"></ul>
+    </div>
+
+    <div>
+        <nav>
+            <ul id="pagination"></ul>
+        </nav>
+    </div>
+
+</div>
+
+<script>
+    let tbody;
+    let itemList = '';
+    let pagination = '';
+    const baseUrl = "http://localhost:8080/";
+    const id = [[${id}]];
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        tbody = document.querySelector('.posts');
+        itemList = '';
+        pagination = '';
+
+        requestPagination(id, 0);
+    });
+
+
+    function addRow(member) {
+        const item =
+            `
+              <div style="margin-bottom: 50px">
+                <div>
+                  <button type="button" id="communicationMember" th:value="${member.id}" onclick="chooseBuyer()">선택</button>
+                </div>
+                <div>
+                  <div>이름 : ${member.username}</div>
+                </div>
+                <div>
+                  <div>이메일 : ${member.email}</div>
+                </div>
+              </div>
+                `
+
+        itemList += item;
+    }
+
+    function requestPagination(id, page) {
+        itemList = '';
+        pagination.innerHTML = '';
+
+        axios.get(`/api/v1/posts/${id}/communicationMembers`, {params: {page: page}})
+            .then(response => {
+
+                if (response.data.content.length !== 0) {
+                    response.data.content.map(member => addRow(member));
+                    tbody.innerHTML = itemList;
+
+                    const totalPages = response.data.totalPages;
+                    const number = response.data.number;
+
+                    const start = Math.floor(number / 10) * 10 + 1;
+                    const last = start + 9 < totalPages ? start + 9 : totalPages;
+
+                    const firstPage = `<li>
+                    <a aria-label="First" onclick="requestPagination(${id}, 0)">
+                        <span aria-hidden="true">First</span>
+                    </a>
+                </li>`
+
+                    const lastPage = `<li>
+                    <a onclick="requestPagination(${id},${totalPages - 1})" aria-label="Last">
+                        <span aria-hidden="true">Last</span>
+                    </a>
+                </li>`
+
+                    pagination = document.getElementById('pagination');
+                    pagination.innerHTML += firstPage;
+
+                    let i;
+                    for (i = start; i < last + 1; i++) {
+                        pagination.innerHTML += `<li class="${i === number + 1} ? 'active'">
+                    <a onclick="requestPagination(${id}, ${i - 1})">${i}</a>
+                </li>`
+                    }
+
+                    pagination.innerHTML += lastPage;
+                }
+            })
+            .catch(error => {
+                alert("오류가 발생했습니다. \n" + error);
+                console.error(error);
+            });
+    }
+
+    function chooseBuyer() {
+        console.log("buyer Id : " + document.getElementById("communicationMember").value);
+        console.log("postOwner Id : " + id);
+
+        axios
+            .patch(`/api/v1/posts/${id}/purchase`,{
+                headers: {
+                    'Content-type': 'application/json',
+                },
+
+                buyerId: document.getElementById("communicationMember").value,
+            }).then(res => {
+
+              window.location.href = `/`;
+            })
+            .catch(error => {
+              alert("오류가 발생했습니다. \n" + error);
+            })
+    }
+
+</script>
+
+</body>
+</html>
