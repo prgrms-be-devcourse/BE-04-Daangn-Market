@@ -1,15 +1,11 @@
 package com.devcourse.be04daangnmarket.comment.api;
 
 import com.devcourse.be04daangnmarket.comment.application.CommentService;
-import com.devcourse.be04daangnmarket.comment.dto.CommentResponse;
-import com.devcourse.be04daangnmarket.comment.dto.CreateCommentRequest;
-import com.devcourse.be04daangnmarket.comment.dto.CreateReplyCommentRequest;
-import com.devcourse.be04daangnmarket.comment.dto.PostCommentResponse;
+import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.common.auth.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import com.devcourse.be04daangnmarket.comment.dto.UpdateCommentRequest;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,15 +22,15 @@ public class CommentRestController {
     }
 
     @PostMapping
-    public ResponseEntity<CommentResponse> create(CreateCommentRequest request, @AuthenticationPrincipal User user) {
-        CommentResponse response = commentService.create(request, user.getId(), user.getUsername());
+    public ResponseEntity<CommentDto.CommentResponse> create(CommentDto.CreateCommentRequest request, @AuthenticationPrincipal User user) {
+        CommentDto.CommentResponse response = commentService.create(request, user.getId(), user.getUsername());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/reply")
-    public ResponseEntity<CommentResponse> createReply(CreateReplyCommentRequest request, @AuthenticationPrincipal User user) {
-        CommentResponse response = commentService.createReply(request, user.getId(), user.getUsername());
+    public ResponseEntity<CommentDto.CommentResponse> createReply(CommentDto.CreateReplyCommentRequest request, @AuthenticationPrincipal User user) {
+        CommentDto.CommentResponse response = commentService.createReply(request, user.getId(), user.getUsername());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -47,23 +43,23 @@ public class CommentRestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CommentResponse> getDetail(@PathVariable Long id) {
-        CommentResponse response = commentService.getDetail(id);
+    public ResponseEntity<CommentDto.CommentResponse> getDetail(@PathVariable Long id) {
+        CommentDto.CommentResponse response = commentService.getDetail(id);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/post/{postId}")
-    public ResponseEntity<Page<PostCommentResponse>> getPostComments(@PathVariable Long postId,
-                                                                     @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<PostCommentResponse> response = commentService.getPostComments(postId, pageable);
+    public ResponseEntity<Page<CommentDto.PostCommentResponse>> getPostComments(@PathVariable Long postId,
+                                                                                @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<CommentDto.PostCommentResponse> response = commentService.getPostComments(postId, pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CommentResponse> update(@PathVariable Long id, UpdateCommentRequest request, @AuthenticationPrincipal User user) {
-        CommentResponse response = commentService.update(id, request, user.getUsername());
+    public ResponseEntity<CommentDto.CommentResponse> update(@PathVariable Long id, CommentDto.UpdateCommentRequest request, @AuthenticationPrincipal User user) {
+        CommentDto.CommentResponse response = commentService.update(id, request, user.getUsername());
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

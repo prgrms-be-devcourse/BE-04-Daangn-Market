@@ -1,8 +1,7 @@
 package com.devcourse.be04daangnmarket.comment.application;
 
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
-import com.devcourse.be04daangnmarket.comment.dto.PostCommentResponse;
-import com.devcourse.be04daangnmarket.comment.dto.UpdateCommentRequest;
+import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.comment.exception.NotFoundException;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.common.constant.Status;
@@ -100,7 +99,7 @@ class CommentServiceTest {
         given(postRepository.findById(postId)).willReturn(Optional.of(post));
 
         //when
-        Page<PostCommentResponse> responses = commentService.getPostComments(postId, pageable);
+        Page<CommentDto.PostCommentResponse> responses = commentService.getPostComments(postId, pageable);
 
         //then
         assertThat(commentPage.getTotalElements()).isEqualTo(responses.getTotalElements());
@@ -116,7 +115,7 @@ class CommentServiceTest {
         MockMultipartFile imageFile = new MockMultipartFile("예시", "예시.png", MediaType.IMAGE_JPEG_VALUE, "예시".getBytes());
         images.add(imageFile);
 
-        UpdateCommentRequest request = new UpdateCommentRequest("변경댓글", 1L, images);
+        CommentDto.UpdateCommentRequest request = new CommentDto.UpdateCommentRequest("변경댓글", 1L, images);
         Comment comment = new Comment("이전댓글", 1L, 1L);
         given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
 

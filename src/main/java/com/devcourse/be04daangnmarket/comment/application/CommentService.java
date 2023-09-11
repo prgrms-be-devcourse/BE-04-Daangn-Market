@@ -1,14 +1,10 @@
 package com.devcourse.be04daangnmarket.comment.application;
 
-import com.devcourse.be04daangnmarket.comment.dto.CreateReplyCommentRequest;
-import com.devcourse.be04daangnmarket.comment.dto.PostCommentResponse;
+import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
-import com.devcourse.be04daangnmarket.comment.dto.CommentResponse;
-import com.devcourse.be04daangnmarket.comment.dto.CreateCommentRequest;
-import com.devcourse.be04daangnmarket.comment.dto.UpdateCommentRequest;
 import com.devcourse.be04daangnmarket.comment.exception.NotFoundException;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.comment.util.CommentConverter;
@@ -45,7 +41,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponse create(CreateCommentRequest request, Long userId, String username) {
+    public CommentDto.CommentResponse create(CommentDto.CreateCommentRequest request, Long userId, String username) {
         Comment comment = CommentConverter.toEntity(request, userId);
 
         Integer groupNumber = commentRepository.findMaxCommentGroup().orElse(START_NUMBER);
@@ -58,7 +54,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponse createReply(CreateReplyCommentRequest request, Long userId, String username) {
+    public CommentDto.CommentResponse createReply(CommentDto.CreateReplyCommentRequest request, Long userId, String username) {
         Comment comment = CommentConverter.toEntity(request, userId);
 
         Integer seqNumber = commentRepository.findMaxSeqFromCommentGroup(request.commentGroup())
@@ -97,7 +93,7 @@ public class CommentService {
         return comment.getSeq() == START_NUMBER;
     }
 
-    public CommentResponse getDetail(Long id) {
+    public CommentDto.CommentResponse getDetail(Long id) {
         Comment comment = getComment(id);
 
         String username = memberService.getMember(comment.getMemberId()).getUsername();
@@ -106,33 +102,33 @@ public class CommentService {
         return CommentConverter.toResponse(comment, images, username);
     }
 
-    public Page<PostCommentResponse> getPostComments(Long postId, Pageable pageable) {
+    public Page<CommentDto.PostCommentResponse> getPostComments(Long postId, Pageable pageable) {
         List<Comment> postComments = commentRepository.findAllByPostIdToSeqIsZero(postId);
-        List<PostCommentResponse> postCommentResponses = new ArrayList<>();
+        List<CommentDto.PostCommentResponse> postCommentResponses = new ArrayList<>();
 
         for (Comment comment : postComments) {
             String commentUsername = memberService.getMember(comment.getMemberId()).getUsername();
             String postTitle = postService.findPostById(comment.getPostId()).getTitle();
             List<ImageResponse> commentImages = imageService.getImages(DomainName.COMMENT, comment.getId());
 
-            List<CommentResponse> replyCommentResponses = getReplyComments(comment);
+            List<CommentDto.CommentResponse> replyCommentResponses = getReplyComments(comment);
 
-            postCommentResponses.add(new PostCommentResponse(comment.getId(), comment.getMemberId(), commentUsername, comment.getPostId(), postTitle, comment.getContent(),
+            postCommentResponses.add(new CommentDto.PostCommentResponse(comment.getId(), comment.getMemberId(), commentUsername, comment.getPostId(), postTitle, comment.getContent(),
                     commentImages, replyCommentResponses, comment.getCreatedAt(), comment.getUpdatedAt()));
         }
 
         return new PageImpl<>(postCommentResponses, pageable, postCommentResponses.size());
     }
 
-    private List<CommentResponse> getReplyComments(Comment comment) {
+    private List<CommentDto.CommentResponse> getReplyComments(Comment comment) {
         List<Comment> replyComments = commentRepository.findRepliesByCommentGroup(comment.getCommentGroup());
-        List<CommentResponse> replyCommentResponses = new ArrayList<>();
+        List<CommentDto.CommentResponse> replyCommentResponses = new ArrayList<>();
 
         for (Comment reply : replyComments) {
             String replyUsername = memberService.getMember(comment.getMemberId()).getUsername();
             List<ImageResponse> replyImages = imageService.getImages(DomainName.COMMENT, reply.getId());
 
-            CommentResponse commentResponse = new CommentResponse(reply.getId(), reply.getMemberId(), replyUsername, reply.getPostId(),
+            CommentDto.CommentResponse commentResponse = new CommentDto.CommentResponse(reply.getId(), reply.getMemberId(), replyUsername, reply.getPostId(),
                     reply.getContent(), replyImages, reply.getCreatedAt(), reply.getUpdatedAt());
             replyCommentResponses.add(commentResponse);
         }
@@ -141,7 +137,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponse update(Long id, UpdateCommentRequest request, String username) {
+    public CommentDto.CommentResponse update(Long id, CommentDto.UpdateCommentRequest request, String username) {
         Comment comment = getComment(id);
         comment.update(request.content());
 

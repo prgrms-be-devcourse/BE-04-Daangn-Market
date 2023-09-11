@@ -1,16 +1,12 @@
 package com.devcourse.be04daangnmarket.comment.api;
 
-import com.devcourse.be04daangnmarket.comment.dto.CreateReplyCommentRequest;
-import com.devcourse.be04daangnmarket.comment.dto.PostCommentResponse;
+import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.common.auth.User;
 import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
 import com.devcourse.be04daangnmarket.comment.application.CommentService;
-import com.devcourse.be04daangnmarket.comment.dto.CommentResponse;
-import com.devcourse.be04daangnmarket.comment.dto.CreateCommentRequest;
-import com.devcourse.be04daangnmarket.comment.dto.UpdateCommentRequest;
 import com.devcourse.be04daangnmarket.common.config.SecurityConfig;
 import com.devcourse.be04daangnmarket.member.domain.Member;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,14 +81,14 @@ class CommentRestControllerTest {
         List<MultipartFile> images = new ArrayList<>();
         MockMultipartFile imageFile = new MockMultipartFile("예시", "예시.png", MediaType.IMAGE_JPEG_VALUE, "예시".getBytes());
         images.add(imageFile);
-        CreateCommentRequest request = new CreateCommentRequest("댓글", 1L, null);
+        CommentDto.CreateCommentRequest request = new CommentDto.CreateCommentRequest("댓글", 1L, null);
 
         List<ImageResponse> mockImageResponseList = new ArrayList<>();
         ImageResponse mockImageResponse = new ImageResponse("예시.png", "images/a8f468c1-d234-4c08-8235-63cc59f73a15-예시.png", "image/png",
                 898066, DomainName.COMMENT, 1L);
         mockImageResponseList.add(mockImageResponse);
 
-        CommentResponse mockResponse = new CommentResponse(1L, 1L, "username", 1L, "댓글", null, LocalDateTime.now(), LocalDateTime.now());
+        CommentDto.CommentResponse mockResponse = new CommentDto.CommentResponse(1L, 1L, "username", 1L, "댓글", null, LocalDateTime.now(), LocalDateTime.now());
 
         given(imageService.uploadImages(
                 eq(images),
@@ -122,14 +118,14 @@ class CommentRestControllerTest {
         List<MultipartFile> images = new ArrayList<>();
         MockMultipartFile imageFile = new MockMultipartFile("예시", "예시.png", MediaType.IMAGE_JPEG_VALUE, "예시".getBytes());
         images.add(imageFile);
-        CreateReplyCommentRequest request = new CreateReplyCommentRequest("댓글", 1L, 1, null);
+        CommentDto.CreateReplyCommentRequest request = new CommentDto.CreateReplyCommentRequest("댓글", 1L, 1, null);
 
         List<ImageResponse> mockImageResponseList = new ArrayList<>();
         ImageResponse mockImageResponse = new ImageResponse("예시.png", "images/a8f468c1-d234-4c08-8235-63cc59f73a15-예시.png", "image/png",
                 898066, DomainName.COMMENT, 1L);
         mockImageResponseList.add(mockImageResponse);
 
-        CommentResponse mockResponse = new CommentResponse(1L, 1L, "username", 1L, "댓글", null, LocalDateTime.now(), LocalDateTime.now());
+        CommentDto.CommentResponse mockResponse = new CommentDto.CommentResponse(1L, 1L, "username", 1L, "댓글", null, LocalDateTime.now(), LocalDateTime.now());
 
         given(imageService.uploadImages(
                 eq(images),
@@ -169,7 +165,7 @@ class CommentRestControllerTest {
     void 조회_성공() throws Exception {
         //given
         Long commentId = 1L;
-        CommentResponse mockResponse = new CommentResponse(1L, 1L, "username", 1L, "댓글", null, LocalDateTime.now(), LocalDateTime.now());
+        CommentDto.CommentResponse mockResponse = new CommentDto.CommentResponse(1L, 1L, "username", 1L, "댓글", null, LocalDateTime.now(), LocalDateTime.now());
         given(commentService.getDetail(commentId))
                 .willReturn(mockResponse);
 
@@ -184,12 +180,12 @@ class CommentRestControllerTest {
     void 페이징_조회_성공() throws Exception {
         //given
         Long postId = 1L;
-        PostCommentResponse mockResponse1 = new PostCommentResponse(1L, 1L, "username", 1L, "게시글", "댓글", null, null, LocalDateTime.now(), LocalDateTime.now());
-        PostCommentResponse mockResponse2 = new PostCommentResponse(2L, 1L, "username", 1L, "게시글", "댓글2", null, null, LocalDateTime.now(), LocalDateTime.now());
+        CommentDto.PostCommentResponse mockResponse1 = new CommentDto.PostCommentResponse(1L, 1L, "username", 1L, "게시글", "댓글", null, null, LocalDateTime.now(), LocalDateTime.now());
+        CommentDto.PostCommentResponse mockResponse2 = new CommentDto.PostCommentResponse(2L, 1L, "username", 1L, "게시글", "댓글2", null, null, LocalDateTime.now(), LocalDateTime.now());
 
         Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
-        List<PostCommentResponse> fakeResponses = List.of(mockResponse1, mockResponse2);
-        Page<PostCommentResponse> responsePage = new PageImpl<>(fakeResponses, pageable, fakeResponses.size());
+        List<CommentDto.PostCommentResponse> fakeResponses = List.of(mockResponse1, mockResponse2);
+        Page<CommentDto.PostCommentResponse> responsePage = new PageImpl<>(fakeResponses, pageable, fakeResponses.size());
 
         given(commentService.getPostComments(1L, pageable))
                 .willReturn(responsePage);
@@ -207,8 +203,8 @@ class CommentRestControllerTest {
     @Test
     void 수정_성공() throws Exception {
         //given
-        UpdateCommentRequest request = new UpdateCommentRequest("댓글", 1L, null);
-        CommentResponse mockResponse = new CommentResponse(1L, 1L, "username", 1L, "댓글", null, LocalDateTime.now(), LocalDateTime.now());
+        CommentDto.UpdateCommentRequest request = new CommentDto.UpdateCommentRequest("댓글", 1L, null);
+        CommentDto.CommentResponse mockResponse = new CommentDto.CommentResponse(1L, 1L, "username", 1L, "댓글", null, LocalDateTime.now(), LocalDateTime.now());
 
         given(commentService.update(
                 eq(1L),
