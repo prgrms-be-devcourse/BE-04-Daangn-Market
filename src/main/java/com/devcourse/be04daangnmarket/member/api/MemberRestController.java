@@ -1,8 +1,10 @@
 package com.devcourse.be04daangnmarket.member.api;
 
+import com.devcourse.be04daangnmarket.common.auth.User;
 import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
 import com.devcourse.be04daangnmarket.member.application.MemberService;
 import com.devcourse.be04daangnmarket.member.dto.MemberDto;
+import jakarta.validation.Valid;
 import com.devcourse.be04daangnmarket.post.application.PostService;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 import org.springframework.data.domain.Page;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,14 +40,14 @@ public class MemberRestController {
     }
 
     @PostMapping
-    public ResponseEntity<MemberDto.Response> signUp(@RequestBody MemberDto.SignUpRequest request) {
+    public ResponseEntity<MemberDto.Response> signUp(@RequestBody @Valid MemberDto.SignUpRequest request) {
         MemberDto.Response response = memberService.signUp(request);
 
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<MemberDto.Response> signIn(@RequestBody MemberDto.SignInRequest request) {
+    public ResponseEntity<MemberDto.Response> signIn(@RequestBody @Valid MemberDto.SignInRequest request) {
         MemberDto.Response response = memberService.signIn(request);
 
         String token = jwtTokenProvider.createToken(request.email());
@@ -63,8 +66,10 @@ public class MemberRestController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MemberDto.Response> updateProfile(@PathVariable Long id,
-                                                            @RequestBody MemberDto.UpdateProfileRequest request) {
+    public ResponseEntity<MemberDto.Response> updateProfile(@AuthenticationPrincipal User user,
+                                                            @PathVariable Long id,
+                                                            @RequestBody @Valid MemberDto.UpdateProfileRequest request) {
+        memberService.validateById(id, user.getId());
         MemberDto.Response response = memberService.updateProfile(id, request.username());
 
         return new ResponseEntity<>(response, HttpStatus.OK);

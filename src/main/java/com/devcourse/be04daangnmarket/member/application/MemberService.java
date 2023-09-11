@@ -11,6 +11,7 @@ import java.util.NoSuchElementException;
 
 import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.DUPLICATED_USERNAME;
 import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.FAIL_LOGIN;
+import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.ILLEGAL_USER_ACCESS;
 import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.NOT_FOUND_USER;
 
 @Service
@@ -63,6 +64,12 @@ public class MemberService {
         Member member = getMember(id);
 
         return toResponse(member);
+    }
+
+    public void validateById(Long pathId, Long authUserId) {
+        if (pathId != authUserId) {
+            throw new IllegalArgumentException(ILLEGAL_USER_ACCESS.getMessage());
+        }
     }
 
     public Member getMember(Long id) {
