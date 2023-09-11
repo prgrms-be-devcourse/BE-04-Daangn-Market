@@ -1,6 +1,8 @@
 package com.devcourse.be04daangnmarket.comment.repository;
 
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,4 +25,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query("SELECT c FROM Comment c WHERE c.commentGroup=:commentGroup AND c.seq > 0 ORDER BY c.seq ASC")
     List<Comment> findRepliesByCommentGroup(@Param("commentGroup") int commentGroup);
+
+    @Query("SELECT DISTINCT c.memberId FROM Comment c WHERE c.postId=:postId AND c.memberId <> :writerId")
+    Page<Long> findDistinctMemberIdsByPostIdAndNotInWriterId(@Param("postId") Long postId, @Param("writerId") Long writerId, Pageable pageable);
 }
