@@ -62,7 +62,7 @@ public class PostRestController {
 			request.files()
 		);
 
-		return new ResponseEntity<>(response, HttpStatus.CREATED);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 	@GetMapping("/{id}")
@@ -73,7 +73,7 @@ public class PostRestController {
 	) {
 		PostDto.Response response = postService.getPost(id, req, res);
 
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 	@GetMapping
@@ -83,7 +83,7 @@ public class PostRestController {
 		Pageable pageable = PageRequest.of(page, PAGE_SIZE);
 		Page<PostDto.Response> responses = postService.getAllPost(pageable);
 
-		return new ResponseEntity<>(responses, HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(responses);
 	}
 
 	@GetMapping("/category")
@@ -94,7 +94,7 @@ public class PostRestController {
 		Pageable pageable = PageRequest.of(page, PAGE_SIZE);
 		Page<PostDto.Response> response = postService.getPostByCategory(category, pageable);
 
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 	@GetMapping("/member/{memberId}")
@@ -105,7 +105,7 @@ public class PostRestController {
 		Pageable pageable = PageRequest.of(page, PAGE_SIZE);
 		Page<PostDto.Response> response = postService.getPostByMemberId(memberId, pageable);
 
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 	@GetMapping("/search")
@@ -116,7 +116,7 @@ public class PostRestController {
 		Pageable pageable = PageRequest.of(page, PAGE_SIZE);
 		Page<PostDto.Response> response = postService.getPostByKeyword(keyword, pageable);
 
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 	@PutMapping("/{id}")
@@ -134,7 +134,7 @@ public class PostRestController {
 			request.files()
 		);
 
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 	@PatchMapping("/{id}/status")
@@ -144,7 +144,7 @@ public class PostRestController {
 	) {
 		PostDto.Response response = postService.updateStatus(id, request.status());
 
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 	@PatchMapping("/{id}/purchase")
@@ -154,14 +154,14 @@ public class PostRestController {
 	) {
 		PostDto.Response response = postService.purchaseProduct(id, request.buyerId());
 
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deletePost(@PathVariable Long id) {
 		postService.delete(id);
 
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	@GetMapping("/{id}/communicationMembers")
