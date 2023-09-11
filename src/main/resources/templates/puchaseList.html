@@ -60,16 +60,14 @@
     function addRow(post) {
         let item2 = '';
 
-        for (let imageKey of post.images) {
-            const urlPath = baseUrl + imageKey.path;
+        let image = post.images[0];
 
-            item2 +=
+        item2 +=
+            `
+                <div style="float: left; margin-right: 20px">
+                  <img src="${image.path}" alt="이미지" style="width: 120px; height: 120px">
+                </div>
                 `
-                    <div style="float: left; margin-right: 20px">
-                      <img src="${urlPath}" alt="이미지" style="width: 120px; height: 120px">
-                    </div>
-                    `
-        }
 
         const item =
             `
