@@ -1,7 +1,7 @@
 package com.devcourse.be04daangnmarket.member.domain;
 
+import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.common.entity.BaseEntity;
-import com.devcourse.be04daangnmarket.member.domain.constant.Status;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,6 +30,7 @@ public class Member extends BaseEntity {
     private double temperature = 36.5;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Status status = Status.ALIVE;
 
     protected Member() {

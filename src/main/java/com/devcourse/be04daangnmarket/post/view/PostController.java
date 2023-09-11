@@ -1,8 +1,8 @@
 package com.devcourse.be04daangnmarket.post.view;
 
 import com.devcourse.be04daangnmarket.post.application.PostService;
-import com.devcourse.be04daangnmarket.post.domain.Category;
-import com.devcourse.be04daangnmarket.post.domain.TransactionType;
+import com.devcourse.be04daangnmarket.post.domain.constant.Category;
+import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 
 import org.springframework.stereotype.Controller;

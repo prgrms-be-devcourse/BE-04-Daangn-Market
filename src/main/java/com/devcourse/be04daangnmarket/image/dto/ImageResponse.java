@@ -1,6 +1,6 @@
 package com.devcourse.be04daangnmarket.image.dto;
 
-import com.devcourse.be04daangnmarket.image.domain.DomainName;
+import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 
 public record ImageResponse(
     String name,

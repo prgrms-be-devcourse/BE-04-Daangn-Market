@@ -5,7 +5,7 @@ import com.devcourse.be04daangnmarket.comment.dto.PostCommentResponse;
 import com.devcourse.be04daangnmarket.common.auth.User;
 import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
-import com.devcourse.be04daangnmarket.image.domain.DomainName;
+import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
 import com.devcourse.be04daangnmarket.comment.application.CommentService;
 import com.devcourse.be04daangnmarket.comment.dto.CommentResponse;

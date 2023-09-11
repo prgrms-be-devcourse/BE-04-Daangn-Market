@@ -36,9 +36,9 @@ import com.devcourse.be04daangnmarket.common.config.SecurityConfig;
 import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
 import com.devcourse.be04daangnmarket.member.domain.Member;
 import com.devcourse.be04daangnmarket.post.application.PostService;
-import com.devcourse.be04daangnmarket.post.domain.Category;
-import com.devcourse.be04daangnmarket.post.domain.Status;
-import com.devcourse.be04daangnmarket.post.domain.TransactionType;
+import com.devcourse.be04daangnmarket.post.domain.constant.Category;
+import com.devcourse.be04daangnmarket.post.domain.constant.Status;
+import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

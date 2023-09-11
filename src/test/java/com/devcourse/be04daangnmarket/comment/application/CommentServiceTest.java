@@ -1,17 +1,17 @@
 package com.devcourse.be04daangnmarket.comment.application;
 
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
-import com.devcourse.be04daangnmarket.comment.domain.DeletedStatus;
 import com.devcourse.be04daangnmarket.comment.dto.PostCommentResponse;
 import com.devcourse.be04daangnmarket.comment.dto.UpdateCommentRequest;
 import com.devcourse.be04daangnmarket.comment.exception.NotFoundException;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
+import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.member.domain.Member;
 import com.devcourse.be04daangnmarket.member.repository.MemberRepository;
-import com.devcourse.be04daangnmarket.post.domain.Category;
+import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
-import com.devcourse.be04daangnmarket.post.domain.TransactionType;
+import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 import com.devcourse.be04daangnmarket.post.repository.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,7 +77,7 @@ class CommentServiceTest {
         commentService.delete(comment.getId());
 
         // then
-        assertThat(comment.getDeletedStatus()).isEqualTo(DeletedStatus.DELETED);
+        assertThat(comment.getStatus()).isEqualTo(Status.DELETED);
     }
 
     @Test

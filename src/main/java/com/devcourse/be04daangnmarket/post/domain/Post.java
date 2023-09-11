@@ -2,6 +2,9 @@ package com.devcourse.be04daangnmarket.post.domain;
 
 import java.time.LocalDateTime;
 
+import com.devcourse.be04daangnmarket.post.domain.constant.Category;
+import com.devcourse.be04daangnmarket.post.domain.constant.Status;
+import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 

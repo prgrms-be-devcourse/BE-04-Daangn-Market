@@ -1,4 +1,4 @@
-package com.devcourse.be04daangnmarket.post.domain;
+package com.devcourse.be04daangnmarket.post.domain.constant;
 
 public enum Category {
 

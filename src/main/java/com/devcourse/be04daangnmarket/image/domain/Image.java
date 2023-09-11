@@ -1,6 +1,8 @@
 package com.devcourse.be04daangnmarket.image.domain;
 
+import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.common.entity.BaseEntity;
+import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

@@ -1,7 +1,7 @@
 package com.devcourse.be04daangnmarket.image.application;
 
-import com.devcourse.be04daangnmarket.image.domain.Status;
-import com.devcourse.be04daangnmarket.image.domain.DomainName;
+import com.devcourse.be04daangnmarket.common.constant.Status;
+import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 import com.devcourse.be04daangnmarket.image.domain.Image;
 import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
 import com.devcourse.be04daangnmarket.image.repository.ImageRepository;

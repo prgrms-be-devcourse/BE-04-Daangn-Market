@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.devcourse.be04daangnmarket.common.auth.User;
 import com.devcourse.be04daangnmarket.post.application.PostService;
-import com.devcourse.be04daangnmarket.post.domain.Category;
+import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 
 import jakarta.servlet.http.HttpServletRequest;
