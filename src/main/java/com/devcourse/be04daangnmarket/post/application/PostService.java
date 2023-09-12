@@ -4,9 +4,9 @@ import static com.devcourse.be04daangnmarket.post.exception.ErrorMessage.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import com.devcourse.be04daangnmarket.image.dto.ImageDto;
-import com.devcourse.be04daangnmarket.post.exception.NotFoundPostException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -142,7 +142,7 @@ public class PostService {
 
 	public Post findPostById(Long id) {
 		return postRepository.findById(id)
-			.orElseThrow(() -> new NotFoundPostException(NOT_FOUND_POST.getMessage()));
+			.orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
 	}
 
 	@Transactional

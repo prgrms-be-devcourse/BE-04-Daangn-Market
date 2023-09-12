@@ -2,13 +2,13 @@ package com.devcourse.be04daangnmarket.member.application;
 
 import com.devcourse.be04daangnmarket.member.domain.Member;
 import com.devcourse.be04daangnmarket.member.dto.MemberDto;
-import com.devcourse.be04daangnmarket.member.exception.DuplicatedUsernameException;
-import com.devcourse.be04daangnmarket.member.exception.NotFoundMemberException;
 import com.devcourse.be04daangnmarket.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.NoSuchElementException;
 
 import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.DUPLICATED_USERNAME;
 import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.FAIL_LOGIN;
@@ -59,7 +59,7 @@ public class MemberService {
             return toResponse(member);
         }
 
-        throw new DuplicatedUsernameException(DUPLICATED_USERNAME.getMessage());
+        throw new IllegalArgumentException(DUPLICATED_USERNAME.getMessage());
     }
 
     public MemberDto.Response getProfile(Long id) {
@@ -76,7 +76,7 @@ public class MemberService {
 
     public Member getMember(Long id) {
         return memberRepository.findById(id)
-                .orElseThrow(() -> new NotFoundMemberException(NOT_FOUND_USER.getMessage()));
+                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_USER.getMessage()));
     }
 
     private boolean isAvailableUsername(String username) {

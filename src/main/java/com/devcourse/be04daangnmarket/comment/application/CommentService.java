@@ -5,7 +5,6 @@ import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
-import com.devcourse.be04daangnmarket.comment.exception.NotFoundCommentException;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.comment.util.CommentConverter;
 import com.devcourse.be04daangnmarket.member.application.MemberService;
@@ -21,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static com.devcourse.be04daangnmarket.comment.exception.ErrorMessage.NOT_FOUND_COMMENT;
 
@@ -64,7 +64,7 @@ public class CommentService {
         Comment comment = CommentConverter.toEntity(request, userId);
 
         Integer seqNumber = commentRepository.findMaxSeqFromCommentGroup(request.commentGroup())
-                .orElseThrow(() -> new NotFoundCommentException(NOT_FOUND_COMMENT.getMessage()));
+                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_COMMENT.getMessage()));
         comment.addSeq(seqNumber);
 
         Comment saved = commentRepository.save(comment);
@@ -92,7 +92,7 @@ public class CommentService {
 
     private Comment getComment(Long id) {
         return commentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundCommentException(NOT_FOUND_COMMENT.getMessage()));
+                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_COMMENT.getMessage()));
     }
 
     private boolean isGroupComment(Comment comment) {

@@ -1,8 +1,5 @@
 package com.devcourse.be04daangnmarket.common.exception;
 
-import com.devcourse.be04daangnmarket.member.exception.DuplicatedUsernameException;
-import com.devcourse.be04daangnmarket.member.exception.NotFoundMemberException;
-import com.devcourse.be04daangnmarket.post.exception.NotFoundPostException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,9 +7,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.devcourse.be04daangnmarket.comment.exception.NotFoundCommentException;
 import com.devcourse.be04daangnmarket.image.exception.FileDeleteException;
 import com.devcourse.be04daangnmarket.image.exception.FileUploadException;
+
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class CommonExceptionHandler {
@@ -22,22 +20,10 @@ public class CommonExceptionHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
 	}
 
-	@ExceptionHandler(
-			{
-					NotFoundCommentException.class,
-					NotFoundMemberException.class,
-					NotFoundPostException.class
-			}
-	)
+	@ExceptionHandler(NoSuchElementException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public ResponseEntity<String> notFoundHandle(NotFoundException exception) {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
-	}
-
-	@ExceptionHandler(DuplicatedUsernameException.class)
-	@ResponseStatus(HttpStatus.CONFLICT)
-	public ResponseEntity<String> duplicationUserHandle(DuplicatedUsernameException exception) {
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
+	public ResponseEntity<String> noSuchElementHandle(NoSuchElementException exception) {
+		return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler(
