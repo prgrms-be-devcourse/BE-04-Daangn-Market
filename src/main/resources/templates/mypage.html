@@ -18,8 +18,8 @@
 
             })
             .catch(error => {
-                alert("오류가 발생했습니다. \n" + error);
-                console.error(error);
+                alert("오류가 발생했습니다. \n" + error.response.data);
+                console.log(error);
             });
     });
 </script>
