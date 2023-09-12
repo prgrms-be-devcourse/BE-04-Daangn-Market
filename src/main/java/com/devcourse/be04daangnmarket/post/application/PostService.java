@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import com.devcourse.be04daangnmarket.image.dto.ImageDto;
+import com.devcourse.be04daangnmarket.post.domain.constant.PostStatus;
 import com.devcourse.be04daangnmarket.post.util.PostConverter;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,6 @@ import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 import com.devcourse.be04daangnmarket.member.application.MemberService;
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
-import com.devcourse.be04daangnmarket.post.domain.constant.Status;
 import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 import com.devcourse.be04daangnmarket.post.repository.PostRepository;
@@ -139,9 +140,9 @@ public class PostService {
 	}
 
 	@Transactional
-	public PostDto.Response updateStatus(Long id, Status status) {
+	public PostDto.Response updateStatus(Long id, PostStatus postStatus) {
 		Post post = findPostById(id);
-		post.updateStatus(status);
+		post.updateStatus(postStatus);
 
 		List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
 		String username = getUsername(post.getMemberId());

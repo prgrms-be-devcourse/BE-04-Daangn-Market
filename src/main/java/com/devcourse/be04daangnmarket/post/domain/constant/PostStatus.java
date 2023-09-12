@@ -1,6 +1,6 @@
 package com.devcourse.be04daangnmarket.post.domain.constant;
 
-public enum Status {
+public enum PostStatus {
 	FOR_SALE("판매중"),
 	SOLD("거래완료"),
 	HIDDEN("숨김"),
@@ -9,7 +9,7 @@ public enum Status {
 
 	private final String description;
 
-	Status(String description) {
+	PostStatus(String description) {
 		this.description = description;
 	}
 

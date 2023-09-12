@@ -3,8 +3,9 @@ package com.devcourse.be04daangnmarket.post.domain;
 import java.time.LocalDateTime;
 
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
-import com.devcourse.be04daangnmarket.post.domain.constant.Status;
+import com.devcourse.be04daangnmarket.post.domain.constant.PostStatus;
 import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
+
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
@@ -49,7 +50,7 @@ public class Post extends BaseEntity {
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	@ColumnDefault("'FOR_SALE'")
-	private Status status;
+	private PostStatus postStatus;
 
 	private Long buyerId;
 
@@ -61,7 +62,7 @@ public class Post extends BaseEntity {
 
 	public Post(Long memberId, String title, String description, int price, int views, TransactionType transactionType,
 		Category category,
-		Status status, LocalDateTime pullUpAt) {
+		PostStatus postStatus, LocalDateTime pullUpAt) {
 		this.memberId = memberId;
 		this.title = title;
 		this.description = description;
@@ -69,7 +70,7 @@ public class Post extends BaseEntity {
 		this.views = views;
 		this.transactionType = transactionType;
 		this.category = category;
-		this.status = status;
+		this.postStatus = postStatus;
 		this.pullUpAt = pullUpAt;
 	}
 
@@ -82,7 +83,7 @@ public class Post extends BaseEntity {
 		this.views = 0;
 		this.transactionType = transactionType;
 		this.category = category;
-		this.status = Status.FOR_SALE;
+		this.postStatus = PostStatus.FOR_SALE;
 		this.pullUpAt = LocalDateTime.now();
 	}
 
@@ -114,8 +115,8 @@ public class Post extends BaseEntity {
 		return category;
 	}
 
-	public Status getStatus() {
-		return status;
+	public PostStatus getPostStatus() {
+		return postStatus;
 	}
 
 	public Long getBuyerId() {
@@ -150,8 +151,8 @@ public class Post extends BaseEntity {
 		}
 	}
 
-	public void updateStatus(Status status) {
-		this.status = status;
+	public void updateStatus(PostStatus postStatus) {
+		this.postStatus = postStatus;
 	}
 
 	public void updateView() {

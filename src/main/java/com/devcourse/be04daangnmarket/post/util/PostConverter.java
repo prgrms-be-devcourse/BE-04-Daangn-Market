@@ -36,7 +36,7 @@ public class PostConverter {
                 post.getViews(),
                 post.getTransactionType().getDescription(),
                 post.getCategory().getDescription(),
-                post.getStatus().getDescription(),
+                post.getPostStatus().getDescription(),
                 images,
                 post.getBuyerId(),
                 post.getCreatedAt()
