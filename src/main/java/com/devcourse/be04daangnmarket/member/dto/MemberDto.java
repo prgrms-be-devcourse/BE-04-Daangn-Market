@@ -45,12 +45,19 @@ public class MemberDto {
 
     public record Response(
             Long id,
+
             String username,
+
             String phoneNumber,
+
             String email,
+
             double temperature,
+
             Status status,
+
             LocalDateTime createdAt,
+
             LocalDateTime updatedAt
     ) {
     }

@@ -1,6 +1,7 @@
 package com.devcourse.be04daangnmarket.post.api;
 
 import com.devcourse.be04daangnmarket.comment.application.CommentService;
+import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.common.auth.User;
 import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import com.devcourse.be04daangnmarket.post.application.PostService;
@@ -48,7 +49,8 @@ public class PostRestController {
                 request.files()
         );
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(response);
     }
 
     @GetMapping("/{id}")
@@ -57,7 +59,7 @@ public class PostRestController {
                                                     HttpServletResponse res) {
         PostDto.Response response = postService.getPost(id, req, res);
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
@@ -65,7 +67,7 @@ public class PostRestController {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
         Page<PostDto.Response> responses = postService.getAllPost(pageable);
 
-        return ResponseEntity.status(HttpStatus.OK).body(responses);
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/category")
@@ -74,7 +76,7 @@ public class PostRestController {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
         Page<PostDto.Response> response = postService.getPostByCategory(category, pageable);
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/member/{memberId}")
@@ -83,7 +85,7 @@ public class PostRestController {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
         Page<PostDto.Response> response = postService.getPostByMemberId(memberId, pageable);
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/search")
@@ -92,7 +94,7 @@ public class PostRestController {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
         Page<PostDto.Response> response = postService.getPostByKeyword(keyword, pageable);
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
@@ -108,7 +110,7 @@ public class PostRestController {
                 request.files()
         );
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}/status")
@@ -116,7 +118,7 @@ public class PostRestController {
                                                              @RequestBody @Valid PostDto.StatusUpdateRequest request) {
         PostDto.Response response = postService.updateStatus(id, request.status());
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}/purchase")
@@ -124,14 +126,24 @@ public class PostRestController {
                                                             @RequestBody @Valid PostDto.BuyerUpdateRequest request) {
         PostDto.Response response = postService.purchaseProduct(id, request.buyerId());
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable Long id) {
         postService.delete(id);
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .build();
+    }
+
+    @GetMapping("/{postId}/comments")
+    public ResponseEntity<Page<CommentDto.PostCommentResponse>> getPostComments(@PathVariable Long postId,
+                                                                                @RequestParam(defaultValue = "0") int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("createdAt").descending());
+        Page<CommentDto.PostCommentResponse> response = commentService.getPostComments(postId, pageable);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}/communicationMembers")
@@ -140,6 +152,6 @@ public class PostRestController {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         Page<MemberDto.Response> responses = commentService.getCommenterByPostId(id, pageable);
 
-        return ResponseEntity.status(HttpStatus.OK).body(responses);
+        return ResponseEntity.ok(responses);
     }
 }

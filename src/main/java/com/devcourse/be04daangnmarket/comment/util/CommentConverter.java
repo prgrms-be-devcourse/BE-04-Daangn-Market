@@ -16,7 +16,15 @@ public class CommentConverter {
     }
 
     public static CommentDto.CommentResponse toResponse(Comment comment, List<ImageDto.ImageResponse> images, String username) {
-        return new CommentDto.CommentResponse(comment.getId(), comment.getMemberId(), username,
-                comment.getPostId(), comment.getContent(), images, comment.getCreatedAt(), comment.getUpdatedAt());
+        return new CommentDto.CommentResponse(
+                comment.getId(),
+                comment.getMemberId(),
+                username,
+                comment.getPostId(),
+                comment.getContent(),
+                images,
+                comment.getCreatedAt(),
+                comment.getUpdatedAt()
+        );
     }
 }

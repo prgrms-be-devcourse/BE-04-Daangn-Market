@@ -67,17 +67,29 @@ public class PostDto {
 
     public record Response(
             Long id,
+
             Long memberId,
+
             String userName,
+
             String title,
+
             String description,
+
             int price,
+
             int views,
+
             String transactionType,
+
             String category,
+
             String status,
+
             List<ImageDto.ImageResponse> images,
+
             Long buyerId,
+
             LocalDateTime createdAt
     ) {
     }
