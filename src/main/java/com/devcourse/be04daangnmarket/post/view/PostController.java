@@ -71,4 +71,11 @@ public class PostController {
 
         return "communicationList";
     }
+
+    @GetMapping("/posts/{id}/comments")
+    public String comments(@PathVariable Long id, Model model) {
+        model.addAttribute("id", id);
+
+        return "comments";
+    }
 }

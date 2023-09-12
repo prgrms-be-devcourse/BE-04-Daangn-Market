@@ -72,6 +72,8 @@ public class CommentDto {
 
             List<CommentResponse> replyComments,
 
+            int commentGroup,
+
             LocalDateTime createdAt,
 
             LocalDateTime updatedAt

@@ -180,8 +180,8 @@ class CommentRestControllerTest {
     void 페이징_조회_성공() throws Exception {
         //given
         Long postId = 1L;
-        CommentDto.PostCommentResponse mockResponse1 = new CommentDto.PostCommentResponse(1L, 1L, "username", 1L, "게시글", "댓글", null, null, LocalDateTime.now(), LocalDateTime.now());
-        CommentDto.PostCommentResponse mockResponse2 = new CommentDto.PostCommentResponse(2L, 1L, "username", 1L, "게시글", "댓글2", null, null, LocalDateTime.now(), LocalDateTime.now());
+        CommentDto.PostCommentResponse mockResponse1 = new CommentDto.PostCommentResponse(1L, 1L, "username", 1L, "게시글", "댓글", null, null, 1, LocalDateTime.now(), LocalDateTime.now());
+        CommentDto.PostCommentResponse mockResponse2 = new CommentDto.PostCommentResponse(2L, 1L, "username", 1L, "게시글", "댓글2", null, null, 1, LocalDateTime.now(), LocalDateTime.now());
 
         Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
         List<CommentDto.PostCommentResponse> fakeResponses = List.of(mockResponse1, mockResponse2);
