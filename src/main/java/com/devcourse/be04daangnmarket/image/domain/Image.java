@@ -26,7 +26,7 @@ public class Image extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Status status = Status.ALIVE;
+    private Status status;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -43,6 +43,7 @@ public class Image extends BaseEntity {
         this.type = type;
         this.size = size;
         this.path = path;
+        this.status = Status.ALIVE;
         this.domainName = domainName;
         this.domainId = domainId;
     }

@@ -51,8 +51,8 @@ public class ImageService {
 				continue;
 			}
 
-			String originalName = multipartFile.getOriginalFilename().replaceAll(" ", "");
-			String uniqueName = createUniqueName(originalName);
+			String fileNameWithoutSpaces = multipartFile.getOriginalFilename().replaceAll(" ", "");
+			String uniqueName = createUniqueName(fileNameWithoutSpaces);
 
 			saveImageToLocalStorage(multipartFile, uniqueName);
 
@@ -76,7 +76,7 @@ public class ImageService {
 
 	private void saveImageToLocalStorage(MultipartFile multipartFile, String uniqueName) {
 		try {
-			java.io.File file = new java.io.File(FOLDER_PATH + RELATIVE_PATH);
+			java.io.File file = new java.io.File(FOLDER_PATH);
 
 			if (isEmptyFile(file)) {
 				file.mkdirs();
@@ -96,7 +96,7 @@ public class ImageService {
 	}
 
 	private String getFullPath(String uniqueName) {
-		return FOLDER_PATH + RELATIVE_PATH + uniqueName;
+		return FOLDER_PATH + uniqueName;
 	}
 
 	public List<ImageDto.ImageResponse> getImages(DomainName domainName, Long domainId) {
