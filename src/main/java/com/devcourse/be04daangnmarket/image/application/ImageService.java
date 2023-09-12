@@ -7,6 +7,7 @@ import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.image.exception.FileUploadException;
 import com.devcourse.be04daangnmarket.image.repository.ImageRepository;
 
+import com.devcourse.be04daangnmarket.image.util.ImageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,7 +60,7 @@ public class ImageService {
 					multipartFile.getSize(), getRelativePath(uniqueName), domainName, domainId);
 
 			imageRepository.save(image);
-			imageResponses.add(toDto(image));
+			imageResponses.add(ImageConverter.toResponse(image));
 		}
 
 		return imageResponses;
@@ -103,19 +104,8 @@ public class ImageService {
 
 		return images.stream()
 				.filter(image -> image.getStatus().equals(Status.ALIVE))
-				.map(this::toDto)
+				.map(ImageConverter::toResponse)
 				.collect(Collectors.toList());
-	}
-
-	private ImageDto.ImageResponse toDto(Image image) {
-		return new ImageDto.ImageResponse(
-				image.getName(),
-				image.getPath(),
-				image.getType(),
-				image.getSize(),
-				image.getDomainName(),
-				image.getDomainId()
-		);
 	}
 
 	@Transactional
