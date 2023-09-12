@@ -2,6 +2,7 @@ package com.devcourse.be04daangnmarket.post.domain;
 
 import java.time.LocalDateTime;
 
+import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.domain.constant.PostStatus;
 import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
@@ -22,144 +23,169 @@ import jakarta.persistence.Table;
 @DynamicInsert
 @Table(name = "posts")
 public class Post extends BaseEntity {
-	@Column(nullable = false)
-	private Long memberId;
+    @Column(nullable = false)
+    private Long memberId;
 
-	@Column(nullable = false)
-	private String title;
+    @Column(nullable = false)
+    private String title;
 
-	@Lob
-	private String description;
+    @Lob
+    private String description;
 
-	@Column(nullable = false)
-	@ColumnDefault("0")
-	private int price;
+    @Column(nullable = false)
+    @ColumnDefault("0")
+    private int price;
 
-	@Column(nullable = false)
-	@ColumnDefault("0")
-	private int views;
+    @Column(nullable = false)
+    @ColumnDefault("0")
+    private int views;
 
-	@Column(nullable = false)
-	@Enumerated(EnumType.STRING)
-	private TransactionType transactionType;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TransactionType transactionType;
 
-	@Column(nullable = false)
-	@Enumerated(EnumType.STRING)
-	private Category category;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
-	@Column(nullable = false)
-	@Enumerated(EnumType.STRING)
-	@ColumnDefault("'FOR_SALE'")
-	private PostStatus postStatus;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'FOR_SALE'")
+    private PostStatus postStatus;
 
-	private Long buyerId;
+    private Long buyerId;
 
-	@Column(columnDefinition = "TIMESTAMP")
-	private LocalDateTime pullUpAt;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status = Status.ALIVE;
 
-	protected Post() {
-	}
+    @Column(columnDefinition = "TIMESTAMP")
+    private LocalDateTime pullUpAt;
 
-	public Post(Long memberId, String title, String description, int price, int views, TransactionType transactionType,
-		Category category,
-		PostStatus postStatus, LocalDateTime pullUpAt) {
-		this.memberId = memberId;
-		this.title = title;
-		this.description = description;
-		this.price = price;
-		this.views = views;
-		this.transactionType = transactionType;
-		this.category = category;
-		this.postStatus = postStatus;
-		this.pullUpAt = pullUpAt;
-	}
+    protected Post() {
+    }
 
-	public Post(Long memberId, String title, String description, int price, TransactionType transactionType,
-		Category category) {
-		this.memberId = memberId;
-		this.title = title;
-		this.description = description;
-		this.price = price;
-		this.views = 0;
-		this.transactionType = transactionType;
-		this.category = category;
-		this.postStatus = PostStatus.FOR_SALE;
-		this.pullUpAt = LocalDateTime.now();
-	}
+    public Post(Long memberId,
+                String title,
+                String description,
+                int price,
+                int views,
+                TransactionType transactionType,
+                Category category,
+                PostStatus postStatus,
+                LocalDateTime pullUpAt) {
+        this.memberId = memberId;
+        this.title = title;
+        this.description = description;
+        this.price = price;
+        this.views = views;
+        this.transactionType = transactionType;
+        this.category = category;
+        this.postStatus = postStatus;
+        this.pullUpAt = pullUpAt;
+    }
 
-	public Long getMemberId() {
-		return memberId;
-	}
+    public Post(Long memberId,
+                String title,
+                String description,
+                int price,
+                TransactionType transactionType,
+                Category category) {
+        this.memberId = memberId;
+        this.title = title;
+        this.description = description;
+        this.price = price;
+        this.views = 0;
+        this.transactionType = transactionType;
+        this.category = category;
+        this.postStatus = PostStatus.FOR_SALE;
+        this.pullUpAt = LocalDateTime.now();
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public Long getMemberId() {
+        return memberId;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public int getPrice() {
-		return price;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public int getViews() {
-		return views;
-	}
+    public int getPrice() {
+        return price;
+    }
 
-	public TransactionType getTransactionType() {
-		return transactionType;
-	}
+    public int getViews() {
+        return views;
+    }
 
-	public Category getCategory() {
-		return category;
-	}
+    public TransactionType getTransactionType() {
+        return transactionType;
+    }
 
-	public PostStatus getPostStatus() {
-		return postStatus;
-	}
+    public Category getCategory() {
+        return category;
+    }
 
-	public Long getBuyerId() {
-		return buyerId;
-	}
+    public PostStatus getPostStatus() {
+        return postStatus;
+    }
 
-	public LocalDateTime getPullUpAt() {
-		return pullUpAt;
-	}
+    public Long getBuyerId() {
+        return buyerId;
+    }
 
-	public void update(String title, String description, int price,
-		TransactionType transactionType, Category category) {
+    public Status getStatus() {
+        return status;
+    }
 
-		if (title != null) {
-			this.title = title;
-		}
+    public LocalDateTime getPullUpAt() {
+        return pullUpAt;
+    }
 
-		if (description != null) {
-			this.description = description;
-		}
+    public void update(String title,
+                       String description,
+                       int price,
+                       TransactionType transactionType,
+                       Category category) {
 
-		if (price >= 0) {
-			this.price = price;
-		}
+        if (title != null) {
+            this.title = title;
+        }
 
-		if (transactionType != null) {
-			this.transactionType = transactionType;
-		}
+        if (description != null) {
+            this.description = description;
+        }
 
-		if (category != null) {
-			this.category = category;
-		}
-	}
+        if (price >= 0) {
+            this.price = price;
+        }
 
-	public void updateStatus(PostStatus postStatus) {
-		this.postStatus = postStatus;
-	}
+        if (transactionType != null) {
+            this.transactionType = transactionType;
+        }
 
-	public void updateView() {
-		this.views++;
-	}
+        if (category != null) {
+            this.category = category;
+        }
+    }
 
-	public void purchased(Long buyerId) {
-		this.buyerId = buyerId;
-	}
+    public void updatePostStatus(PostStatus postStatus) {
+        this.postStatus = postStatus;
+    }
+
+    public void deleteStatus() {
+        this.status = Status.DELETED;
+    }
+
+    public void updateView() {
+        this.views++;
+    }
+
+    public void purchased(Long buyerId) {
+        this.buyerId = buyerId;
+    }
 }

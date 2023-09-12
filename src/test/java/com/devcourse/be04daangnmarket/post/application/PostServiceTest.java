@@ -338,7 +338,7 @@ class PostServiceTest {
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
         // when
-        PostDto.Response response = postService.updateStatus(postId, updateStatus);
+        PostDto.Response response = postService.updatePostStatus(postId, updateStatus);
 
         // then
         assertNotNull(response);

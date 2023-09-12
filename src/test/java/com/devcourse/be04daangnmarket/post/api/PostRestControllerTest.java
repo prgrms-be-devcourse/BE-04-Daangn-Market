@@ -273,7 +273,7 @@ class PostRestControllerTest {
 		);
 
 		// when
-		when(postService.updateStatus(postId, mockRequest.postStatus())).thenReturn(mockResponse);
+		when(postService.updatePostStatus(postId, mockRequest.postStatus())).thenReturn(mockResponse);
 
 		// then
 		mockMvc.perform(patch("/api/v1/posts/{id}/status", postId)
@@ -282,7 +282,7 @@ class PostRestControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.status").value(PostStatus.SOLD.getDescription()));
 
-		verify(postService, times(1)).updateStatus(postId, mockRequest.postStatus());
+		verify(postService, times(1)).updatePostStatus(postId, mockRequest.postStatus());
 	}
 
 	@Test
