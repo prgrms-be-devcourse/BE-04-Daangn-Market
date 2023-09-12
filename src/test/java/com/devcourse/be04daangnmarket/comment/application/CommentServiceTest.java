@@ -2,7 +2,6 @@ package com.devcourse.be04daangnmarket.comment.application;
 
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
-import com.devcourse.be04daangnmarket.comment.exception.NotFoundCommentException;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
@@ -28,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static com.devcourse.be04daangnmarket.comment.exception.ErrorMessage.NOT_FOUND_COMMENT;
@@ -61,7 +61,7 @@ class CommentServiceTest {
 
         //when & then
         assertThatThrownBy(() -> commentService.delete(commentId))
-                .isInstanceOf(NotFoundCommentException.class)
+                .isInstanceOf(NoSuchElementException.class)
                 .hasMessage(NOT_FOUND_COMMENT.getMessage());
     }
 

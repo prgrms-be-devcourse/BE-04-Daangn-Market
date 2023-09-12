@@ -129,6 +129,7 @@ public class CommentService {
                             comment.getContent(),
                             commentImages,
                             replyCommentResponses,
+                            comment.getCommentGroup(),
                             comment.getCreatedAt(),
                             comment.getUpdatedAt()
                     )

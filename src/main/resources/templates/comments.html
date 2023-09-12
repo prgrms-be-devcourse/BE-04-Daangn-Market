@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<script th:src="@{https://unpkg.com/axios/dist/axios.min.js}"></script>
+<head>
+    <meta charset="utf-8">
+    <title>comments</title>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css">
+</head>
+
+<body>
+<form id="uploadComments" enctype="multipart/form-data">
+    <div>
+        <label for="content">댓글</label>
+        <input type="text" id="content" name="content" placeholder="제목">
+    </div>
+    <div>
+        <label for="files">파일 선택:</label>
+        <input type="file" id="files" name="files" multiple/>
+    </div>
+    <div>
+        <button type="button" onclick="uploadComments()">댓글 작성</button>
+    </div>
+</form>
+
+<div id="commentList">
+</div>
+
+<script>
+    const postId = [[${id}]];
+    const commentList = document.getElementById('commentList');
+    document.addEventListener("DOMContentLoaded", loadComments);
+
+    function loadComments() {
+        axios.get('/api/v1/posts/' + postId + '/comments')
+            .then(response => {
+                displayComments(response.data.content)
+            })
+            .catch(error => {
+                alert("오류가 발생했습니다. \n" + error.response.data);
+                console.log(error);
+            });
+    }
+
+    function uploadComments() {
+        const formData = new FormData(document.getElementById('uploadComments'));
+        formData.append("postId", postId);
+
+        const headers = {
+            'Authorization': localStorage.getItem('token'),
+            'Content-Type': "multipart/form-data"
+        }
+
+        axios.post('/api/v1/comments', formData, {headers: headers})
+            .then(function (response) {
+                loadComments();
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+    }
+
+    function displayComments(comments) {
+        if (comments.length === 0) {
+            return;
+        }
+        commentList.innerHTML = '';
+        comments.forEach(comment => {
+            const cardElement = createCardElement(comment);
+            commentList.appendChild(cardElement);
+        });
+
+    }
+
+    function createCardElement(comment) {
+        const cardElement = document.createElement('div');
+        cardElement.classList.add('card');
+        cardElement.innerHTML = `
+    <div class="comment">
+        <div style="float: left; margin-right: 20px">
+          <img src="../../${comment.images[0].path}" alt="이미지" style="width: 120px; height: 120px">
+        </div>
+        <p>${comment.content}</p>
+        <textarea class="replyContent" placeholder="댓글 또는 대댓글 작성..."></textarea>
+        <input type="hidden" class="postId" value="${comment.postId}">
+        <input type="hidden" class="commentGroup" value="${comment.commentGroup}">
+        <button class="addReply">대댓글 작성</button>
+    </div>
+    <div class="replies">
+    </div>
+    <hr>
+        `;
+
+        const addReplyButton = cardElement.querySelector('.addReply');
+        addReplyButton.addEventListener('click', () => {
+            const content = cardElement.querySelector('.replyContent').value;
+            const postId = cardElement.querySelector('.postId').value;
+            const commentGroup = cardElement.querySelector('.commentGroup').value;
+            uploadReply(postId, commentGroup, content);
+        });
+
+        const repliesContainer = cardElement.querySelector('.replies');
+        const replyComments = comment.replyComments;
+        replyComments.forEach(reply => {
+            const replyElement = document.createElement('div');
+            replyElement.classList.add('comment');
+            replyElement.innerHTML = `<p>${reply.content}</p>`;
+            repliesContainer.appendChild(replyElement);
+        });
+
+        return cardElement;
+    }
+
+    function uploadReply(postId, commentGroup, content) {
+
+        const headers = {
+            'Authorization': localStorage.getItem('token'),
+            'Content-Type': "multipart/form-data"
+        }
+
+        axios.post(`/api/v1/comments/reply`, {
+                content: content,
+                postId: postId,
+                commentGroup: commentGroup
+            }
+            , {headers: headers}
+        ).then(response => {
+            console.log(JSON.stringify(response));
+            loadComments();
+
+        }).catch(error => {
+            alert("오류가 발생했습니다. \n" + error.response.data);
+            console.log(error);
+        })
+    }
+
+</script>
+</body>
+</html>
