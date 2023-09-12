@@ -7,42 +7,41 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.devcourse.be04daangnmarket.comment.exception.NotFoundException;
 import com.devcourse.be04daangnmarket.image.exception.FileDeleteException;
 import com.devcourse.be04daangnmarket.image.exception.FileUploadException;
 
+import java.util.NoSuchElementException;
+
 @RestControllerAdvice
 public class CommonExceptionHandler {
-
 	@ExceptionHandler(IllegalArgumentException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ResponseEntity<String> invalidHandle(IllegalArgumentException exception) {
-		return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
 	}
 
-	@ExceptionHandler(NotFoundException.class)
+	@ExceptionHandler(NoSuchElementException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public ResponseEntity<String> notFoundHandle(NotFoundException exception) {
+	public ResponseEntity<String> noSuchElementHandle(NoSuchElementException exception) {
 		return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
 	}
 
-	@ExceptionHandler(FileUploadException.class)
+	@ExceptionHandler(
+			{
+					FileUploadException.class,
+					FileDeleteException.class
+			}
+	)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public ResponseEntity<String> fileUploadHandle(FileUploadException exception) {
-		return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-
-	@ExceptionHandler(FileDeleteException.class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public ResponseEntity<String> fileDeleteHandle(FileDeleteException exception) {
-		return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+	public ResponseEntity<String> fileHandle(FileException exception) {
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException exception) {
+	public ResponseEntity<String> validationHandle(MethodArgumentNotValidException exception) {
 		String errorMessage = exception.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
 
-		return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
 	}
 }

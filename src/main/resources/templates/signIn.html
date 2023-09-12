@@ -25,7 +25,8 @@
                 window.location.href = "http://localhost:8080/";
             })
             .catch(error => {
-                alert("오류가 발생했습니다. \n" + error);
+                alert("오류가 발생했습니다. \n" + error.response.data);
+                console.log(error);
             })
     }
 </script>

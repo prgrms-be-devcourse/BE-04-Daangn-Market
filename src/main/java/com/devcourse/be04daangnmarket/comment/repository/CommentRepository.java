@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-
     @Query("SELECT max(c.commentGroup) FROM Comment c")
     Optional<Integer> findMaxCommentGroup();
 

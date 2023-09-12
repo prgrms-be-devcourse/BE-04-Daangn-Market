@@ -43,7 +43,8 @@ public class MemberRestController {
     public ResponseEntity<MemberDto.Response> signUp(@RequestBody @Valid MemberDto.SignUpRequest request) {
         MemberDto.Response response = memberService.signUp(request);
 
-        return new ResponseEntity(response, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(response);
     }
 
     @PostMapping("/login")
@@ -55,14 +56,16 @@ public class MemberRestController {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Authorization", token);
 
-        return new ResponseEntity(response, httpHeaders, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK)
+                .headers(httpHeaders)
+                .body(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<MemberDto.Response> getProfile(@PathVariable Long id) {
         MemberDto.Response response = memberService.getProfile(id);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
@@ -72,7 +75,7 @@ public class MemberRestController {
         memberService.validateById(id, user.getId());
         MemberDto.Response response = memberService.updateProfile(id, request.username());
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}/sale")
@@ -80,7 +83,7 @@ public class MemberRestController {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
         Page<PostDto.Response> saleList = postService.getPostByMemberId(id, pageable);
 
-        return new ResponseEntity<>(saleList, HttpStatus.OK);
+        return ResponseEntity.ok(saleList);
     }
 
     @GetMapping("/{id}/purchase")
@@ -88,6 +91,6 @@ public class MemberRestController {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
         Page<PostDto.Response> purchaseList = postService.getPostByBuyerId(id, pageable);
 
-        return new ResponseEntity<>(purchaseList, HttpStatus.OK);
+        return ResponseEntity.ok(purchaseList);
     }
 }

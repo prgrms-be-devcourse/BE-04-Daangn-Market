@@ -24,7 +24,7 @@
         </a>
     </div>
     <div>
-        <a th:href="|/mypage/${id}|">
+        <a th:href="|/members/${id}/mypage|">
             <button>뒤로 가기</button>
         </a>
     </div>
@@ -136,8 +136,8 @@
                 }
             })
             .catch(error => {
-                alert("오류가 발생했습니다. \n" + error);
-                console.error(error);
+                alert("오류가 발생했습니다. \n" + error.response.data);
+                console.log(error);
             });
     }
 

@@ -18,8 +18,8 @@
 
             })
             .catch(error => {
-                alert("오류가 발생했습니다. \n" + error);
-                console.error(error);
+                alert("오류가 발생했습니다. \n" + error.response.data);
+                console.log(error);
             });
     });
 </script>
@@ -38,7 +38,7 @@
                 </a>
             </div>
             <div class="button_container">
-                <a th:href="|/members/${id}/sasle|">
+                <a th:href="|/members/${id}/sale|">
                     <button class="sales_details_btn">판매내역</button>
                 </a>
             </div>

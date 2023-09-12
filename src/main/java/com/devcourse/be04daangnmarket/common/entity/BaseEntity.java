@@ -14,7 +14,6 @@ import jakarta.persistence.MappedSuperclass;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -38,5 +37,4 @@ public abstract class BaseEntity {
 	public LocalDateTime getUpdatedAt() {
 		return updatedAt;
 	}
-
 }

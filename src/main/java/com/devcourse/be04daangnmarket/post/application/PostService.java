@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import com.devcourse.be04daangnmarket.image.dto.ImageDto;
+import com.devcourse.be04daangnmarket.post.util.PostConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,14 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.devcourse.be04daangnmarket.image.application.ImageService;
-import com.devcourse.be04daangnmarket.image.domain.DomainName;
-import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
+import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 import com.devcourse.be04daangnmarket.member.application.MemberService;
-import com.devcourse.be04daangnmarket.member.dto.MemberDto;
-import com.devcourse.be04daangnmarket.post.domain.Category;
+import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
-import com.devcourse.be04daangnmarket.post.domain.Status;
-import com.devcourse.be04daangnmarket.post.domain.TransactionType;
+import com.devcourse.be04daangnmarket.post.domain.constant.Status;
+import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 import com.devcourse.be04daangnmarket.post.repository.PostRepository;
 
@@ -31,7 +31,6 @@ import jakarta.servlet.http.HttpServletResponse;
 @Service
 @Transactional(readOnly = true)
 public class PostService {
-
 	private final PostRepository postRepository;
 	private final ImageService imageService;
 	private final MemberService memberService;
@@ -43,9 +42,14 @@ public class PostService {
 	}
 
 	@Transactional
-	public PostDto.Response create(Long memberId, String title, String description, int price,
-		TransactionType transactionType, Category category, List<MultipartFile> files) throws IOException {
-		Post post = new Post(
+	public PostDto.Response create(Long memberId,
+								   String title,
+								   String description,
+								   int price,
+								   TransactionType transactionType,
+								   Category category,
+								   List<MultipartFile> files) throws IOException {
+		Post post = PostConverter.toEntity(
 			memberId,
 			title,
 			description,
@@ -56,9 +60,10 @@ public class PostService {
 
 		postRepository.save(post);
 
-		List<ImageResponse> images = imageService.uploadImages(files, DomainName.POST, post.getId());
+		List<ImageDto.ImageResponse> images = imageService.uploadImages(files, DomainName.POST, post.getId());
+		String username = getUsername(post.getMemberId());
 
-		return toResponse(post, images);
+		return PostConverter.toResponse(post, images, username);
 	}
 
 	@Transactional
@@ -68,48 +73,54 @@ public class PostService {
 		if (!isViewed(id, req, res))
 			post.updateView();
 
-		List<ImageResponse> images = imageService.getImages(DomainName.POST, id);
+		List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, id);
+		String username = getUsername(post.getMemberId());
 
-		return toResponse(post, images);
+		return PostConverter.toResponse(post, images, username);
 	}
 
 	public Page<PostDto.Response> getAllPost(Pageable pageable) {
 		return postRepository.findAll(pageable).map(post -> {
-			List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+			List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+			String username = getUsername(post.getMemberId());
 
-			return toResponse(post, images);
+			return PostConverter.toResponse(post, images, username);
 		});
 	}
 
 	public Page<PostDto.Response> getPostByCategory(Category category, Pageable pageable) {
 		return postRepository.findByCategory(category, pageable).map(post -> {
-			List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+			List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+			String username = getUsername(post.getMemberId());
 
-			return toResponse(post, images);
+			return PostConverter.toResponse(post, images, username);
 		});
 	}
 
 	public Page<PostDto.Response> getPostByMemberId(Long memberId, Pageable pageable) {
 		return postRepository.findByMemberId(memberId, pageable).map(post -> {
-			List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+			List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+			String username = getUsername(post.getMemberId());
 
-			return toResponse(post, images);
+			return PostConverter.toResponse(post, images, username);
 		});
 	}
 
 	public Page<PostDto.Response> getPostByKeyword(String keyword, Pageable pageable) {
 		return postRepository.findByTitleContaining(keyword, pageable).map(post -> {
-			List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+			List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+			String username = getUsername(post.getMemberId());
 
-			return toResponse(post, images);
+			return PostConverter.toResponse(post, images, username);
 		});
 	}
 
 	public Page<PostDto.Response> getPostByBuyerId(Long buyerId, Pageable pageable) {
 		return postRepository.findByBuyerId(buyerId, pageable).map(post -> {
-			List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+			List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+			String username = getUsername(post.getMemberId());
 
-			return toResponse(post, images);
+			return PostConverter.toResponse(post, images, username);
 		});
 	}
 
@@ -121,18 +132,21 @@ public class PostService {
 		post.update(title, description, price, transactionType, category);
 		imageService.deleteAllImages(DomainName.POST, id);
 
-		List<ImageResponse> images = imageService.uploadImages(files, DomainName.POST, id);
+		List<ImageDto.ImageResponse> images = imageService.uploadImages(files, DomainName.POST, id);
+		String username = getUsername(post.getMemberId());
 
-		return toResponse(post, images);
+		return PostConverter.toResponse(post, images, username);
 	}
 
 	@Transactional
 	public PostDto.Response updateStatus(Long id, Status status) {
 		Post post = findPostById(id);
 		post.updateStatus(status);
-		List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
 
-		return toResponse(post, images);
+		List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+		String username = getUsername(post.getMemberId());
+
+		return PostConverter.toResponse(post, images, username);
 	}
 
 	public Post findPostById(Long id) {
@@ -150,29 +164,15 @@ public class PostService {
 	public PostDto.Response purchaseProduct(Long id, Long buyerId) {
 		Post post = findPostById(id);
 		post.purchased(buyerId);
-		List<ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
 
-		return toResponse(post, images);
+		List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+		String username = getUsername(post.getMemberId());
+
+		return PostConverter.toResponse(post, images, username);
 	}
 
-	private PostDto.Response toResponse(Post post, List<ImageResponse> images) {
-		MemberDto.Response member = memberService.getProfile(post.getMemberId());
-
-		return new PostDto.Response(
-			post.getId(),
-			post.getMemberId(),
-			member.username(),
-			post.getTitle(),
-			post.getDescription(),
-			post.getPrice(),
-			post.getViews(),
-			post.getTransactionType().getDescription(),
-			post.getCategory().getDescription(),
-			post.getStatus().getDescription(),
-			images,
-			post.getBuyerId(),
-			post.getCreatedAt()
-		);
+	private String getUsername(Long memberId) {
+		return memberService.getProfile(memberId).username();
 	}
 
 	private boolean isViewed(Long id, HttpServletRequest req, HttpServletResponse res) {
@@ -180,12 +180,15 @@ public class PostService {
 		String cookieValue = Long.toString(id);
 		Cookie[] cookies = req.getCookies();
 
-		if (cookies == null)
+		if (cookies == null) {
 			return false;
+		}
 
-		for (Cookie cookie : cookies)
-			if (cookie.getName().contains(cookieName))
+		for (Cookie cookie : cookies) {
+			if (cookie.getName().contains(cookieName)) {
 				return true;
+			}
+		}
 
 		Cookie cookie = new Cookie(cookieName, cookieValue);
 		cookie.setPath("/");

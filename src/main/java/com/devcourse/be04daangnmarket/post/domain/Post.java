@@ -2,6 +2,9 @@ package com.devcourse.be04daangnmarket.post.domain;
 
 import java.time.LocalDateTime;
 
+import com.devcourse.be04daangnmarket.post.domain.constant.Category;
+import com.devcourse.be04daangnmarket.post.domain.constant.Status;
+import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
@@ -18,7 +21,6 @@ import jakarta.persistence.Table;
 @DynamicInsert
 @Table(name = "posts")
 public class Post extends BaseEntity {
-
 	@Column(nullable = false)
 	private Long memberId;
 
@@ -130,15 +132,19 @@ public class Post extends BaseEntity {
 		if (title != null) {
 			this.title = title;
 		}
+
 		if (description != null) {
 			this.description = description;
 		}
+
 		if (price >= 0) {
 			this.price = price;
 		}
+
 		if (transactionType != null) {
 			this.transactionType = transactionType;
 		}
+
 		if (category != null) {
 			this.category = category;
 		}
@@ -155,5 +161,4 @@ public class Post extends BaseEntity {
 	public void purchased(Long buyerId) {
 		this.buyerId = buyerId;
 	}
-
 }

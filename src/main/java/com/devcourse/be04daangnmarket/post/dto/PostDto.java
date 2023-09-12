@@ -3,85 +3,94 @@ package com.devcourse.be04daangnmarket.post.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.devcourse.be04daangnmarket.image.dto.ImageResponse;
-import com.devcourse.be04daangnmarket.post.domain.Category;
-import com.devcourse.be04daangnmarket.post.domain.Status;
-import com.devcourse.be04daangnmarket.post.domain.TransactionType;
+import com.devcourse.be04daangnmarket.post.domain.constant.Category;
+import com.devcourse.be04daangnmarket.post.domain.constant.Status;
+import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public class PostDto {
+    public record CreateRequest(
+            @NotBlank(message = "제목은 필수 입니다")
+            String title,
 
-	public record CreateRequest(
+            String description,
 
-		@NotBlank(message = "제목은 필수 입니다")
-		String title,
+            @Positive(message = "가격은 양수여야 합니다.")
+            int price,
 
-		String description,
+            @NotNull(message = "거래 유형은 필수 입니다.")
+            TransactionType transactionType,
 
-		@Positive(message = "가격은 양수여야 합니다.")
-		int price,
+            @NotNull(message = "카테고리는 필수 입니다.")
+            Category category,
 
-		@NotNull(message = "거래 유형은 필수 입니다.")
-		TransactionType transactionType,
+            List<MultipartFile> files
+    ) {
+    }
 
-		@NotNull(message = "카테고리는 필수 입니다.")
-		Category category,
+    public record UpdateRequest(
+            @NotBlank(message = "제목은 필수 입니다")
+            String title,
 
-		List<MultipartFile> files
-	) {
-	}
+            String description,
 
-	public record UpdateRequest(
-		@NotBlank(message = "제목은 필수 입니다")
-		String title,
+            @Positive(message = "가격은 양수여야 합니다.")
+            int price,
 
-		String description,
+            @NotNull(message = "거래 유형은 필수 입니다.")
+            TransactionType transactionType,
 
-		@Positive(message = "가격은 양수여야 합니다.")
-		int price,
+            @NotNull(message = "카테고리는 필수 입니다.")
+            Category category,
 
-		@NotNull(message = "거래 유형은 필수 입니다.")
-		TransactionType transactionType,
+            List<MultipartFile> files
+    ) {
+    }
 
-		@NotNull(message = "카테고리는 필수 입니다.")
-		Category category,
+    public record StatusUpdateRequest(
+            @NotNull(message = "게시글 상태값은 필수 입니다.")
+            Status status
+    ) {
+    }
 
-		List<MultipartFile> files
-	) {
-	}
+    public record BuyerUpdateRequest(
+            @NotNull(message = "구매자 정보는 필수 입니다.")
+            Long buyerId
+    ) {
+    }
 
-	public record StatusUpdateRequest(
-		@NotNull(message = "게시글 상태값은 필수 입니다.")
-		Status status
-	) {
-	}
+    public record Response(
+            Long id,
 
-	public record BuyerUpdateRequest(
-		@NotNull(message = "구매자 정보는 필수 입니다.")
-		Long buyerId
-	) {
-	}
+            Long memberId,
 
-	public record Response(
-		Long id,
-		Long memberId,
-		String userName,
-		String title,
-		String description,
-		int price,
-		int views,
-		String transactionType,
-		String category,
-		String status,
-		List<ImageResponse> images,
-		Long buyerId,
-		LocalDateTime createdAt
-	) {
-	}
+            String userName,
 
+            String title,
+
+            String description,
+
+            int price,
+
+            int views,
+
+            String transactionType,
+
+            String category,
+
+            String status,
+
+            List<ImageDto.ImageResponse> images,
+
+            Long buyerId,
+
+            LocalDateTime createdAt
+    ) {
+    }
 }

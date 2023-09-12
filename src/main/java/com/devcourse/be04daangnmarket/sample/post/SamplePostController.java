@@ -4,12 +4,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.devcourse.be04daangnmarket.post.domain.Category;
-import com.devcourse.be04daangnmarket.post.domain.TransactionType;
+import com.devcourse.be04daangnmarket.post.domain.constant.Category;
+import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 
 @Controller
 public class SamplePostController {
-
 	@GetMapping("/sample/create/posts")
 	public String sampleMain(Model model){
 		model.addAttribute("categories", Category.values());
@@ -17,5 +16,4 @@ public class SamplePostController {
 
 		return "/sample/sampleCreatePost";
 	}
-
 }

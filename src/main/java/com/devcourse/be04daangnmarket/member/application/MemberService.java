@@ -3,10 +3,12 @@ package com.devcourse.be04daangnmarket.member.application;
 import com.devcourse.be04daangnmarket.member.domain.Member;
 import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import com.devcourse.be04daangnmarket.member.repository.MemberRepository;
+import com.devcourse.be04daangnmarket.member.util.MemberConverter;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.util.NoSuchElementException;
 
 import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.DUPLICATED_USERNAME;
@@ -26,16 +28,11 @@ public class MemberService {
     }
 
     public MemberDto.Response signUp(MemberDto.SignUpRequest request) {
-        Member member = new Member(
-                request.username(),
-                request.phoneNumber(),
-                request.email(),
-                passwordEncoder.encode(request.password())
-        );
+        Member member = MemberConverter.toEntity(request, passwordEncoder);
 
         Member savedMember = memberRepository.save(member);
 
-        return toResponse(savedMember);
+        return MemberConverter.toResponse(savedMember);
     }
 
     public MemberDto.Response signIn(MemberDto.SignInRequest request) {
@@ -43,7 +40,7 @@ public class MemberService {
                 .orElseThrow(() -> new UsernameNotFoundException(FAIL_LOGIN.getMessage()));
 
         if (member.isMatchedPassword(passwordEncoder, request.password())) {
-            return toResponse(member);
+            return MemberConverter.toResponse(member);
         }
 
         throw new UsernameNotFoundException(FAIL_LOGIN.getMessage());
@@ -54,7 +51,8 @@ public class MemberService {
 
         if (isAvailableUsername(username)) {
             member.updateProfile(username);
-            return toResponse(member);
+
+            return MemberConverter.toResponse(member);
         }
 
         throw new IllegalArgumentException(DUPLICATED_USERNAME.getMessage());
@@ -63,7 +61,7 @@ public class MemberService {
     public MemberDto.Response getProfile(Long id) {
         Member member = getMember(id);
 
-        return toResponse(member);
+        return MemberConverter.toResponse(member);
     }
 
     public void validateById(Long pathId, Long authUserId) {
@@ -79,18 +77,5 @@ public class MemberService {
 
     private boolean isAvailableUsername(String username) {
         return memberRepository.findByUsername(username).isEmpty();
-    }
-
-    private MemberDto.Response toResponse(Member member) {
-        return new MemberDto.Response(
-                member.getId(),
-                member.getUsername(),
-                member.getPhoneNumber(),
-                member.getEmail(),
-                member.getTemperature(),
-                member.getStatus(),
-                member.getCreatedAt(),
-                member.getUpdatedAt()
-        );
     }
 }

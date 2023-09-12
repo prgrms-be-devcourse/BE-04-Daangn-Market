@@ -1,17 +1,16 @@
 package com.devcourse.be04daangnmarket.comment.application;
 
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
-import com.devcourse.be04daangnmarket.comment.domain.DeletedStatus;
-import com.devcourse.be04daangnmarket.comment.dto.PostCommentResponse;
-import com.devcourse.be04daangnmarket.comment.dto.UpdateCommentRequest;
-import com.devcourse.be04daangnmarket.comment.exception.NotFoundException;
+import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
+import com.devcourse.be04daangnmarket.comment.exception.NotFoundCommentException;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
+import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.member.domain.Member;
 import com.devcourse.be04daangnmarket.member.repository.MemberRepository;
-import com.devcourse.be04daangnmarket.post.domain.Category;
+import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
-import com.devcourse.be04daangnmarket.post.domain.TransactionType;
+import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 import com.devcourse.be04daangnmarket.post.repository.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage.NOT_FOUND_COMMENT;
+import static com.devcourse.be04daangnmarket.comment.exception.ErrorMessage.NOT_FOUND_COMMENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -40,7 +39,6 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class CommentServiceTest {
-
     @InjectMocks
     private CommentService commentService;
 
@@ -63,7 +61,7 @@ class CommentServiceTest {
 
         //when & then
         assertThatThrownBy(() -> commentService.delete(commentId))
-                .isInstanceOf(NotFoundException.class)
+                .isInstanceOf(NotFoundCommentException.class)
                 .hasMessage(NOT_FOUND_COMMENT.getMessage());
     }
 
@@ -77,7 +75,7 @@ class CommentServiceTest {
         commentService.delete(comment.getId());
 
         // then
-        assertThat(comment.getDeletedStatus()).isEqualTo(DeletedStatus.DELETED);
+        assertThat(comment.getStatus()).isEqualTo(Status.DELETED);
     }
 
     @Test
@@ -100,7 +98,7 @@ class CommentServiceTest {
         given(postRepository.findById(postId)).willReturn(Optional.of(post));
 
         //when
-        Page<PostCommentResponse> responses = commentService.getPostComments(postId, pageable);
+        Page<CommentDto.PostCommentResponse> responses = commentService.getPostComments(postId, pageable);
 
         //then
         assertThat(commentPage.getTotalElements()).isEqualTo(responses.getTotalElements());
@@ -116,7 +114,7 @@ class CommentServiceTest {
         MockMultipartFile imageFile = new MockMultipartFile("예시", "예시.png", MediaType.IMAGE_JPEG_VALUE, "예시".getBytes());
         images.add(imageFile);
 
-        UpdateCommentRequest request = new UpdateCommentRequest("변경댓글", 1L, images);
+        CommentDto.UpdateCommentRequest request = new CommentDto.UpdateCommentRequest("변경댓글", 1L, images);
         Comment comment = new Comment("이전댓글", 1L, 1L);
         given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
 

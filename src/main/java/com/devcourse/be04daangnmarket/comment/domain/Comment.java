@@ -1,15 +1,15 @@
 package com.devcourse.be04daangnmarket.comment.domain;
 
+import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
-import static com.devcourse.be04daangnmarket.comment.exception.ExceptionMessage.*;
+import static com.devcourse.be04daangnmarket.comment.exception.ErrorMessage.*;
 
 @Entity
 @Table(name = "comments")
@@ -19,8 +19,8 @@ public class Comment extends BaseEntity {
     private String content;
 
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'ALIVE'")
-    private DeletedStatus deletedStatus;
+    @Column(nullable = false)
+    private Status status;
 
     @Column(nullable = false)
     private Long memberId;//작성자 Id
@@ -33,7 +33,6 @@ public class Comment extends BaseEntity {
     private int seq;//댓글의 순서 1번이 댓글 주인, 뒤로 대댓글
 
     protected Comment() {
-
     }
 
     public Comment(String content, Long memberId, Long postId) {
@@ -55,8 +54,8 @@ public class Comment extends BaseEntity {
         return content;
     }
 
-    public DeletedStatus getDeletedStatus() {
-        return deletedStatus;
+    public Status getStatus() {
+        return status;
     }
 
     public Long getMemberId() {
@@ -94,7 +93,7 @@ public class Comment extends BaseEntity {
     }
 
     public void deleteStatus() {
-        this.deletedStatus = DeletedStatus.DELETED;
+        this.status = Status.DELETED;
     }
 
     public void update(String content) {

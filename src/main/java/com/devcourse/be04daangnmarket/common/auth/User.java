@@ -7,7 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 
 public record User(Member member) implements UserDetails {
-
     public Long getId() {
         return member.getId();
     }
