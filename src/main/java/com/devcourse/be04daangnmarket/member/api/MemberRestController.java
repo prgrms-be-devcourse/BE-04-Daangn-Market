@@ -81,7 +81,7 @@ public class MemberRestController {
     @GetMapping("/{id}/sale")
     public ResponseEntity<Page<PostDto.Response>> getSaleList(@PathVariable Long id, @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
-        Page<PostDto.Response> saleList = postService.getPostByMemberId(id, pageable);
+        Page<PostDto.Response> saleList = postService.getAllPost(pageable, null, id, null, null);
 
         return ResponseEntity.ok(saleList);
     }
@@ -89,7 +89,7 @@ public class MemberRestController {
     @GetMapping("/{id}/purchase")
     public ResponseEntity<Page<PostDto.Response>> getPurchaseList(@PathVariable Long id, @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
-        Page<PostDto.Response> purchaseList = postService.getPostByBuyerId(id, pageable);
+        Page<PostDto.Response> purchaseList = postService.getAllPost(pageable, null, null, null, id);
 
         return ResponseEntity.ok(purchaseList);
     }

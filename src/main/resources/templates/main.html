@@ -89,7 +89,7 @@
         itemList = '';
         pagination.innerHTML = '';
 
-        axios.get(`/api/v1/posts`, {params: {page: page}})
+        axios.get(`/api/v1/posts/search`, {params: {page: page}})
             .then(response => {
 
                 if (response.data.content.length !== 0) {

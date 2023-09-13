@@ -10,12 +10,11 @@ import com.devcourse.be04daangnmarket.post.dto.PostDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -62,39 +61,15 @@ public class PostRestController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    public ResponseEntity<Page<PostDto.Response>> getAllPost(@RequestParam(defaultValue = "0") int page) {
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
-        Page<PostDto.Response> responses = postService.getAllPost(pageable);
+    @GetMapping("/search")
+    public ResponseEntity<Page<PostDto.Response>> getAllPost(@RequestParam(required = false) Category category,
+                                                             @RequestParam(required = false) Long memberId,
+                                                             @RequestParam(required = false) String title,
+                                                             @RequestParam(required = false) Long buyerId,
+                                                             @PageableDefault(page = 0, size = PAGE_SIZE, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<PostDto.Response> responses = postService.getAllPost(pageable, category, memberId, title, buyerId);
 
         return ResponseEntity.ok(responses);
-    }
-
-    @GetMapping("/category")
-    public ResponseEntity<Page<PostDto.Response>> getPostByCategory(@RequestParam @NotNull Category category,
-                                                                    @RequestParam(defaultValue = "0") int page) {
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
-        Page<PostDto.Response> response = postService.getPostByCategory(category, pageable);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/member/{memberId}")
-    public ResponseEntity<Page<PostDto.Response>> getPostByMemberId(@PathVariable @NotNull Long memberId,
-                                                                    @RequestParam(defaultValue = "0") int page) {
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
-        Page<PostDto.Response> response = postService.getPostByMemberId(memberId, pageable);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<Page<PostDto.Response>> getPostByKeyword(@RequestParam @NotBlank String keyword,
-                                                                   @RequestParam(defaultValue = "0") int page) {
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
-        Page<PostDto.Response> response = postService.getPostByKeyword(keyword, pageable);
-
-        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
@@ -139,8 +114,7 @@ public class PostRestController {
 
     @GetMapping("/{postId}/comments")
     public ResponseEntity<Page<CommentDto.PostCommentResponse>> getPostComments(@PathVariable Long postId,
-                                                                                @RequestParam(defaultValue = "0") int page) {
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("createdAt").descending());
+                                                                                @PageableDefault(page = 0, size = PAGE_SIZE, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<CommentDto.PostCommentResponse> response = commentService.getPostComments(postId, pageable);
 
         return ResponseEntity.ok(response);
@@ -148,8 +122,7 @@ public class PostRestController {
 
     @GetMapping("/{id}/communicationMembers")
     public ResponseEntity<Page<MemberDto.Response>> getCommunicationMembers(@PathVariable Long id,
-                                                                            @RequestParam(defaultValue = "0") int page) {
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+                                                                            @PageableDefault(page = 0, size = PAGE_SIZE) Pageable pageable) {
         Page<MemberDto.Response> responses = commentService.getCommenterByPostId(id, pageable);
 
         return ResponseEntity.ok(responses);

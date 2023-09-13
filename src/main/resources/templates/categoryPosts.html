@@ -30,7 +30,7 @@
         itemList = '';
         pagination.innerHTML = '';
 
-        axios.get(`/api/v1/posts/category?category=${category}&page=${page}`)
+        axios.get(`/api/v1/posts/search?category=${category}&page=${page}`)
             .then(res => {
                 if (res.data.content.length !== 0) {
                     res.data.content.map(post => addRow(post));

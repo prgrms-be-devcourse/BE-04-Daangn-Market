@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.devcourse.be04daangnmarket.image.dto.ImageDto;
+import com.devcourse.be04daangnmarket.post.repository.PostCriteriaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -44,6 +45,9 @@ class PostServiceTest {
 
 	@Mock
 	private PostRepository postRepository;
+
+	@Mock
+	private PostCriteriaRepository postCriteriaRepository;
 
 	@Mock
 	private ImageService imageService;
@@ -214,7 +218,7 @@ class PostServiceTest {
 		when(postRepository.findAll(pageable)).thenReturn(page);
 
 		// when
-		Page<PostDto.Response> response = postService.getAllPost(pageable);
+		Page<PostDto.Response> response = postService.getAllPost(pageable, null, null, null, null);
 
 		// then
 		assertEquals(page.getTotalElements(), response.getTotalElements());
@@ -239,10 +243,10 @@ class PostServiceTest {
 		List<Post> posts = List.of(post);
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<Post> page = new PageImpl<>(posts);
-		when(postRepository.findByCategory(category, pageable)).thenReturn(page);
+		when(postCriteriaRepository.findAllByOffsetPaging(pageable, category, null, null, null)).thenReturn(page);
 
 		// when
-		Page<PostDto.Response> response = postService.getPostByCategory(category, pageable);
+		Page<PostDto.Response> response = postService.getAllPost(pageable, category, null, null, null);
 
 		// then
 		assertEquals(page.getTotalElements(), response.getTotalElements());
@@ -267,10 +271,10 @@ class PostServiceTest {
 		List<Post> posts = List.of(post);
 		Pageable pageable = PageRequest.of(0, 10);
 		Page<Post> page = new PageImpl<>(posts);
-		when(postRepository.findByMemberId(memberId, pageable)).thenReturn(page);
+		when(postCriteriaRepository.findAllByOffsetPaging(pageable, null, memberId, null, null)).thenReturn(page);
 
 		// when
-		Page<PostDto.Response> response = postService.getPostByMemberId(memberId, pageable);
+		Page<PostDto.Response> response = postService.getAllPost(pageable, null, memberId, null, null);
 
 		// then
 		assertEquals(page.getTotalElements(), response.getTotalElements());

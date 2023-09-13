@@ -199,7 +199,7 @@ class PostRestControllerTest {
 		Page<PostDto.Response> responsePage = new PageImpl<>(fakeResponses, pageable, fakeResponses.size());
 
 		// when
-		when(postService.getAllPost(pageable)).thenReturn(responsePage);
+		when(postService.getAllPost(pageable, null, null, null, null)).thenReturn(responsePage);
 
 		// then
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts")
@@ -237,7 +237,7 @@ class PostRestControllerTest {
 
 		List<PostDto.Response> mockResponses = List.of(postResponse);
 
-		when(postService.getPostByCategory(category, pageable)).thenReturn(new PageImpl<>(mockResponses));
+		when(postService.getAllPost(pageable, category, null, null, null)).thenReturn(new PageImpl<>(mockResponses));
 
 		// when then
 		mockMvc.perform(get("/api/v1/posts/category")

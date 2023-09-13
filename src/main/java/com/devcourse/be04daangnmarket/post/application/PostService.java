@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import com.devcourse.be04daangnmarket.image.dto.ImageDto;
+import com.devcourse.be04daangnmarket.post.repository.PostCriteriaRepository;
 import com.devcourse.be04daangnmarket.post.util.PostConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,11 +35,13 @@ public class PostService {
 	private final PostRepository postRepository;
 	private final ImageService imageService;
 	private final MemberService memberService;
+	private final PostCriteriaRepository postCriteriaRepository;
 
-	public PostService(PostRepository postRepository, ImageService imageService, MemberService memberService) {
+	public PostService(PostRepository postRepository, ImageService imageService, MemberService memberService, PostCriteriaRepository postCriteriaRepository) {
 		this.postRepository = postRepository;
 		this.imageService = imageService;
 		this.memberService = memberService;
+		this.postCriteriaRepository = postCriteriaRepository;
 	}
 
 	@Transactional
@@ -79,44 +82,12 @@ public class PostService {
 		return PostConverter.toResponse(post, images, username);
 	}
 
-	public Page<PostDto.Response> getAllPost(Pageable pageable) {
-		return postRepository.findAll(pageable).map(post -> {
-			List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
-			String username = getUsername(post.getMemberId());
-
-			return PostConverter.toResponse(post, images, username);
-		});
-	}
-
-	public Page<PostDto.Response> getPostByCategory(Category category, Pageable pageable) {
-		return postRepository.findByCategory(category, pageable).map(post -> {
-			List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
-			String username = getUsername(post.getMemberId());
-
-			return PostConverter.toResponse(post, images, username);
-		});
-	}
-
-	public Page<PostDto.Response> getPostByMemberId(Long memberId, Pageable pageable) {
-		return postRepository.findByMemberId(memberId, pageable).map(post -> {
-			List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
-			String username = getUsername(post.getMemberId());
-
-			return PostConverter.toResponse(post, images, username);
-		});
-	}
-
-	public Page<PostDto.Response> getPostByKeyword(String keyword, Pageable pageable) {
-		return postRepository.findByTitleContaining(keyword, pageable).map(post -> {
-			List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
-			String username = getUsername(post.getMemberId());
-
-			return PostConverter.toResponse(post, images, username);
-		});
-	}
-
-	public Page<PostDto.Response> getPostByBuyerId(Long buyerId, Pageable pageable) {
-		return postRepository.findByBuyerId(buyerId, pageable).map(post -> {
+	public Page<PostDto.Response> getAllPost(Pageable pageable,
+											 Category category,
+											 Long memberId,
+											 String title,
+											 Long buyerId) {
+		return postCriteriaRepository.findAllByOffsetPaging(pageable, category, memberId, title, buyerId).map(post -> {
 			List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
 			String username = getUsername(post.getMemberId());
 
