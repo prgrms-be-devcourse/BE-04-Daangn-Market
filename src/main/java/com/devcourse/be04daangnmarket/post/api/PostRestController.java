@@ -116,7 +116,7 @@ public class PostRestController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<PostDto.Response> updatePostStatus(@PathVariable @NotNull Long id,
                                                              @RequestBody @Valid PostDto.StatusUpdateRequest request) {
-        PostDto.Response response = postService.updateStatus(id, request.status());
+        PostDto.Response response = postService.updatePostStatus(id, request.postStatus());
 
         return ResponseEntity.ok(response);
     }

@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
+import com.devcourse.be04daangnmarket.post.domain.constant.PostStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,6 @@ import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
 import com.devcourse.be04daangnmarket.member.domain.Member;
 import com.devcourse.be04daangnmarket.post.application.PostService;
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
-import com.devcourse.be04daangnmarket.post.domain.constant.Status;
 import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -88,7 +88,7 @@ class PostRestControllerTest {
 			1000,
 			TransactionType.SALE.getDescription(),
 			Category.DIGITAL_DEVICES.getDescription(),
-			Status.FOR_SALE.getDescription(),
+			PostStatus.FOR_SALE.getDescription(),
 			null,
 			null,
 			LocalDateTime.now()
@@ -138,7 +138,7 @@ class PostRestControllerTest {
 			1000,
 			TransactionType.SALE.getDescription(),
 			Category.DIGITAL_DEVICES.getDescription(),
-			Status.FOR_SALE.getDescription(),
+			PostStatus.FOR_SALE.getDescription(),
 			null,
 			null,
 			LocalDateTime.now()
@@ -171,7 +171,7 @@ class PostRestControllerTest {
 			1000,
 			TransactionType.SALE.getDescription(),
 			Category.DIGITAL_DEVICES.getDescription(),
-			Status.FOR_SALE.getDescription(),
+			PostStatus.FOR_SALE.getDescription(),
 			null,
 			null,
 			LocalDateTime.now()
@@ -187,7 +187,7 @@ class PostRestControllerTest {
 			1000,
 			TransactionType.SALE.getDescription(),
 			Category.DIGITAL_DEVICES.getDescription(),
-			Status.FOR_SALE.getDescription(),
+			PostStatus.FOR_SALE.getDescription(),
 			null,
 			null,
 			LocalDateTime.now()
@@ -229,7 +229,7 @@ class PostRestControllerTest {
 			1000,
 			TransactionType.SALE.getDescription(),
 			Category.DIGITAL_DEVICES.getDescription(),
-			Status.FOR_SALE.getDescription(),
+			PostStatus.FOR_SALE.getDescription(),
 			null,
 			null,
 			LocalDateTime.now()
@@ -254,7 +254,7 @@ class PostRestControllerTest {
 	void updatePostStatusTest() throws Exception {
 		// given
 		Long postId = 1L;
-		PostDto.StatusUpdateRequest mockRequest = new PostDto.StatusUpdateRequest(Status.SOLD);
+		PostDto.StatusUpdateRequest mockRequest = new PostDto.StatusUpdateRequest(PostStatus.SOLD);
 
 		PostDto.Response mockResponse = new PostDto.Response(
 			1L,
@@ -266,23 +266,23 @@ class PostRestControllerTest {
 			1000,
 			TransactionType.SALE.getDescription(),
 			Category.DIGITAL_DEVICES.getDescription(),
-			Status.SOLD.getDescription(),
+			PostStatus.SOLD.getDescription(),
 			null,
 			null,
 			LocalDateTime.now()
 		);
 
 		// when
-		when(postService.updateStatus(postId, mockRequest.status())).thenReturn(mockResponse);
+		when(postService.updatePostStatus(postId, mockRequest.postStatus())).thenReturn(mockResponse);
 
 		// then
 		mockMvc.perform(patch("/api/v1/posts/{id}/status", postId)
 				.content(objectMapper.writeValueAsString(mockRequest))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.status").value(Status.SOLD.getDescription()));
+			.andExpect(jsonPath("$.status").value(PostStatus.SOLD.getDescription()));
 
-		verify(postService, times(1)).updateStatus(postId, mockRequest.status());
+		verify(postService, times(1)).updatePostStatus(postId, mockRequest.postStatus());
 	}
 
 	@Test
@@ -303,7 +303,7 @@ class PostRestControllerTest {
 			1000,
 			TransactionType.SALE.getDescription(),
 			Category.DIGITAL_DEVICES.getDescription(),
-			Status.SOLD.getDescription(),
+			PostStatus.SOLD.getDescription(),
 			null,
 			buyerId,
 			LocalDateTime.now()

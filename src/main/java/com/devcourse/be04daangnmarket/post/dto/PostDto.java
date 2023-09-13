@@ -7,7 +7,7 @@ import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
-import com.devcourse.be04daangnmarket.post.domain.constant.Status;
+import com.devcourse.be04daangnmarket.post.domain.constant.PostStatus;
 import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 
 import jakarta.validation.constraints.NotBlank;
@@ -55,7 +55,7 @@ public class PostDto {
 
     public record StatusUpdateRequest(
             @NotNull(message = "게시글 상태값은 필수 입니다.")
-            Status status
+            PostStatus postStatus
     ) {
     }
 
