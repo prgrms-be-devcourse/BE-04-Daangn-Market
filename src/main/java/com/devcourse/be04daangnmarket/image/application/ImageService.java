@@ -3,6 +3,7 @@ package com.devcourse.be04daangnmarket.image.application;
 import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 import com.devcourse.be04daangnmarket.image.domain.Image;
+import com.devcourse.be04daangnmarket.image.domain.constant.Type;
 import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.image.exception.FileUploadException;
 import com.devcourse.be04daangnmarket.image.repository.ImageRepository;
@@ -51,12 +52,13 @@ public class ImageService {
 				continue;
 			}
 
+			Type imageType = Type.findImageType(multipartFile.getContentType());
 			String fileNameWithoutSpaces = multipartFile.getOriginalFilename().replaceAll(" ", "");
 			String uniqueName = createUniqueName(fileNameWithoutSpaces);
 
 			saveImageToLocalStorage(multipartFile, uniqueName);
 
-			Image image = new Image(multipartFile.getOriginalFilename(), multipartFile.getContentType(),
+			Image image = new Image(multipartFile.getOriginalFilename(), imageType,
 					multipartFile.getSize(), getRelativePath(uniqueName), domainName, domainId);
 
 			imageRepository.save(image);

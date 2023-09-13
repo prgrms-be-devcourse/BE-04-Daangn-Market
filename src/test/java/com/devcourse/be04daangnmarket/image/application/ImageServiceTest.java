@@ -3,6 +3,7 @@ package com.devcourse.be04daangnmarket.image.application;
 import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 import com.devcourse.be04daangnmarket.image.domain.Image;
+import com.devcourse.be04daangnmarket.image.domain.constant.Type;
 import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.image.repository.ImageRepository;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ class ImageServiceTest {
         List<MultipartFile> multipartFiles = new ArrayList<>();
         MockMultipartFile imageFile = new MockMultipartFile(
                 "구직_공고문",
-                "구직_공고문.png",
+                "구직_공고문.jpeg",
                 MediaType.IMAGE_JPEG_VALUE,
                 "test".getBytes());
         multipartFiles.add(imageFile);
@@ -47,7 +48,7 @@ class ImageServiceTest {
 
         Image image = new Image(
                 imageFile.getOriginalFilename(),
-                imageFile.getContentType(),
+                Type.JPEG,
                 imageFile.getSize(),
                 "images/randomPath-" + imageFile.getOriginalFilename(),
                 domainName,
@@ -76,7 +77,7 @@ class ImageServiceTest {
 
         Image image = new Image(
                 imageFile.getOriginalFilename(),
-                imageFile.getContentType(),
+                Type.JPEG,
                 imageFile.getSize(),
                 "images/randomPath-" + imageFile.getOriginalFilename(),
                 domainName,
@@ -101,7 +102,7 @@ class ImageServiceTest {
         List<MultipartFile> multipartFiles = new ArrayList<>();
         MockMultipartFile imageFile = new MockMultipartFile(
                 "구직_공고문",
-                "구직_공고문.png",
+                "구직_공고문.jpeg",
                 MediaType.IMAGE_JPEG_VALUE,
                 "test".getBytes());
         multipartFiles.add(imageFile);
@@ -109,7 +110,7 @@ class ImageServiceTest {
         DomainName domainName = DomainName.COMMENT;
         Long domainId = 1L;
 
-        Image image = new Image(imageFile.getOriginalFilename(), imageFile.getContentType(),
+        Image image = new Image(imageFile.getOriginalFilename(), Type.JPEG,
                 imageFile.getSize(), "images/randomPath-" + imageFile.getOriginalFilename(), domainName, domainId);
         List<Image> images = List.of(image);
 
