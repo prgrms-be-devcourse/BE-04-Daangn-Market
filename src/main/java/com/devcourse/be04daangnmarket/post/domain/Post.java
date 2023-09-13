@@ -57,7 +57,7 @@ public class Post extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Status status = Status.ALIVE;
+    private Status status;
 
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime pullUpAt;
@@ -82,6 +82,7 @@ public class Post extends BaseEntity {
         this.transactionType = transactionType;
         this.category = category;
         this.postStatus = postStatus;
+        this.status = Status.ALIVE;
         this.pullUpAt = pullUpAt;
     }
 
@@ -99,6 +100,7 @@ public class Post extends BaseEntity {
         this.transactionType = transactionType;
         this.category = category;
         this.postStatus = PostStatus.FOR_SALE;
+        this.status = Status.ALIVE;
         this.pullUpAt = LocalDateTime.now();
     }
 

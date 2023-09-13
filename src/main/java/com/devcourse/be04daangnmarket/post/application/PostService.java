@@ -71,8 +71,10 @@ public class PostService {
     public PostDto.Response getPost(Long id, HttpServletRequest req, HttpServletResponse res) {
         Post post = findPostById(id);
 
-        if (!isViewed(id, req, res))
+        if (!isViewed(id, req, res)){
             post.updateView();
+        }
+
 
         List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, id);
         String username = getUsername(post.getMemberId());
@@ -159,6 +161,7 @@ public class PostService {
     public void delete(Long id) {
         Post post = findPostById(id);
         post.deleteStatus();
+
         imageService.deleteAllImages(DomainName.POST, id);
     }
 
