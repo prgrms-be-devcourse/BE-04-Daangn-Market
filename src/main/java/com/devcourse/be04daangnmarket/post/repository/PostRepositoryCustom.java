@@ -6,5 +6,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 public interface PostRepositoryCustom {
-    Slice<Post> getPostsWithMultiFilters(Category category, Pageable pageable);
+
+    Slice<Post> getPostsWithMultiFilters(Category category,
+                                         Long memberId,
+                                         String keyword,
+                                         Pageable pageable);
 }

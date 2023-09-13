@@ -23,8 +23,8 @@ class PostRepositoryCustomImplTest {
     private PostRepository postRepository;
 
     @Test
-    @DisplayName("조회 조건이 있을 때 조건을 반영한 동적 쿼리 페이징 결과 성공")
-    void getPostsWithMultiFiltersTest() {
+    @DisplayName("단일 조회 조건이 있을 때 조건을 반영한 동적 쿼리 페이징 결과 성공")
+    void getPostsWithFilterTest() {
         // given
         List<Post> posts = List.of(
                 new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
@@ -40,15 +40,20 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 10);
-        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(Category.DIGITAL_DEVICES, pageable);
+        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+                Category.DIGITAL_DEVICES,
+                null,
+                null,
+                pageable
+        );
 
         // then
         assertEquals(3, selectedPost.getContent().size());
     }
 
     @Test
-    @DisplayName("조회 조건이 없을 때 조건을 반영한 동적 쿼리 페이징 결과 성공")
-    void getPostsWithMultiFiltersTest2() {
+    @DisplayName("단일 조회 조건이 없을 때 조건을 반영한 동적 쿼리 페이징 결과 성공")
+    void getPostsWithNoneFilterTest() {
         // given
         List<Post> posts = List.of(
                 new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
@@ -64,9 +69,72 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 10);
-        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(null, pageable);
+        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+                null,
+                null,
+                null,
+                pageable
+        );
 
         // then
         assertEquals(4, selectedPost.getContent().size());
+    }
+
+    @Test
+    @DisplayName("다중 조회 조건이 있을 때 조건을 반영한 동적 쿼리 페이징 결과 성공")
+    void getPostsWithMultiFilterTest() {
+        // given
+        List<Post> posts = List.of(
+                new Post(2L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "mouse~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "keyKey~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.HOUSEHOLD_KITCHEN),
+                new Post(2L, "house~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES)
+        );
+        postRepository.saveAll(posts);
+
+        // when
+        Pageable pageable = PageRequest.of(0, 10);
+        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+                Category.DIGITAL_DEVICES,
+                2L,
+                null,
+                pageable
+        );
+
+        // then
+        assertEquals(2, selectedPost.getContent().size());
+    }
+
+    @Test
+    @DisplayName("키워드가 포함된 게시글 페이징 조회 성공")
+    void getPostsWithKeywordFilterTest() {
+        // given
+        List<Post> posts = List.of(
+                new Post(2L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "mousekey~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "keyKey~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.HOUSEHOLD_KITCHEN),
+                new Post(2L, "house~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES)
+        );
+        postRepository.saveAll(posts);
+
+        // when
+        Pageable pageable = PageRequest.of(0, 10);
+        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+                null,
+                null,
+                "key",
+                pageable
+        );
+
+        // then
+        assertEquals(3, selectedPost.getContent().size());
     }
 }

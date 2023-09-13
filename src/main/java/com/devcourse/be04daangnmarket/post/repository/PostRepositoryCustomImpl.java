@@ -27,17 +27,29 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public Slice<Post> getPostsWithMultiFilters(Category category, Pageable pageable) {
+    public Slice<Post> getPostsWithMultiFilters(Category category,
+                                                Long memberId,
+                                                String keyword,
+                                                Pageable pageable) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
 
         CriteriaQuery<Post> query = builder.createQuery(Post.class);
         Root<Post> post = query.from(Post.class);
 
-        Predicate categoryPredicate = Optional.ofNullable(category)
-                .map(key -> builder.equal(post.get("category"), category))
+        Predicate predicate1 = Optional.ofNullable(category)
+                .map(key -> builder.equal(post.get("category"), key))
                 .orElse(null);
 
-        Predicate where = builder.and(Stream.of(categoryPredicate).filter(Objects::nonNull).toArray(Predicate[]::new));
+        Predicate predicate2 = Optional.ofNullable(memberId)
+                .map(key -> builder.equal(post.get("memberId"), key))
+                .orElse(null);
+
+
+        Predicate predicate3 = Optional.ofNullable(keyword)
+                .map(key -> builder.like(post.get("title"), "%" + key + "%"))
+                .orElse(null);
+
+        Predicate where = builder.and(Stream.of(predicate1, predicate2, predicate3).filter(Objects::nonNull).toArray(Predicate[]::new));
 
         query.select(post).where(where);
 
