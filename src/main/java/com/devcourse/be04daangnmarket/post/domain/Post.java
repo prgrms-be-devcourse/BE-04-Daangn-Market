@@ -186,6 +186,7 @@ public class Post extends BaseEntity {
     }
 
     public void purchased(Long buyerId) {
+        this.postStatus = PostStatus.SOLD;
         this.buyerId = buyerId;
     }
 }
