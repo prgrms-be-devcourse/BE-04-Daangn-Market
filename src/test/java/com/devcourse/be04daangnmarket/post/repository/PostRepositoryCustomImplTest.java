@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -44,6 +45,7 @@ class PostRepositoryCustomImplTest {
                 Category.DIGITAL_DEVICES,
                 null,
                 null,
+                null,
                 pageable
         );
 
@@ -70,6 +72,7 @@ class PostRepositoryCustomImplTest {
         // when
         Pageable pageable = PageRequest.of(0, 10);
         Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+                null,
                 null,
                 null,
                 null,
@@ -102,6 +105,7 @@ class PostRepositoryCustomImplTest {
                 Category.DIGITAL_DEVICES,
                 2L,
                 null,
+                null,
                 pageable
         );
 
@@ -131,10 +135,73 @@ class PostRepositoryCustomImplTest {
                 null,
                 null,
                 "key",
+                null,
                 pageable
         );
 
         // then
         assertEquals(3, selectedPost.getContent().size());
+    }
+
+    @Test
+    @DisplayName("첫 조회시 게시글 아이디 값 없는 커서 기반 페이징 조회 성공")
+    void getPostsWithFilterWithCursorFirst() {
+        // given
+        List<Post> posts = List.of(
+                new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "mouse~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "keyKey~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.HOUSEHOLD_KITCHEN),
+                new Post(1L, "house~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES)
+        );
+        postRepository.saveAll(posts);
+
+        // when
+        Pageable pageable = PageRequest.of(0, 2);
+        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+                null,
+                null,
+                "key",
+                null,
+                pageable
+        );
+
+        // then
+        assertEquals(3L, selectedPost.getContent().get(0).getId());
+        assertEquals(1L, selectedPost.getContent().get(1).getId());
+    }
+
+    @Test
+    @DisplayName("첫 조회 이후 게시글 아이디 값을 사용한 커서 기반 페이징 조회 성공")
+    void getPostsWithFilterWithCursor() {
+        // given
+        List<Post> posts = List.of(
+                new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "mouse~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "keyKey~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.HOUSEHOLD_KITCHEN),
+                new Post(1L, "house~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES)
+        );
+        postRepository.saveAll(posts);
+
+        // when
+        Pageable pageable = PageRequest.of(0, 2);
+        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+                null,
+                null,
+                "key",
+                2L,
+                pageable
+        );
+
+        // then
+        assertEquals(1L, selectedPost.getContent().get(0).getId());
+        assertEquals(1, selectedPost.getContent().size());
     }
 }

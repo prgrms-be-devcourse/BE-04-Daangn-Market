@@ -4,10 +4,7 @@ import com.devcourse.be04daangnmarket.post.domain.Post;
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -30,6 +27,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     public Slice<Post> getPostsWithMultiFilters(Category category,
                                                 Long memberId,
                                                 String keyword,
+                                                Long id,
                                                 Pageable pageable) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
 
@@ -44,25 +42,33 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .map(key -> builder.equal(post.get("memberId"), key))
                 .orElse(null);
 
-
         Predicate predicate3 = Optional.ofNullable(keyword)
                 .map(key -> builder.like(post.get("title"), "%" + key + "%"))
                 .orElse(null);
 
-        Predicate where = builder.and(Stream.of(predicate1, predicate2, predicate3).filter(Objects::nonNull).toArray(Predicate[]::new));
+        Predicate predicate4 = Optional.ofNullable(id)
+                .map(key -> builder.lessThan(post.get("id"), key))
+                .orElse(null);
 
-        query.select(post).where(where);
+        Predicate where = builder.and(Stream.of(predicate1, predicate2, predicate3, predicate4)
+                .filter(Objects::nonNull)
+                .toArray(Predicate[]::new));
+
+        Order order = builder.desc(post.get("id"));
+
+        query.select(post).where(where).orderBy(order);
 
         TypedQuery<Post> typedQuery = em.createQuery(query);
-
-        typedQuery.setFirstResult((int) pageable.getOffset());
-        typedQuery.setMaxResults(pageable.getPageSize());
+        typedQuery.setFirstResult(0);
+        typedQuery.setMaxResults(pageable.getPageSize() + 1);
         List<Post> resultList = typedQuery.getResultList();
 
-        return new SliceImpl<>(resultList, pageable, hasMorePages(resultList.size(), pageable));
-    }
+        boolean hasMorePages = resultList.size() > pageable.getPageSize();
 
-    private boolean hasMorePages(int pageSize, Pageable pageable) {
-        return pageSize > pageable.getPageSize();
+        if (hasMorePages) {
+            resultList.remove(resultList.size() - 1);
+        }
+
+        return new SliceImpl<>(resultList, pageable, hasMorePages);
     }
 }

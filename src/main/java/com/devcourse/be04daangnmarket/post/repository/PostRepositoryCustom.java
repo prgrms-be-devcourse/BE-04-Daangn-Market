@@ -10,5 +10,7 @@ public interface PostRepositoryCustom {
     Slice<Post> getPostsWithMultiFilters(Category category,
                                          Long memberId,
                                          String keyword,
-                                         Pageable pageable);
+                                         Long id,
+                                         Pageable pageable
+    );
 }
