@@ -14,9 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-
 public class PostRepositoryCustomImpl implements PostRepositoryCustom {
-
     private final EntityManager em;
 
     public PostRepositoryCustomImpl(EntityManager em) {
@@ -55,8 +53,6 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 .map(key -> builder.like(post.get("title"), "%" + key + "%"))
                 .orElse(null);
 
-
-
         Predicate where = builder.and(Stream.of(predicate1, predicate2, predicate3, predicate4, predicate5)
                 .filter(Objects::nonNull)
                 .toArray(Predicate[]::new));
@@ -70,12 +66,15 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         typedQuery.setMaxResults(pageable.getPageSize() + 1);
         List<Post> resultList = typedQuery.getResultList();
 
-        boolean hasMorePages = resultList.size() > pageable.getPageSize();
+        return toSlice(resultList, pageable);
+    }
 
-        if (hasMorePages) {
-            resultList.remove(resultList.size() - 1);
+    private SliceImpl<Post> toSlice(List<Post> posts, Pageable pageable) {
+        if (posts.size() > pageable.getPageSize()) {
+            posts.remove(posts.size() - 1);
+            return new SliceImpl<>(posts, pageable, true);
         }
 
-        return new SliceImpl<>(resultList, pageable, hasMorePages);
+        return new SliceImpl<>(posts, pageable, false);
     }
 }

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.devcourse.be04daangnmarket.image.dto.ImageDto;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
@@ -62,6 +63,19 @@ public class PostDto {
     public record BuyerUpdateRequest(
             @NotNull(message = "구매자 정보는 필수 입니다.")
             Long buyerId
+    ) {
+    }
+
+    public record FilterRequest(
+            Long id,
+
+            Category category,
+
+            Long memberId,
+
+            Long buyerId,
+
+            String keyword
     ) {
     }
 
