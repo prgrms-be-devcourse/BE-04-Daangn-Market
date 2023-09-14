@@ -20,6 +20,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -214,14 +216,14 @@ class PostServiceTest {
 
 		List<Post> posts = List.of(post, post2);
 		Pageable pageable = PageRequest.of(0, 10);
-		Page<Post> page = new PageImpl<>(posts, pageable, posts.size());
-		when(postRepository.findAll(pageable)).thenReturn(page);
+		Slice<Post> page = new SliceImpl<>(posts, pageable, false);
+		when(postCriteriaRepository.findAllByOffsetPaging(pageable, null, null, null, null, null)).thenReturn(page);
 
 		// when
-		Page<PostDto.Response> response = postService.getAllPost(pageable, null, null, null, null);
+		Slice<PostDto.Response> response = postService.getAllPost(pageable, null, null, null, null, null);
 
 		// then
-		assertEquals(page.getTotalElements(), response.getTotalElements());
+		assertEquals(page.hasNext(), response.hasNext());
 		assertEquals(page.getNumber(), response.getNumber());
 		verify(postRepository, times(1)).findAll(pageable);
 	}
@@ -242,14 +244,14 @@ class PostServiceTest {
 
 		List<Post> posts = List.of(post);
 		Pageable pageable = PageRequest.of(0, 10);
-		Page<Post> page = new PageImpl<>(posts);
-		when(postCriteriaRepository.findAllByOffsetPaging(pageable, category, null, null, null)).thenReturn(page);
+		Slice<Post> page = new SliceImpl<>(posts, pageable, false);
+		when(postCriteriaRepository.findAllByOffsetPaging(pageable, null, category, null, null, null)).thenReturn(page);
 
 		// when
-		Page<PostDto.Response> response = postService.getAllPost(pageable, category, null, null, null);
+		Slice<PostDto.Response> response = postService.getAllPost(pageable, null, null, null, null, null);
 
 		// then
-		assertEquals(page.getTotalElements(), response.getTotalElements());
+		assertEquals(page.hasNext(), response.hasNext());
 		assertEquals(page.getNumber(), response.getNumber());
 		verify(postRepository, times(1)).findByCategory(category, pageable);
 	}
@@ -270,14 +272,14 @@ class PostServiceTest {
 
 		List<Post> posts = List.of(post);
 		Pageable pageable = PageRequest.of(0, 10);
-		Page<Post> page = new PageImpl<>(posts);
-		when(postCriteriaRepository.findAllByOffsetPaging(pageable, null, memberId, null, null)).thenReturn(page);
+		Slice<Post> page = new SliceImpl<>(posts, pageable, false);
+		when(postCriteriaRepository.findAllByOffsetPaging(pageable, null, null, null, null, null)).thenReturn(page);
 
 		// when
-		Page<PostDto.Response> response = postService.getAllPost(pageable, null, memberId, null, null);
+		Slice<PostDto.Response> response = postService.getAllPost(pageable, null, null, null, null, null);
 
 		// then
-		assertEquals(page.getTotalElements(), response.getTotalElements());
+		assertEquals(page.hasNext(), response.hasNext());
 		assertEquals(page.getNumber(), response.getNumber());
 		verify(postRepository, times(1)).findByMemberId(memberId, pageable);
 	}

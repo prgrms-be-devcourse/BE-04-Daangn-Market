@@ -19,6 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -196,10 +198,10 @@ class PostRestControllerTest {
 		List<PostDto.Response> fakeResponses = List.of(postResponse1, postResponse2);
 
 		Pageable pageable = PageRequest.of(0, 10);
-		Page<PostDto.Response> responsePage = new PageImpl<>(fakeResponses, pageable, fakeResponses.size());
+		Slice<PostDto.Response> responsePage = new SliceImpl<>(fakeResponses, pageable, false);
 
 		// when
-		when(postService.getAllPost(pageable, null, null, null, null)).thenReturn(responsePage);
+		when(postService.getAllPost(pageable, null, null, null, null, null)).thenReturn((Page<PostDto.Response>) responsePage);
 
 		// then
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts")
@@ -237,7 +239,7 @@ class PostRestControllerTest {
 
 		List<PostDto.Response> mockResponses = List.of(postResponse);
 
-		when(postService.getAllPost(pageable, category, null, null, null)).thenReturn(new PageImpl<>(mockResponses));
+		when(postService.getAllPost(pageable, null, category, null, null, null)).thenReturn(new PageImpl<>(mockResponses));
 
 		// when then
 		mockMvc.perform(get("/api/v1/posts/category")

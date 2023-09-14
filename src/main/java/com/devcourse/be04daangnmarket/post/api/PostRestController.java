@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -62,12 +63,13 @@ public class PostRestController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<PostDto.Response>> getAllPost(@RequestParam(required = false) Category category,
-                                                             @RequestParam(required = false) Long memberId,
-                                                             @RequestParam(required = false) String title,
-                                                             @RequestParam(required = false) Long buyerId,
-                                                             @PageableDefault(page = 0, size = PAGE_SIZE, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<PostDto.Response> responses = postService.getAllPost(pageable, category, memberId, title, buyerId);
+    public ResponseEntity<Slice<PostDto.Response>> getAllPost(@RequestParam(required = false) Category category,
+                                                              @RequestParam(required = false) Long memberId,
+                                                              @RequestParam(required = false) String title,
+                                                              @RequestParam(required = false) Long buyerId,
+                                                              @RequestParam(required = false) Long id,
+                                                              @PageableDefault(page = 0, size = PAGE_SIZE, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Slice<PostDto.Response> responses = postService.getAllPost(pageable, id, category, memberId, title, buyerId);
 
         return ResponseEntity.ok(responses);
     }

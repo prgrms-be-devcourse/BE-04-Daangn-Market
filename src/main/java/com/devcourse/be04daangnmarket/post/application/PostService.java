@@ -11,6 +11,7 @@ import com.devcourse.be04daangnmarket.post.repository.PostCriteriaRepository;
 import com.devcourse.be04daangnmarket.post.util.PostConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -82,12 +83,13 @@ public class PostService {
 		return PostConverter.toResponse(post, images, username);
 	}
 
-	public Page<PostDto.Response> getAllPost(Pageable pageable,
-											 Category category,
-											 Long memberId,
-											 String title,
-											 Long buyerId) {
-		return postCriteriaRepository.findAllByOffsetPaging(pageable, category, memberId, title, buyerId).map(post -> {
+	public Slice<PostDto.Response> getAllPost(Pageable pageable,
+											  Long id,
+											  Category category,
+											  Long memberId,
+											  String title,
+											  Long buyerId) {
+		return postCriteriaRepository.findAllByOffsetPaging(pageable, id, category, memberId, title, buyerId).map(post -> {
 			List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
 			String username = getUsername(post.getMemberId());
 

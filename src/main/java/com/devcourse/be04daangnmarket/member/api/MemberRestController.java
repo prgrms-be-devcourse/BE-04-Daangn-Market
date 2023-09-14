@@ -10,6 +10,7 @@ import com.devcourse.be04daangnmarket.post.dto.PostDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -79,17 +80,17 @@ public class MemberRestController {
     }
 
     @GetMapping("/{id}/sale")
-    public ResponseEntity<Page<PostDto.Response>> getSaleList(@PathVariable Long id, @RequestParam(defaultValue = "0") int page) {
+    public ResponseEntity<Slice<PostDto.Response>> getSaleList(@PathVariable Long id, @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
-        Page<PostDto.Response> saleList = postService.getAllPost(pageable, null, id, null, null);
+        Slice<PostDto.Response> saleList = postService.getAllPost(pageable,null,  null, id, null, null);
 
         return ResponseEntity.ok(saleList);
     }
 
     @GetMapping("/{id}/purchase")
-    public ResponseEntity<Page<PostDto.Response>> getPurchaseList(@PathVariable Long id, @RequestParam(defaultValue = "0") int page) {
+    public ResponseEntity<Slice<PostDto.Response>> getPurchaseList(@PathVariable Long id, @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
-        Page<PostDto.Response> purchaseList = postService.getAllPost(pageable, null, null, null, id);
+        Slice<PostDto.Response> purchaseList = postService.getAllPost(pageable,null, null, null, null, id);
 
         return ResponseEntity.ok(purchaseList);
     }
