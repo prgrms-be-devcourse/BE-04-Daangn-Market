@@ -24,33 +24,40 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public Slice<Post> getPostsWithMultiFilters(Category category,
+    public Slice<Post> getPostsWithMultiFilters(Long id,
+                                                Category category,
                                                 Long memberId,
+                                                Long buyerId,
                                                 String keyword,
-                                                Long id,
                                                 Pageable pageable) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
 
         CriteriaQuery<Post> query = builder.createQuery(Post.class);
         Root<Post> post = query.from(Post.class);
 
-        Predicate predicate1 = Optional.ofNullable(category)
-                .map(key -> builder.equal(post.get("category"), key))
-                .orElse(null);
-
-        Predicate predicate2 = Optional.ofNullable(memberId)
-                .map(key -> builder.equal(post.get("memberId"), key))
-                .orElse(null);
-
-        Predicate predicate3 = Optional.ofNullable(keyword)
-                .map(key -> builder.like(post.get("title"), "%" + key + "%"))
-                .orElse(null);
-
-        Predicate predicate4 = Optional.ofNullable(id)
+        Predicate predicate1 = Optional.ofNullable(id)
                 .map(key -> builder.lessThan(post.get("id"), key))
                 .orElse(null);
 
-        Predicate where = builder.and(Stream.of(predicate1, predicate2, predicate3, predicate4)
+        Predicate predicate2 = Optional.ofNullable(category)
+                .map(key -> builder.equal(post.get("category"), key))
+                .orElse(null);
+
+        Predicate predicate3 = Optional.ofNullable(memberId)
+                .map(key -> builder.equal(post.get("memberId"), key))
+                .orElse(null);
+
+        Predicate predicate4 = Optional.ofNullable(buyerId)
+                .map(key -> builder.equal(post.get("buyerId"), key))
+                .orElse(null);
+
+        Predicate predicate5 = Optional.ofNullable(keyword)
+                .map(key -> builder.like(post.get("title"), "%" + key + "%"))
+                .orElse(null);
+
+
+
+        Predicate where = builder.and(Stream.of(predicate1, predicate2, predicate3, predicate4, predicate5)
                 .filter(Objects::nonNull)
                 .toArray(Predicate[]::new));
 

@@ -7,10 +7,11 @@ import org.springframework.data.domain.Slice;
 
 public interface PostRepositoryCustom {
 
-    Slice<Post> getPostsWithMultiFilters(Category category,
+    Slice<Post> getPostsWithMultiFilters(Long id,
+                                         Category category,
                                          Long memberId,
+                                         Long buyerId,
                                          String keyword,
-                                         Long id,
                                          Pageable pageable
     );
 }

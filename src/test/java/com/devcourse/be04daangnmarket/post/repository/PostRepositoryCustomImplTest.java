@@ -11,7 +11,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -42,6 +41,7 @@ class PostRepositoryCustomImplTest {
         // when
         Pageable pageable = PageRequest.of(0, 10);
         Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+                null,
                 Category.DIGITAL_DEVICES,
                 null,
                 null,
@@ -76,6 +76,7 @@ class PostRepositoryCustomImplTest {
                 null,
                 null,
                 null,
+                null,
                 pageable
         );
 
@@ -102,6 +103,7 @@ class PostRepositoryCustomImplTest {
         // when
         Pageable pageable = PageRequest.of(0, 10);
         Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+                null,
                 Category.DIGITAL_DEVICES,
                 2L,
                 null,
@@ -134,8 +136,9 @@ class PostRepositoryCustomImplTest {
         Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
                 null,
                 null,
-                "key",
                 null,
+                null,
+                "key",
                 pageable
         );
 
@@ -164,8 +167,9 @@ class PostRepositoryCustomImplTest {
         Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
                 null,
                 null,
-                "key",
                 null,
+                null,
+                "key",
                 pageable
         );
 
@@ -193,10 +197,11 @@ class PostRepositoryCustomImplTest {
         // when
         Pageable pageable = PageRequest.of(0, 2);
         Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+                2L,
+                null,
                 null,
                 null,
                 "key",
-                2L,
                 pageable
         );
 
