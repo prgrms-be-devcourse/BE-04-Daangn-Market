@@ -33,33 +33,41 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         CriteriaQuery<Post> query = builder.createQuery(Post.class);
         Root<Post> post = query.from(Post.class);
 
-        Predicate predicate1 = Optional.ofNullable(id)
+        Predicate idCondition = Optional.ofNullable(id)
                 .map(key -> builder.lessThan(post.get("id"), key))
                 .orElse(null);
 
-        Predicate predicate2 = Optional.ofNullable(category)
+        Predicate categoryCondition = Optional.ofNullable(category)
                 .map(key -> builder.equal(post.get("category"), key))
                 .orElse(null);
 
-        Predicate predicate3 = Optional.ofNullable(memberId)
+        Predicate memberIdCondition = Optional.ofNullable(memberId)
                 .map(key -> builder.equal(post.get("memberId"), key))
                 .orElse(null);
 
-        Predicate predicate4 = Optional.ofNullable(buyerId)
+        Predicate buyerIdCondition = Optional.ofNullable(buyerId)
                 .map(key -> builder.equal(post.get("buyerId"), key))
                 .orElse(null);
 
-        Predicate predicate5 = Optional.ofNullable(keyword)
+        Predicate keywordCondition = Optional.ofNullable(keyword)
                 .map(key -> builder.like(post.get("title"), "%" + key + "%"))
                 .orElse(null);
 
-        Predicate where = builder.and(Stream.of(predicate1, predicate2, predicate3, predicate4, predicate5)
+        Predicate where = builder.and(Stream.of(
+                        idCondition,
+                        categoryCondition,
+                        memberIdCondition,
+                        buyerIdCondition,
+                        keywordCondition
+                )
                 .filter(Objects::nonNull)
                 .toArray(Predicate[]::new));
 
         Order order = builder.desc(post.get("id"));
 
-        query.select(post).where(where).orderBy(order);
+        query.select(post)
+                .where(where)
+                .orderBy(order);
 
         TypedQuery<Post> typedQuery = em.createQuery(query);
         typedQuery.setFirstResult(0);
