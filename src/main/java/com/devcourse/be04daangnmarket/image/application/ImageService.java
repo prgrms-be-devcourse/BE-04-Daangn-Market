@@ -48,10 +48,6 @@ public class ImageService {
 		}
 
 		for (MultipartFile multipartFile : multipartFiles) {
-			if (multipartFile.isEmpty()) {
-				continue;
-			}
-
 			Type imageType = Type.findImageType(multipartFile.getContentType());
 			String fileNameWithoutSpaces = multipartFile.getOriginalFilename().replaceAll(" ", "");
 			String uniqueName = createUniqueName(fileNameWithoutSpaces);
@@ -69,7 +65,7 @@ public class ImageService {
 	}
 
 	private boolean isEmptyImages(List<MultipartFile> multipartFiles) {
-		return multipartFiles == null;
+		return multipartFiles == null || multipartFiles.get(0).isEmpty();
 	}
 
 	private String createUniqueName(String originalName) {
