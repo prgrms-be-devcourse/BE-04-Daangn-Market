@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static com.devcourse.be04daangnmarket.comment.exception.ErrorMessage.NOT_FOUND_COMMENT;
+import static com.devcourse.be04daangnmarket.comment.util.CommentConverter.toResponse;
 
 @Transactional(readOnly = true)
 @Service
@@ -46,7 +47,8 @@ public class CommentService {
 
     @Transactional
     public CommentDto.CommentResponse create(CommentDto.CreateCommentRequest request, Long userId, String username) {
-        Comment comment = CommentConverter.toEntity(request, userId);
+        Long postId = postService.findPostById(request.postId()).getId();
+        Comment comment = CommentConverter.toEntity(request, postId, userId);
 
         Integer groupNumber = commentRepository.findMaxCommentGroup().orElse(START_NUMBER);
         comment.addGroup(groupNumber);
@@ -54,14 +56,15 @@ public class CommentService {
         Comment saved = commentRepository.save(comment);
         List<ImageDto.ImageResponse> images = imageService.uploadImages(request.files(), DomainName.COMMENT, saved.getId());
 
-        return CommentConverter.toResponse(saved, images, username);
+        return toResponse(saved, images, username);
     }
 
     @Transactional
     public CommentDto.CommentResponse createReply(CommentDto.CreateReplyCommentRequest request,
                                                   Long userId,
                                                   String username) {
-        Comment comment = CommentConverter.toEntity(request, userId);
+        Long postId = postService.findPostById(request.postId()).getId();
+        Comment comment = CommentConverter.toEntity(request, postId, userId);
 
         Integer seqNumber = commentRepository.findMaxSeqFromCommentGroup(request.commentGroup())
                 .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_COMMENT.getMessage()));
@@ -70,7 +73,7 @@ public class CommentService {
         Comment saved = commentRepository.save(comment);
         List<ImageDto.ImageResponse> images = imageService.uploadImages(request.files(), DomainName.COMMENT, saved.getId());
 
-        return CommentConverter.toResponse(saved, images, username);
+        return toResponse(saved, images, username);
     }
 
     @Transactional
@@ -105,7 +108,7 @@ public class CommentService {
         String username = memberService.getMember(comment.getMemberId()).getUsername();
         List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.COMMENT, id);
 
-        return CommentConverter.toResponse(comment, images, username);
+        return toResponse(comment, images, username);
     }
 
     public Page<CommentDto.PostCommentResponse> getPostComments(Long postId, Pageable pageable) {
@@ -120,19 +123,7 @@ public class CommentService {
             List<CommentDto.CommentResponse> replyCommentResponses = getReplyComments(comment);
 
             postCommentResponses.add(
-                    new CommentDto.PostCommentResponse(
-                            comment.getId(),
-                            comment.getMemberId(),
-                            commentUsername,
-                            comment.getPostId(),
-                            postTitle,
-                            comment.getContent(),
-                            commentImages,
-                            replyCommentResponses,
-                            comment.getCommentGroup(),
-                            comment.getCreatedAt(),
-                            comment.getUpdatedAt()
-                    )
+                    toResponse(comment, commentUsername, postTitle, commentImages, replyCommentResponses)
             );
         }
 
@@ -147,7 +138,7 @@ public class CommentService {
             String replyUsername = memberService.getMember(comment.getMemberId()).getUsername();
             List<ImageDto.ImageResponse> replyImages = imageService.getImages(DomainName.COMMENT, reply.getId());
 
-            CommentDto.CommentResponse commentResponse = CommentConverter.toResponse(reply, replyImages, replyUsername);
+            CommentDto.CommentResponse commentResponse = toResponse(reply, replyImages, replyUsername);
             replyCommentResponses.add(commentResponse);
         }
 
@@ -166,7 +157,7 @@ public class CommentService {
             images = imageService.uploadImages(request.files(), DomainName.COMMENT, id);
         }
 
-        return CommentConverter.toResponse(comment, images, username);
+        return toResponse(comment, images, username);
     }
 
     private boolean isExistImages(List<MultipartFile> files) {
