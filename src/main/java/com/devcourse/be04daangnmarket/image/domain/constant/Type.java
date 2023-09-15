@@ -26,7 +26,7 @@ public enum Type {
                 .filter(type -> type.getFullType().equals(typeName))
                 .findFirst()
                 .orElseThrow(() -> {
-                    throw new FileUploadException(ExceptionMessage.INVALID_IMAGE_TYPE_EXCEPTION.getMessage());
+                    throw new FileUploadException(ExceptionMessage.NOT_CORRECT_IMAGE_TYPE_EXCEPTION.getMessage());
                 });
     }
 }
