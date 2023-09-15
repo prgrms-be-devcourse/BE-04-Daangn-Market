@@ -9,13 +9,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import org.hibernate.annotations.DynamicInsert;
 
-import static com.devcourse.be04daangnmarket.comment.exception.ErrorMessage.*;
-
 @Entity
 @Table(name = "comments")
 @DynamicInsert
 public class Comment extends BaseEntity {
-    @Column(name = "content", length = 500)
+    @Column(length = 500, nullable = false)
     private String content;
 
     @Enumerated(EnumType.STRING)
@@ -28,15 +26,16 @@ public class Comment extends BaseEntity {
     @Column(nullable = false)
     private Long postId;//댓글이 작성된 게시글 Id
 
+    @Column(nullable = false)
     private int commentGroup;//그룹 Id 댓글을 작성할 때 마다 증가
 
+    @Column(nullable = false)
     private int seq;//댓글의 순서 1번이 댓글 주인, 뒤로 대댓글
 
     protected Comment() {
     }
 
     public Comment(String content, Long memberId, Long postId) {
-        validateContent(content);
         this.content = content;
         this.memberId = memberId;
         this.postId = postId;
@@ -74,16 +73,6 @@ public class Comment extends BaseEntity {
         return seq;
     }
 
-    private void validateContent(String content) {
-        if (isCommentWithinRange(content)) {
-            throw new IllegalArgumentException(INVALID_CONTENT.getMessage());
-        }
-    }
-
-    private boolean isCommentWithinRange(String content) {
-        return content.length() > 500;
-    }
-
     public void addGroup(int groupNumber) {
         this.commentGroup = groupNumber + 1;
     }
@@ -97,7 +86,6 @@ public class Comment extends BaseEntity {
     }
 
     public void update(String content) {
-        validateContent(content);
         this.content = content;
     }
 }
