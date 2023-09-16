@@ -8,7 +8,7 @@ public class ImageConverter {
         return new ImageDto.ImageResponse(
       				image.getName(),
       				image.getPath(),
-      				image.getType(),
+      				image.getType().getFullType(),
       				image.getSize(),
       				image.getDomainName(),
       				image.getDomainId()

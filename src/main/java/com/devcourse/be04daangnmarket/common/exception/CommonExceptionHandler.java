@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.devcourse.be04daangnmarket.image.exception.FileDeleteException;
 import com.devcourse.be04daangnmarket.image.exception.FileUploadException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.NoSuchElementException;
 
@@ -29,12 +30,17 @@ public class CommonExceptionHandler {
 	@ExceptionHandler(
 			{
 					FileUploadException.class,
-					FileDeleteException.class
+					FileDeleteException.class,
 			}
 	)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ResponseEntity<String> fileHandle(FileException exception) {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
+	}
+
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public ResponseEntity<String> FileMaxSizeHandle(MaxUploadSizeExceededException exception) {
+		return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(exception.getMessage());
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)

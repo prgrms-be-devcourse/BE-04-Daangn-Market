@@ -3,6 +3,7 @@ package com.devcourse.be04daangnmarket.image.application;
 import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 import com.devcourse.be04daangnmarket.image.domain.Image;
+import com.devcourse.be04daangnmarket.image.domain.constant.Type;
 import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.image.exception.FileUploadException;
 import com.devcourse.be04daangnmarket.image.repository.ImageRepository;
@@ -47,16 +48,13 @@ public class ImageService {
 		}
 
 		for (MultipartFile multipartFile : multipartFiles) {
-			if (multipartFile.isEmpty()) {
-				continue;
-			}
-
-			String originalName = multipartFile.getOriginalFilename().replaceAll(" ", "");
-			String uniqueName = createUniqueName(originalName);
+			Type imageType = Type.findImageType(multipartFile.getContentType());
+			String fileNameWithoutSpaces = multipartFile.getOriginalFilename().replaceAll(" ", "");
+			String uniqueName = createUniqueName(fileNameWithoutSpaces);
 
 			saveImageToLocalStorage(multipartFile, uniqueName);
 
-			Image image = new Image(multipartFile.getOriginalFilename(), multipartFile.getContentType(),
+			Image image = new Image(multipartFile.getOriginalFilename(), imageType,
 					multipartFile.getSize(), getRelativePath(uniqueName), domainName, domainId);
 
 			imageRepository.save(image);
@@ -67,7 +65,7 @@ public class ImageService {
 	}
 
 	private boolean isEmptyImages(List<MultipartFile> multipartFiles) {
-		return multipartFiles == null;
+		return multipartFiles == null || multipartFiles.get(0).isEmpty();
 	}
 
 	private String createUniqueName(String originalName) {
@@ -76,7 +74,7 @@ public class ImageService {
 
 	private void saveImageToLocalStorage(MultipartFile multipartFile, String uniqueName) {
 		try {
-			java.io.File file = new java.io.File(FOLDER_PATH + RELATIVE_PATH);
+			java.io.File file = new java.io.File(FOLDER_PATH);
 
 			if (isEmptyFile(file)) {
 				file.mkdirs();
@@ -96,7 +94,7 @@ public class ImageService {
 	}
 
 	private String getFullPath(String uniqueName) {
-		return FOLDER_PATH + RELATIVE_PATH + uniqueName;
+		return FOLDER_PATH + uniqueName;
 	}
 
 	public List<ImageDto.ImageResponse> getImages(DomainName domainName, Long domainId) {

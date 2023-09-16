@@ -3,6 +3,7 @@ package com.devcourse.be04daangnmarket.image.domain;
 import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.common.entity.BaseEntity;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
+import com.devcourse.be04daangnmarket.image.domain.constant.Type;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,7 +17,8 @@ public class Image extends BaseEntity {
     private String name;
 
     @Column(nullable = false)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private Type type;
 
     @Column(nullable = false)
     private long size;
@@ -26,7 +28,7 @@ public class Image extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Status status = Status.ALIVE;
+    private Status status;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -38,11 +40,12 @@ public class Image extends BaseEntity {
     protected Image() {
     }
 
-    public Image(String name, String type, long size, String path, DomainName domainName, Long domainId) {
+    public Image(String name, Type type, long size, String path, DomainName domainName, Long domainId) {
         this.name = name;
         this.type = type;
         this.size = size;
         this.path = path;
+        this.status = Status.ALIVE;
         this.domainName = domainName;
         this.domainId = domainId;
     }
@@ -51,7 +54,7 @@ public class Image extends BaseEntity {
         return name;
     }
 
-    public String getType() {
+    public Type getType() {
         return type;
     }
 
