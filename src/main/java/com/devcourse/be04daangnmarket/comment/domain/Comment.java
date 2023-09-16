@@ -88,4 +88,8 @@ public class Comment extends BaseEntity {
     public void update(String content) {
         this.content = content;
     }
+
+    public boolean isGroupComment() {
+        return this.seq == 0;
+    }
 }

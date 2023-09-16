@@ -137,11 +137,11 @@ public class PostRestController {
                 .build();
     }
 
-    @GetMapping("/{postId}/comments")
-    public ResponseEntity<Page<CommentDto.PostCommentResponse>> getPostComments(@PathVariable Long postId,
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<Page<CommentDto.PostCommentResponse>> getPostComments(@PathVariable Long id,
                                                                                 @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("createdAt").descending());
-        Page<CommentDto.PostCommentResponse> response = commentService.getPostComments(postId, pageable);
+        Page<CommentDto.PostCommentResponse> response = commentService.getPostComments(id, pageable);
 
         return ResponseEntity.ok(response);
     }

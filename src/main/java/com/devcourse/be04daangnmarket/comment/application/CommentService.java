@@ -16,7 +16,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,13 +49,17 @@ public class CommentService implements CommentProviderService {
         Long postId = postService.findPostById(request.postId()).getId();
         Comment comment = CommentConverter.toEntity(request, postId, userId);
 
-        Integer groupNumber = commentRepository.findMaxCommentGroup().orElse(START_NUMBER);
-        comment.addGroup(groupNumber);
+        createCommentGroupNumber(comment);
 
         Comment saved = commentRepository.save(comment);
         List<ImageDto.ImageResponse> images = imageService.uploadImages(request.files(), DomainName.COMMENT, saved.getId());
 
         return toResponse(saved, images, username);
+    }
+
+    private void createCommentGroupNumber(Comment comment) {
+        Integer groupNumber = commentRepository.findMaxCommentGroup().orElse(START_NUMBER);
+        comment.addGroup(groupNumber);
     }
 
     @Transactional
@@ -66,9 +69,7 @@ public class CommentService implements CommentProviderService {
         Long postId = postService.findPostById(request.postId()).getId();
         Comment comment = CommentConverter.toEntity(request, postId, userId);
 
-        Integer seqNumber = commentRepository.findMaxSeqFromCommentGroup(request.commentGroup())
-                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_COMMENT.getMessage()));
-        comment.addSeq(seqNumber);
+        addMaxSequenceToReplyComment(request, comment);
 
         Comment saved = commentRepository.save(comment);
         List<ImageDto.ImageResponse> images = imageService.uploadImages(request.files(), DomainName.COMMENT, saved.getId());
@@ -76,17 +77,19 @@ public class CommentService implements CommentProviderService {
         return toResponse(saved, images, username);
     }
 
+    private void addMaxSequenceToReplyComment(CommentDto.CreateReplyCommentRequest request, Comment comment) {
+        Integer seqNumber = commentRepository.findMaxSeqFromCommentGroup(request.commentGroup())
+                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_COMMENT.getMessage()));
+        comment.addSeq(seqNumber);
+    }
+
     @Transactional
     public CommentDto.CommentResponse update(Long id, CommentDto.UpdateCommentRequest request, String username) {
         Comment comment = getComment(id);
         comment.update(request.content());
 
-        List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.COMMENT, comment.getId());
-
-        if (isExistImages(request.files())) {
-            imageService.deleteAllImages(DomainName.COMMENT, id);
-            images = imageService.uploadImages(request.files(), DomainName.COMMENT, id);
-        }
+        imageService.deleteAllImages(DomainName.COMMENT, id);
+        List<ImageDto.ImageResponse> images = imageService.uploadImages(request.files(), DomainName.COMMENT, id);
 
         return toResponse(comment, images, username);
     }
@@ -97,35 +100,30 @@ public class CommentService implements CommentProviderService {
                 .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_COMMENT.getMessage()));
     }
 
-    private boolean isExistImages(List<MultipartFile> files) {
-        return !files.get(START_NUMBER).isEmpty();
-    }
-
     @Transactional
     public void delete(Long id) {
         Comment comment = getComment(id);
 
-        if (isGroupComment(comment)) {
+        if (comment.isGroupComment()) {
             List<Comment> sameGroupComments = commentRepository.findAllByCommentGroup(comment.getCommentGroup());
 
             for (Comment sameGroupComment : sameGroupComments) {
-                sameGroupComment.deleteStatus();
-                imageService.deleteAllImages(DomainName.COMMENT, sameGroupComment.getId());
+                deleteComment(sameGroupComment);
             }
         }
 
-        comment.deleteStatus();
-        imageService.deleteAllImages(DomainName.COMMENT, id);
+        deleteComment(comment);
     }
 
-    private boolean isGroupComment(Comment comment) {
-        return comment.getSeq() == START_NUMBER;
+    private void deleteComment(Comment comment) {
+        comment.deleteStatus();
+        imageService.deleteAllImages(DomainName.COMMENT, comment.getId());
     }
 
     public CommentDto.CommentResponse getDetail(Long id) {
         Comment comment = getComment(id);
-
         String username = memberService.getMember(comment.getMemberId()).getUsername();
+
         List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.COMMENT, id);
 
         return toResponse(comment, images, username);
