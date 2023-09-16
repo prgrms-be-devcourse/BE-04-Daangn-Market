@@ -1,6 +1,6 @@
 package com.devcourse.be04daangnmarket.post.api;
 
-import com.devcourse.be04daangnmarket.comment.application.CommentService;
+import com.devcourse.be04daangnmarket.comment.application.CommentProviderService;
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.common.auth.User;
 import com.devcourse.be04daangnmarket.member.dto.MemberDto;
@@ -29,9 +29,9 @@ public class PostRestController {
     private final int PAGE_SIZE = 5;
 
     private final PostService postService;
-    private final CommentService commentService;
+    private final CommentProviderService commentService;
 
-    public PostRestController(PostService postService, CommentService commentService) {
+    public PostRestController(PostService postService, CommentProviderService commentService) {
         this.postService = postService;
         this.commentService = commentService;
     }
