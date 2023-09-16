@@ -165,10 +165,8 @@ public class CommentService implements CommentProviderService {
     }
 
     @Override
-    public Page<MemberDto.Response> getCommenterByPostId(Long postId, Pageable pageable) {
-        Long writerId = postService.findPostById(postId).getMemberId();
-
-         return commentRepository.findDistinctMemberIdsByPostIdAndNotInWriterId(postId, writerId, pageable)
+    public Page<MemberDto.Response> getCommenterByPostId(Long writerId, Pageable pageable) {
+         return commentRepository.findDistinctMemberIdsByPostIdAndNotInWriterId(writerId, writerId, pageable)
                 .map(memberId -> {
                     Member member = memberService.getMember(memberId);
 

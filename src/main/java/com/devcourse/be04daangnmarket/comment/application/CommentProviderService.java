@@ -11,5 +11,5 @@ public interface CommentProviderService {
 
     Page<CommentDto.PostCommentResponse> getPostComments(Long postId, Pageable pageable);
 
-    Page<MemberDto.Response> getCommenterByPostId(Long postId, Pageable pageable);
+    Page<MemberDto.Response> getCommenterByPostId(Long writerId, Pageable pageable);
 }

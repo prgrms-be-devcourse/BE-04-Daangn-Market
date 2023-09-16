@@ -150,7 +150,8 @@ public class PostRestController {
     public ResponseEntity<Page<MemberDto.Response>> getCommunicationMembers(@PathVariable Long id,
                                                                             @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<MemberDto.Response> responses = commentService.getCommenterByPostId(id, pageable);
+        Long writerId = postService.findPostById(id).getMemberId();
+        Page<MemberDto.Response> responses = commentService.getCommenterByPostId(writerId, pageable);
 
         return ResponseEntity.ok(responses);
     }
