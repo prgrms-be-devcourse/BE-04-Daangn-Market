@@ -12,6 +12,7 @@ import com.devcourse.be04daangnmarket.post.util.PostConverter;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -71,7 +72,7 @@ public class PostService {
     public PostDto.Response getPost(Long id, HttpServletRequest req, HttpServletResponse res) {
         Post post = findPostById(id);
 
-        if (!isViewed(id, req, res)){
+        if (!isViewed(id, req, res)) {
             post.updateView();
         }
 
@@ -89,6 +90,22 @@ public class PostService {
 
             return PostConverter.toResponse(post, images, username);
         });
+    }
+
+    public Slice<PostDto.Response> getPostsWithFilter(PostDto.FilterRequest request, Pageable pageable) {
+        return postRepository.getPostsWithMultiFilters(
+                        request.id(),
+                        request.category(),
+                        request.memberId(),
+                        request.buyerId(),
+                        request.keyword(),
+                        pageable)
+                .map(post -> {
+                    List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+                    String username = getUsername(post.getMemberId());
+
+                    return PostConverter.toResponse(post, images, username);
+                });
     }
 
     public Page<PostDto.Response> getPostByCategory(Category category, Pageable pageable) {
@@ -202,4 +219,5 @@ public class PostService {
 
         return false;
     }
+
 }

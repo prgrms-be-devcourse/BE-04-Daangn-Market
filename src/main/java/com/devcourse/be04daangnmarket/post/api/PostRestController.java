@@ -12,10 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -66,6 +63,14 @@ public class PostRestController {
     public ResponseEntity<Page<PostDto.Response>> getAllPost(@RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("id").descending());
         Page<PostDto.Response> responses = postService.getAllPost(pageable);
+
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<Slice<PostDto.Response>> getPostsWithFilters(PostDto.FilterRequest request,
+                                                                       Pageable pageable) {
+        Slice<PostDto.Response> responses = postService.getPostsWithFilter(request, pageable);
 
         return ResponseEntity.ok(responses);
     }

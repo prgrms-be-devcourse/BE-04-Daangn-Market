@@ -9,12 +9,12 @@ import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
 
 @Repository
-public interface PostRepository extends JpaRepository<Post, Long> {
-	Page<Post> findByCategory(Category category, Pageable pageable);
+public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
+    Page<Post> findByCategory(Category category, Pageable pageable);
 
-	Page<Post> findByMemberId(Long memberId, Pageable pageable);
+    Page<Post> findByMemberId(Long memberId, Pageable pageable);
 
-	Page<Post> findByTitleContaining(String title, Pageable pageable);
+    Page<Post> findByTitleContaining(String title, Pageable pageable);
 
-	Page<Post> findByBuyerId(Long buyerId, Pageable pageable);
+    Page<Post> findByBuyerId(Long buyerId, Pageable pageable);
 }
