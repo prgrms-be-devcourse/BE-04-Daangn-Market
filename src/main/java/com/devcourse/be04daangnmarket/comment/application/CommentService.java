@@ -16,17 +16,17 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import static com.devcourse.be04daangnmarket.comment.exception.ErrorMessage.NOT_FOUND_COMMENT;
+import static com.devcourse.be04daangnmarket.comment.util.CommentConverter.toResponse;
 
 @Transactional(readOnly = true)
 @Service
-public class CommentService {
+public class CommentService implements CommentProviderService {
     private static final int START_NUMBER = 0;
 
     private final ImageService imageService;
@@ -46,68 +46,90 @@ public class CommentService {
 
     @Transactional
     public CommentDto.CommentResponse create(CommentDto.CreateCommentRequest request, Long userId, String username) {
-        Comment comment = CommentConverter.toEntity(request, userId);
+        Long postId = postService.findPostById(request.postId()).getId();
+        Comment comment = CommentConverter.toEntity(request, postId, userId);
 
-        Integer groupNumber = commentRepository.findMaxCommentGroup().orElse(START_NUMBER);
-        comment.addGroup(groupNumber);
+        createCommentGroupNumber(comment);
 
         Comment saved = commentRepository.save(comment);
         List<ImageDto.ImageResponse> images = imageService.uploadImages(request.files(), DomainName.COMMENT, saved.getId());
 
-        return CommentConverter.toResponse(saved, images, username);
+        return toResponse(saved, images, username);
+    }
+
+    private void createCommentGroupNumber(Comment comment) {
+        Integer groupNumber = commentRepository.findMaxCommentGroup().orElse(START_NUMBER);
+        comment.addGroup(groupNumber);
     }
 
     @Transactional
     public CommentDto.CommentResponse createReply(CommentDto.CreateReplyCommentRequest request,
                                                   Long userId,
                                                   String username) {
-        Comment comment = CommentConverter.toEntity(request, userId);
+        Long postId = postService.findPostById(request.postId()).getId();
+        Comment comment = CommentConverter.toEntity(request, postId, userId);
 
-        Integer seqNumber = commentRepository.findMaxSeqFromCommentGroup(request.commentGroup())
-                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_COMMENT.getMessage()));
-        comment.addSeq(seqNumber);
+        addMaxSequenceToReplyComment(request, comment);
 
         Comment saved = commentRepository.save(comment);
         List<ImageDto.ImageResponse> images = imageService.uploadImages(request.files(), DomainName.COMMENT, saved.getId());
 
-        return CommentConverter.toResponse(saved, images, username);
+        return toResponse(saved, images, username);
+    }
+
+    private void addMaxSequenceToReplyComment(CommentDto.CreateReplyCommentRequest request, Comment comment) {
+        Integer seqNumber = commentRepository.findMaxSeqFromCommentGroup(request.commentGroup())
+                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_COMMENT.getMessage()));
+        comment.addSeq(seqNumber);
+    }
+
+    @Transactional
+    public CommentDto.CommentResponse update(Long id, CommentDto.UpdateCommentRequest request, String username) {
+        Comment comment = getComment(id);
+        comment.update(request.content());
+
+        imageService.deleteAllImages(DomainName.COMMENT, id);
+        List<ImageDto.ImageResponse> images = imageService.uploadImages(request.files(), DomainName.COMMENT, id);
+
+        return toResponse(comment, images, username);
+    }
+
+    @Override
+    public Comment getComment(Long id) {
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_COMMENT.getMessage()));
     }
 
     @Transactional
     public void delete(Long id) {
         Comment comment = getComment(id);
 
-        if (isGroupComment(comment)) {
+        if (comment.isGroupComment()) {
             List<Comment> sameGroupComments = commentRepository.findAllByCommentGroup(comment.getCommentGroup());
 
             for (Comment sameGroupComment : sameGroupComments) {
-                sameGroupComment.deleteStatus();
-                imageService.deleteAllImages(DomainName.COMMENT, sameGroupComment.getId());
+                deleteComment(sameGroupComment);
             }
         }
 
+        deleteComment(comment);
+    }
+
+    private void deleteComment(Comment comment) {
         comment.deleteStatus();
-        imageService.deleteAllImages(DomainName.COMMENT, id);
-    }
-
-    private Comment getComment(Long id) {
-        return commentRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_COMMENT.getMessage()));
-    }
-
-    private boolean isGroupComment(Comment comment) {
-        return comment.getSeq() == START_NUMBER;
+        imageService.deleteAllImages(DomainName.COMMENT, comment.getId());
     }
 
     public CommentDto.CommentResponse getDetail(Long id) {
         Comment comment = getComment(id);
-
         String username = memberService.getMember(comment.getMemberId()).getUsername();
+
         List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.COMMENT, id);
 
-        return CommentConverter.toResponse(comment, images, username);
+        return toResponse(comment, images, username);
     }
 
+    @Override
     public Page<CommentDto.PostCommentResponse> getPostComments(Long postId, Pageable pageable) {
         List<Comment> postComments = commentRepository.findAllByPostIdToSeqIsZero(postId);
         List<CommentDto.PostCommentResponse> postCommentResponses = new ArrayList<>();
@@ -120,19 +142,7 @@ public class CommentService {
             List<CommentDto.CommentResponse> replyCommentResponses = getReplyComments(comment);
 
             postCommentResponses.add(
-                    new CommentDto.PostCommentResponse(
-                            comment.getId(),
-                            comment.getMemberId(),
-                            commentUsername,
-                            comment.getPostId(),
-                            postTitle,
-                            comment.getContent(),
-                            commentImages,
-                            replyCommentResponses,
-                            comment.getCommentGroup(),
-                            comment.getCreatedAt(),
-                            comment.getUpdatedAt()
-                    )
+                    toResponse(comment, commentUsername, postTitle, commentImages, replyCommentResponses)
             );
         }
 
@@ -147,36 +157,16 @@ public class CommentService {
             String replyUsername = memberService.getMember(comment.getMemberId()).getUsername();
             List<ImageDto.ImageResponse> replyImages = imageService.getImages(DomainName.COMMENT, reply.getId());
 
-            CommentDto.CommentResponse commentResponse = CommentConverter.toResponse(reply, replyImages, replyUsername);
+            CommentDto.CommentResponse commentResponse = toResponse(reply, replyImages, replyUsername);
             replyCommentResponses.add(commentResponse);
         }
 
         return replyCommentResponses;
     }
 
-    @Transactional
-    public CommentDto.CommentResponse update(Long id, CommentDto.UpdateCommentRequest request, String username) {
-        Comment comment = getComment(id);
-        comment.update(request.content());
-
-        List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.COMMENT, comment.getId());
-
-        if (isExistImages(request.files())) {
-            imageService.deleteAllImages(DomainName.COMMENT, id);
-            images = imageService.uploadImages(request.files(), DomainName.COMMENT, id);
-        }
-
-        return CommentConverter.toResponse(comment, images, username);
-    }
-
-    private boolean isExistImages(List<MultipartFile> files) {
-        return !files.get(START_NUMBER).isEmpty();
-    }
-
-    public Page<MemberDto.Response> getCommenterByPostId(Long postId, Pageable pageable) {
-        Long writerId = postService.findPostById(postId).getMemberId();
-
-         return commentRepository.findDistinctMemberIdsByPostIdAndNotInWriterId(postId, writerId, pageable)
+    @Override
+    public Page<MemberDto.Response> getCommenterByPostId(Long writerId, Pageable pageable) {
+         return commentRepository.findDistinctMemberIdsByPostIdAndNotInWriterId(writerId, writerId, pageable)
                 .map(memberId -> {
                     Member member = memberService.getMember(memberId);
 

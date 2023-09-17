@@ -3,6 +3,7 @@ package com.devcourse.be04daangnmarket.comment.api;
 import com.devcourse.be04daangnmarket.comment.application.CommentService;
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.common.auth.User;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,7 +19,7 @@ public class CommentRestController {
     }
 
     @PostMapping
-    public ResponseEntity<CommentDto.CommentResponse> create(CommentDto.CreateCommentRequest request,
+    public ResponseEntity<CommentDto.CommentResponse> create(@Valid CommentDto.CreateCommentRequest request,
                                                              @AuthenticationPrincipal User user) {
         CommentDto.CommentResponse response = commentService.create(request, user.getId(), user.getUsername());
 
@@ -27,7 +28,7 @@ public class CommentRestController {
     }
 
     @PostMapping("/reply")
-    public ResponseEntity<CommentDto.CommentResponse> createReply(CommentDto.CreateReplyCommentRequest request,
+    public ResponseEntity<CommentDto.CommentResponse> createReply(@Valid CommentDto.CreateReplyCommentRequest request,
                                                                   @AuthenticationPrincipal User user) {
         CommentDto.CommentResponse response = commentService.createReply(request, user.getId(), user.getUsername());
 
@@ -52,7 +53,7 @@ public class CommentRestController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CommentDto.CommentResponse> update(@PathVariable Long id,
-                                                             CommentDto.UpdateCommentRequest request,
+                                                             @Valid CommentDto.UpdateCommentRequest request,
                                                              @AuthenticationPrincipal User user) {
         CommentDto.CommentResponse response = commentService.update(id, request, user.getUsername());
 

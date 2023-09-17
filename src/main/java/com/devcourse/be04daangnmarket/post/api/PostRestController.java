@@ -1,6 +1,6 @@
 package com.devcourse.be04daangnmarket.post.api;
 
-import com.devcourse.be04daangnmarket.comment.application.CommentService;
+import com.devcourse.be04daangnmarket.comment.application.CommentProviderService;
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.common.auth.User;
 import com.devcourse.be04daangnmarket.member.dto.MemberDto;
@@ -26,9 +26,9 @@ public class PostRestController {
     private final int PAGE_SIZE = 5;
 
     private final PostService postService;
-    private final CommentService commentService;
+    private final CommentProviderService commentService;
 
-    public PostRestController(PostService postService, CommentService commentService) {
+    public PostRestController(PostService postService, CommentProviderService commentService) {
         this.postService = postService;
         this.commentService = commentService;
     }
@@ -142,11 +142,11 @@ public class PostRestController {
                 .build();
     }
 
-    @GetMapping("/{postId}/comments")
-    public ResponseEntity<Page<CommentDto.PostCommentResponse>> getPostComments(@PathVariable Long postId,
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<Page<CommentDto.PostCommentResponse>> getPostComments(@PathVariable Long id,
                                                                                 @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("createdAt").descending());
-        Page<CommentDto.PostCommentResponse> response = commentService.getPostComments(postId, pageable);
+        Page<CommentDto.PostCommentResponse> response = commentService.getPostComments(id, pageable);
 
         return ResponseEntity.ok(response);
     }
@@ -155,7 +155,8 @@ public class PostRestController {
     public ResponseEntity<Page<MemberDto.Response>> getCommunicationMembers(@PathVariable Long id,
                                                                             @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<MemberDto.Response> responses = commentService.getCommenterByPostId(id, pageable);
+        Long writerId = postService.findPostById(id).getMemberId();
+        Page<MemberDto.Response> responses = commentService.getCommenterByPostId(writerId, pageable);
 
         return ResponseEntity.ok(responses);
     }
