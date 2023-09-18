@@ -50,4 +50,10 @@ public class CommonExceptionHandler {
 
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
 	}
+
+	@ExceptionHandler(IllegalStateException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ResponseEntity<String> illegalStateHandle(IllegalStateException exception) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+	}
 }
