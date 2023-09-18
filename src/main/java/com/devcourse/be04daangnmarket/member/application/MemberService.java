@@ -41,7 +41,6 @@ public class MemberService {
         Member savedMember = memberRepository.save(member);
 
         return MemberConverter.toResponse(savedMember);
-
     }
 
     public MemberDto.Response signIn(MemberDto.SignInRequest request) {

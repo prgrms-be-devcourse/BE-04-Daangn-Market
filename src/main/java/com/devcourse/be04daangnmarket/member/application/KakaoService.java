@@ -15,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class KakaoService {
-
     @Value("${KAKAO_REST_API_KEY}")
     private String KAKAO_CLIENT_ID;
 

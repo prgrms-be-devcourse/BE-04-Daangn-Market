@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping
 @RestController
 public class SignRestController {
-
     private final KakaoService kakaoService;
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
