@@ -98,7 +98,7 @@ public class PostDto {
 
             String status,
 
-            List<String> images,
+            List<String> imagePaths,
 
             Long buyerId,
 

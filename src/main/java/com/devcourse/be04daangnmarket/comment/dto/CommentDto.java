@@ -46,7 +46,7 @@ public class CommentDto {
 
             String content,
 
-            List<String> images,
+            List<String> imagePaths,
 
             LocalDateTime createdAt,
 
@@ -67,7 +67,7 @@ public class CommentDto {
 
             String content,
 
-            List<String> images,
+            List<String> imagePaths,
 
             List<CommentResponse> replyComments,
 
