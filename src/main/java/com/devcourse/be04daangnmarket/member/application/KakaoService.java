@@ -3,6 +3,7 @@ package com.devcourse.be04daangnmarket.member.application;
 import com.devcourse.be04daangnmarket.member.dto.KakaoResponse;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -34,9 +35,9 @@ public class KakaoService {
                 + "&response_type=code";
     }
 
-    public KakaoResponse getKakaoInfo(String code) throws Exception {
+    public KakaoResponse getKakaoInfo(String code) {
         if (code == null) {
-            throw new Exception("Failed get authorization code");
+            throw new IllegalArgumentException("Failed get authorization code");
         }
 
         String accessToken = "";
@@ -70,13 +71,13 @@ public class KakaoService {
             refreshToken = (String) jsonObj.get("refresh_token");
 
         } catch (Exception e) {
-            throw new Exception("API call failed");
+            throw new IllegalStateException("API call failed");
         }
 
         return getUserInfoWithToken(accessToken);
     }
 
-    private KakaoResponse getUserInfoWithToken(String accessToken) throws Exception {
+    private KakaoResponse getUserInfoWithToken(String accessToken) {
         //HttpHeader 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
@@ -94,14 +95,20 @@ public class KakaoService {
 
         //Response 데이터 파싱
         JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObj    = (JSONObject) jsonParser.parse(response.getBody());
-        JSONObject account = (JSONObject) jsonObj.get("kakao_account");
-        JSONObject profile = (JSONObject) account.get("profile");
 
-        long id = (long) jsonObj.get("id");
-        String nickname = String.valueOf(profile.get("nickname"));
-        String email = String.valueOf(account.get("email"));
+        try {
+            JSONObject jsonObj    = (JSONObject) jsonParser.parse(response.getBody());
+            JSONObject account = (JSONObject) jsonObj.get("kakao_account");
+            JSONObject profile = (JSONObject) account.get("profile");
 
-        return new KakaoResponse(id, nickname, email);
+            long id = (long) jsonObj.get("id");
+            String nickname = String.valueOf(profile.get("nickname"));
+            String email = String.valueOf(account.get("email"));
+
+            return new KakaoResponse(id, nickname, email);
+
+        } catch (ParseException e) {
+            throw new IllegalStateException("json parsing failed");
+        }
     }
 }

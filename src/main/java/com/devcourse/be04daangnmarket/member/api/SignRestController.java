@@ -27,7 +27,7 @@ public class SignRestController {
     }
 
     @GetMapping("/auth/kakao/callback")
-    public ResponseEntity<MemberDto.Response> kakaoLogin(@RequestParam(required = false) String code) throws Exception {
+    public ResponseEntity<MemberDto.Response> kakaoLogin(@RequestParam(required = false) String code) {
         KakaoResponse kakaoInfo = kakaoService.getKakaoInfo(code);
 
         String username = kakaoInfo.username();
