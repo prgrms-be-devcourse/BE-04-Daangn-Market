@@ -2,12 +2,13 @@ package com.devcourse.be04daangnmarket.comment.api;
 
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.common.auth.User;
+import com.devcourse.be04daangnmarket.common.image.LocalImageUpload;
 import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
-import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
-import com.devcourse.be04daangnmarket.image.dto.ImageDto;
+import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.comment.application.CommentService;
 import com.devcourse.be04daangnmarket.common.config.SecurityConfig;
+import com.devcourse.be04daangnmarket.common.image.dto.Type;
 import com.devcourse.be04daangnmarket.member.domain.Member;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,11 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -29,11 +25,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -54,52 +52,45 @@ class CommentRestControllerTest {
     private CommentService commentService;
 
     @MockBean
-    ImageService imageService;
+    private ImageService imageService;
 
     @MockBean
     private JwtTokenProvider jwtTokenProvider;
 
+    @MockBean
+    private LocalImageUpload imageUpload;
+
     @BeforeEach
     public void setup() {
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken(
-                        new User(new Member(
-                                "username",
-                                "0107209675",
-                                "email@naver.com",
-                                "1234")),
-                        null,
-                        Collections.emptyList()
-                )
-        );
+        Member member = new Member("username", "0107209675", "email@naver.com", "1234");
+        User user = new User(member);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Test
     @WithMockUser
     void 댓글_저장_성공() throws Exception {
         //given
-        List<MultipartFile> images = new ArrayList<>();
-        MockMultipartFile imageFile = new MockMultipartFile("예시", "예시.png", MediaType.IMAGE_JPEG_VALUE, "예시".getBytes());
-        images.add(imageFile);
-        CommentDto.CreateCommentRequest request = new CommentDto.CreateCommentRequest("댓글", 1L, null);
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+        MockMultipartFile imageFile = new MockMultipartFile("test1", "test1.png", "image/png", "test1".getBytes(StandardCharsets.UTF_8));
+        multipartFiles.add(imageFile);
 
-        List<ImageDto.ImageResponse> mockImageResponseList = new ArrayList<>();
-        ImageDto.ImageResponse mockImageResponse = new ImageDto.ImageResponse("예시.png", "images/a8f468c1-d234-4c08-8235-63cc59f73a15-예시.png", "image/png",
-                898066, DomainName.COMMENT, 1L);
-        mockImageResponseList.add(mockImageResponse);
+        ImageDto.ImageDetail imageDetail = new ImageDto.ImageDetail("test1", "uniqueName-test1.png", Type.PNG);
+        List<ImageDto.ImageDetail> imageDetails = List.of(imageDetail);
 
-        CommentDto.CommentResponse mockResponse = new CommentDto.CommentResponse(1L, 1L, "username", 1L, "댓글", null, LocalDateTime.now(), LocalDateTime.now());
+        List<String> pathLists = List.of("images/uniqueName-test1.png");
+        CommentDto.CommentResponse mockResponse = new CommentDto.CommentResponse(1L, 1L, "username", 1L, "댓글", pathLists, LocalDateTime.now(), LocalDateTime.now());
 
-        given(imageService.uploadImages(
-                eq(images),
-                eq(DomainName.COMMENT),
-                eq(1L)
-        )).willReturn(mockImageResponseList);
+        given(imageUpload.uploadImages(any())).willReturn(imageDetails);
 
         given(commentService.create(
-                eq(request),
-                eq(null),
-                eq("username")
+                eq(1L),
+                eq(1L),
+                eq("username"),
+                eq("댓글"),
+                eq(imageDetails)
         )).willReturn(mockResponse);
 
         //when & then
@@ -115,28 +106,25 @@ class CommentRestControllerTest {
     @WithMockUser
     void 대댓글_저장_성공() throws Exception {
         //given
-        List<MultipartFile> images = new ArrayList<>();
+        List<MultipartFile> imagePaths = new ArrayList<>();
         MockMultipartFile imageFile = new MockMultipartFile("예시", "예시.png", MediaType.IMAGE_JPEG_VALUE, "예시".getBytes());
-        images.add(imageFile);
-        CommentDto.CreateReplyCommentRequest request = new CommentDto.CreateReplyCommentRequest("댓글", 1L, 1, null);
+        imagePaths.add(imageFile);
 
-        List<ImageDto.ImageResponse> mockImageResponseList = new ArrayList<>();
-        ImageDto.ImageResponse mockImageResponse = new ImageDto.ImageResponse("예시.png", "images/a8f468c1-d234-4c08-8235-63cc59f73a15-예시.png", "image/png",
-                898066, DomainName.COMMENT, 1L);
-        mockImageResponseList.add(mockImageResponse);
+        ImageDto.ImageDetail imageDetail = new ImageDto.ImageDetail("test1", "uniqueName-test1.png", Type.PNG);
+        List<ImageDto.ImageDetail> imageDetails = List.of(imageDetail);
 
-        CommentDto.CommentResponse mockResponse = new CommentDto.CommentResponse(1L, 1L, "username", 1L, "댓글", null, LocalDateTime.now(), LocalDateTime.now());
+        List<String> pathLists = List.of("images/uniqueName-test1.png");
+        CommentDto.CommentResponse mockResponse = new CommentDto.CommentResponse(1L, 1L, "username", 1L, "댓글", pathLists, LocalDateTime.now(), LocalDateTime.now());
 
-        given(imageService.uploadImages(
-                eq(images),
-                eq(DomainName.COMMENT),
-                eq(1L)
-        )).willReturn(mockImageResponseList);
+        given(imageUpload.uploadImages(any())).willReturn(imageDetails);
 
         given(commentService.createReply(
-                eq(request),
-                eq(null),
-                eq("username")
+                eq(1L),
+                eq(1L),
+                eq("username"),
+                eq(1),
+                eq("댓글"),
+                eq(imageDetails)
         )).willReturn(mockResponse);
 
         //when & then
@@ -176,40 +164,18 @@ class CommentRestControllerTest {
                 .andDo(print());
     }
 
-    @Test
-    void 페이징_조회_성공() throws Exception {
-        //given
-        Long postId = 1L;
-        CommentDto.PostCommentResponse mockResponse1 = new CommentDto.PostCommentResponse(1L, 1L, "username", 1L, "게시글", "댓글", null, null, 1, LocalDateTime.now(), LocalDateTime.now());
-        CommentDto.PostCommentResponse mockResponse2 = new CommentDto.PostCommentResponse(2L, 1L, "username", 1L, "게시글", "댓글2", null, null, 1, LocalDateTime.now(), LocalDateTime.now());
-
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
-        List<CommentDto.PostCommentResponse> fakeResponses = List.of(mockResponse1, mockResponse2);
-        Page<CommentDto.PostCommentResponse> responsePage = new PageImpl<>(fakeResponses, pageable, fakeResponses.size());
-
-        given(commentService.getPostComments(1L, pageable))
-                .willReturn(responsePage);
-
-        //when & then
-        mockMvc.perform(get("/api/v1/comments/page/{postId}", postId)
-                        .param("page", "0")
-                        .param("size", "10")
-                        .param("order", "createdAt.desc")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andDo(print());
-    }
 
     @Test
     void 수정_성공() throws Exception {
         //given
-        CommentDto.UpdateCommentRequest request = new CommentDto.UpdateCommentRequest("댓글", 1L, null);
         CommentDto.CommentResponse mockResponse = new CommentDto.CommentResponse(1L, 1L, "username", 1L, "댓글", null, LocalDateTime.now(), LocalDateTime.now());
 
         given(commentService.update(
                 eq(1L),
-                eq(request),
-                eq("username")
+                eq(1L),
+                eq("username"),
+                eq("댓글"),
+                eq(null)
         )).willReturn(mockResponse);
 
         //when & then

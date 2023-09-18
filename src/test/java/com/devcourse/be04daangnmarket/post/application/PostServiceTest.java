@@ -1,14 +1,16 @@
 package com.devcourse.be04daangnmarket.post.application;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.devcourse.be04daangnmarket.image.dto.ImageDto;
+import com.devcourse.be04daangnmarket.common.image.LocalImageUpload;
+import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
+import com.devcourse.be04daangnmarket.common.image.dto.Type;
 import com.devcourse.be04daangnmarket.post.domain.constant.PostStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,11 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
@@ -48,6 +47,9 @@ class PostServiceTest {
     @Mock
     private ImageService imageService;
 
+    @Mock
+    private LocalImageUpload imageUpload;
+
     @MockBean
     private JwtTokenProvider jwtTokenProvider;
 
@@ -64,27 +66,14 @@ class PostServiceTest {
         );
         when(postRepository.save(any(Post.class))).thenReturn(post);
 
-        List<ImageDto.ImageResponse> imageResponses = List.of(
-                new ImageDto.ImageResponse(
-                        "name",
-                        "type",
-                        "type",
-                        1L,
-                        DomainName.POST,
-                        1L
-                )
-        );
-        when(imageService.uploadImages(anyList(), eq(DomainName.POST), eq(null))).thenReturn(imageResponses);
+        List<String> pathLists = List.of("images/uniqueName-test1.png");
+        when(imageService.save(anyList(), eq(DomainName.POST), eq(null))).thenReturn(pathLists);
 
         // when
-        List<MultipartFile> receivedImages = List.of(
-                new MockMultipartFile(
-                        "images",
-                        "test-image.jpg",
-                        MediaType.IMAGE_JPEG_VALUE,
-                        "test image content".getBytes()
-                )
-        );
+        ImageDto.ImageDetail imageDetail = new ImageDto.ImageDetail("test1", "uniqueName-test1.png", Type.PNG);
+        List<ImageDto.ImageDetail> imageDetails = List.of(imageDetail);
+
+        given(imageUpload.uploadImages(any())).willReturn(imageDetails);
 
         PostDto.Response response = postService.create(
                 1L,
@@ -93,7 +82,7 @@ class PostServiceTest {
                 100000,
                 TransactionType.SALE,
                 Category.DIGITAL_DEVICES,
-                receivedImages
+                imageDetails
         );
 
         // then
@@ -104,10 +93,10 @@ class PostServiceTest {
         assertEquals(100000, response.price());
         assertEquals(TransactionType.SALE.getDescription(), response.transactionType());
         assertEquals(Category.DIGITAL_DEVICES.getDescription(), response.category());
-        assertEquals(imageResponses, response.images());
+        assertEquals(pathLists, response.imagePaths());
 
         verify(postRepository, times(1)).save(any(Post.class));
-        verify(imageService, times(1)).uploadImages(anyList(), eq(DomainName.POST), eq(null));
+        verify(imageService, times(1)).save(anyList(), eq(DomainName.POST), eq(null));
     }
 
     @Test
@@ -307,7 +296,7 @@ class PostServiceTest {
                 price,
                 transactionType,
                 category,
-                new ArrayList<MultipartFile>()
+                null
         );
 
         // then
