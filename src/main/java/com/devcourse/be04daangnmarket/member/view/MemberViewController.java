@@ -1,5 +1,6 @@
 package com.devcourse.be04daangnmarket.member.view;
 
+import com.devcourse.be04daangnmarket.member.application.KakaoService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,6 +8,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class MemberViewController {
+    private final KakaoService kakaoService;
+
+    public MemberViewController(KakaoService kakaoService) {
+        this.kakaoService = kakaoService;
+    }
 
     @GetMapping(value = "/sign-up")
     public String signUp() {
@@ -14,7 +20,9 @@ public class MemberViewController {
     }
 
     @GetMapping(value = "/sign-in")
-    public String signIn() {
+    public String signIn(Model model) {
+        model.addAttribute("kakaoUrl", kakaoService.getKakaoLogin());
+
         return "signIn";
     }
 

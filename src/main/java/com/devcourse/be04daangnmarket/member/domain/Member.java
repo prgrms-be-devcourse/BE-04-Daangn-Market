@@ -16,13 +16,11 @@ public class Member extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(unique = true, nullable = false)
     private String phoneNumber;
 
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
@@ -40,6 +38,11 @@ public class Member extends BaseEntity {
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.password = password;
+    }
+
+    public Member(String username, String email) {
+        this.username = username;
+        this.email = email;
     }
 
     public String getUsername() {

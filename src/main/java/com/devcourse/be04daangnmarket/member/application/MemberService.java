@@ -35,6 +35,15 @@ public class MemberService {
         return MemberConverter.toResponse(savedMember);
     }
 
+    public MemberDto.Response kakaoSignUp(String username, String email) {
+        Member member = new Member(username, email);
+
+        Member savedMember = memberRepository.save(member);
+
+        return MemberConverter.toResponse(savedMember);
+
+    }
+
     public MemberDto.Response signIn(MemberDto.SignInRequest request) {
         Member member = memberRepository.findByEmail(request.email())
                 .orElseThrow(() -> new UsernameNotFoundException(FAIL_LOGIN.getMessage()));
@@ -44,6 +53,13 @@ public class MemberService {
         }
 
         throw new UsernameNotFoundException(FAIL_LOGIN.getMessage());
+    }
+
+    public MemberDto.Response kakaoSignIn(String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(FAIL_LOGIN.getMessage()));
+
+        return MemberConverter.toResponse(member);
     }
 
     public MemberDto.Response updateProfile(Long id, String username) {
@@ -73,6 +89,10 @@ public class MemberService {
     public Member getMember(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_USER.getMessage()));
+    }
+
+    public boolean isExistMember(String email) {
+        return memberRepository.findByEmail(email).isPresent();
     }
 
     private boolean isAvailableUsername(String username) {
