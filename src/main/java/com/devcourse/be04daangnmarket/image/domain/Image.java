@@ -21,9 +21,6 @@ public class Image extends BaseEntity {
     private Type type;
 
     @Column(nullable = false)
-    private long size;
-
-    @Column(nullable = false)
     private String path;
 
     @Enumerated(EnumType.STRING)
@@ -40,10 +37,9 @@ public class Image extends BaseEntity {
     protected Image() {
     }
 
-    public Image(String name, Type type, long size, String path, DomainName domainName, Long domainId) {
+    public Image(String name, Type type, String path, DomainName domainName, Long domainId) {
         this.name = name;
         this.type = type;
-        this.size = size;
         this.path = path;
         this.status = Status.ALIVE;
         this.domainName = domainName;
@@ -60,10 +56,6 @@ public class Image extends BaseEntity {
 
     public String getPath() {
         return path;
-    }
-
-    public long getSize() {
-        return size;
     }
 
     public Status getStatus() {

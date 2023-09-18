@@ -3,6 +3,8 @@ package com.devcourse.be04daangnmarket.post.api;
 import com.devcourse.be04daangnmarket.comment.application.CommentService;
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.common.auth.User;
+import com.devcourse.be04daangnmarket.common.image.ImageUpload;
+import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import com.devcourse.be04daangnmarket.post.application.PostService;
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
@@ -19,6 +21,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/posts")
@@ -27,15 +30,19 @@ public class PostRestController {
 
     private final PostService postService;
     private final CommentService commentService;
+    private final ImageUpload imageUpload;
 
-    public PostRestController(PostService postService, CommentService commentService) {
+    public PostRestController(PostService postService, CommentService commentService, ImageUpload imageUpload) {
         this.postService = postService;
         this.commentService = commentService;
+        this.imageUpload = imageUpload;
     }
 
     @PostMapping
     public ResponseEntity<PostDto.Response> createPost(@Valid PostDto.CreateRequest request,
                                                        @AuthenticationPrincipal User user) throws IOException {
+        List<ImageDto.ImageDetail> imageDetails = imageUpload.uploadImages(request.files());
+
         PostDto.Response response = postService.create(
                 user.getId(),
                 request.title(),
@@ -43,7 +50,7 @@ public class PostRestController {
                 request.price(),
                 request.transactionType(),
                 request.category(),
-                request.files()
+                imageDetails
         );
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -105,6 +112,7 @@ public class PostRestController {
     @PutMapping("/{id}")
     public ResponseEntity<PostDto.Response> updatePost(@PathVariable @NotNull Long id,
                                                        @Valid PostDto.UpdateRequest request) {
+        List<ImageDto.ImageDetail> imageDetails = imageUpload.uploadImages(request.files());
         PostDto.Response response = postService.update(
                 id,
                 request.title(),
@@ -112,7 +120,7 @@ public class PostRestController {
                 request.price(),
                 request.transactionType(),
                 request.category(),
-                request.files()
+                imageDetails
         );
 
         return ResponseEntity.ok(response);

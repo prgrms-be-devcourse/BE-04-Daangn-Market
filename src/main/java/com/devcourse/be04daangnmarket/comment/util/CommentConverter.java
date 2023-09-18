@@ -1,28 +1,27 @@
 package com.devcourse.be04daangnmarket.comment.util;
 
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
-import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
 
 import java.util.List;
 
 public class CommentConverter {
-    public static Comment toEntity(CommentDto.CreateCommentRequest dto, Long userId) {
-        return new Comment(dto.content(), userId, dto.postId());
+    public static Comment toEntity(String content, Long userId, Long postId) {
+        return new Comment(content, userId, postId);
     }
 
-    public static Comment toEntity(CommentDto.CreateReplyCommentRequest dto, Long userId) {
-        return new Comment(dto.content(), userId, dto.postId(), dto.commentGroup());
+    public static Comment toEntity(Long postId, String content, int commentGroup, Long userId) {
+        return new Comment(content, userId, postId, commentGroup);
     }
 
-    public static CommentDto.CommentResponse toResponse(Comment comment, List<ImageDto.ImageResponse> images, String username) {
+    public static CommentDto.CommentResponse toResponse(Comment comment, List<String> imagePaths, String username) {
         return new CommentDto.CommentResponse(
                 comment.getId(),
                 comment.getMemberId(),
                 username,
                 comment.getPostId(),
                 comment.getContent(),
-                images,
+                imagePaths,
                 comment.getCreatedAt(),
                 comment.getUpdatedAt()
         );
