@@ -62,7 +62,7 @@ public class MemberService {
     }
 
     public void validateById(Long pathId, Long authUserId) {
-        if (pathId != authUserId) {
+        if (!pathId.equals(authUserId)) {
             throw new IllegalArgumentException(ILLEGAL_USER_ACCESS.getMessage());
         }
     }
