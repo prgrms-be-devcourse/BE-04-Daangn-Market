@@ -11,7 +11,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "imagePaths")
+@Table(name = "images")
 public class Image extends BaseEntity {
     @Column(nullable = false)
     private String name;

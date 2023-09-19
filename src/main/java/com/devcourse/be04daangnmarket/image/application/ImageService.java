@@ -27,9 +27,10 @@ public class ImageService {
 	@Transactional
 	public List<String> save(List<ImageDto.ImageDetail> images, DomainName domainName, Long domainId) {
 		return images.stream()
-               .map(image -> {
-				   String relativePath = getRelativePath(image.uniqueName());
-                   imageRepository.save(toEntity(image.originName(), image.type(), relativePath, domainName, domainId));
+               .map(imageDetail -> {
+				   String relativePath = getRelativePath(imageDetail.uniqueName());
+				   Image image = toEntity(imageDetail.originName(), imageDetail.type(), relativePath, domainName, domainId);
+				   imageRepository.save(image);
 
                    return relativePath;
                })
