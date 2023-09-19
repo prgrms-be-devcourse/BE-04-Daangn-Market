@@ -3,6 +3,7 @@ package com.devcourse.be04daangnmarket.comment.api;
 import com.devcourse.be04daangnmarket.comment.application.CommentService;
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.common.auth.User;
+import jakarta.validation.Valid;
 import com.devcourse.be04daangnmarket.common.image.LocalImageUpload;
 import com.devcourse.be04daangnmarket.common.image.ImageUpload;
 import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
@@ -25,7 +26,7 @@ public class CommentRestController {
     }
 
     @PostMapping
-    public ResponseEntity<CommentDto.CommentResponse> create(CommentDto.CreateCommentRequest request,
+    public ResponseEntity<CommentDto.CommentResponse> create(@Valid CommentDto.CreateCommentRequest request,
                                                              @AuthenticationPrincipal User user) {
         List<ImageDto.ImageDetail> imageDetails = imageUpload.uploadImages(request.files());
         CommentDto.CommentResponse response = commentService.create(request.postId(),
@@ -39,7 +40,7 @@ public class CommentRestController {
     }
 
     @PostMapping("/reply")
-    public ResponseEntity<CommentDto.CommentResponse> createReply(CommentDto.CreateReplyCommentRequest request,
+    public ResponseEntity<CommentDto.CommentResponse> createReply(@Valid CommentDto.CreateReplyCommentRequest request,
                                                                   @AuthenticationPrincipal User user) {
         List<ImageDto.ImageDetail> imageDetails = imageUpload.uploadImages(request.files());
         CommentDto.CommentResponse response = commentService.createReply(request.postId(),
@@ -70,7 +71,7 @@ public class CommentRestController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CommentDto.CommentResponse> update(@PathVariable Long id,
-                                                             CommentDto.UpdateCommentRequest request,
+                                                             @Valid CommentDto.UpdateCommentRequest request,
                                                              @AuthenticationPrincipal User user) {
         List<ImageDto.ImageDetail> imageDetails = imageUpload.uploadImages(request.files());
         CommentDto.CommentResponse response = commentService.update(id,
