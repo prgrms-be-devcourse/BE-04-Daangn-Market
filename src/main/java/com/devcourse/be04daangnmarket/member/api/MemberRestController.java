@@ -2,6 +2,7 @@ package com.devcourse.be04daangnmarket.member.api;
 
 import com.devcourse.be04daangnmarket.common.auth.User;
 import com.devcourse.be04daangnmarket.member.application.MemberService;
+import com.devcourse.be04daangnmarket.member.application.ProfileService;
 import com.devcourse.be04daangnmarket.member.dto.ProfileDto;
 import jakarta.validation.Valid;
 import com.devcourse.be04daangnmarket.post.application.PostService;
@@ -26,16 +27,18 @@ public class MemberRestController {
     private final int PAGE_SIZE = 5;
 
     private final MemberService memberService;
+    private final ProfileService profileService;
     private final PostService postService;
 
-    public MemberRestController(MemberService memberService, PostService postService) {
+    public MemberRestController(MemberService memberService, ProfileService profileService, PostService postService) {
         this.memberService = memberService;
+        this.profileService = profileService;
         this.postService = postService;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProfileDto.Response> getProfile(@PathVariable Long id) {
-        ProfileDto.Response response = memberService.toProfile(id);
+        ProfileDto.Response response = profileService.toProfile(id);
 
         return ResponseEntity.ok(response);
     }
@@ -45,7 +48,7 @@ public class MemberRestController {
                                                             @PathVariable Long id,
                                                             @RequestBody @Valid ProfileDto.UpdateRequest request) {
         memberService.validateById(id, user.getId());
-        ProfileDto.Response response = memberService.updateProfile(id, request.username());
+        ProfileDto.Response response = profileService.updateProfile(id, request.username());
 
         return ResponseEntity.ok(response);
     }

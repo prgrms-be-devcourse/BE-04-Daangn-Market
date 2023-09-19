@@ -7,7 +7,7 @@ import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.comment.util.CommentConverter;
-import com.devcourse.be04daangnmarket.member.application.MemberService;
+import com.devcourse.be04daangnmarket.member.application.ProfileService;
 import com.devcourse.be04daangnmarket.member.domain.Profile;
 import com.devcourse.be04daangnmarket.member.dto.ProfileDto;
 import com.devcourse.be04daangnmarket.member.util.ProfileConverter;
@@ -32,17 +32,16 @@ public class CommentService implements CommentProviderService {
 
     private final ImageService imageService;
     private final CommentRepository commentRepository;
-    private final MemberService memberService;
     private final PostService postService;
+    private final ProfileService profileService;
 
     public CommentService(ImageService imageService,
                           CommentRepository commentRepository,
-                          MemberService memberService,
-                          PostService postService) {
+                          PostService postService, ProfileService profileService) {
         this.imageService = imageService;
         this.commentRepository = commentRepository;
-        this.memberService = memberService;
         this.postService = postService;
+        this.profileService = profileService;
     }
 
     @Transactional
@@ -123,7 +122,7 @@ public class CommentService implements CommentProviderService {
 
     public CommentDto.CommentResponse getDetail(Long id) {
         Comment comment = getComment(id);
-        String username = memberService.getProfile(comment.getMemberId()).getUsername();
+        String username = profileService.getProfile(comment.getMemberId()).getUsername();
 
         List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.COMMENT, id);
 
@@ -136,7 +135,7 @@ public class CommentService implements CommentProviderService {
         List<CommentDto.PostCommentResponse> postCommentResponses = new ArrayList<>();
 
         for (Comment comment : postComments) {
-            String commentUsername = memberService.getProfile(comment.getMemberId()).getUsername();
+            String commentUsername = profileService.getProfile(comment.getMemberId()).getUsername();
             String postTitle = postService.findPostById(comment.getPostId()).getTitle();
             List<ImageDto.ImageResponse> commentImages = imageService.getImages(DomainName.COMMENT, comment.getId());
 
@@ -155,7 +154,7 @@ public class CommentService implements CommentProviderService {
         List<CommentDto.CommentResponse> replyCommentResponses = new ArrayList<>();
 
         for (Comment reply : replyComments) {
-            String replyUsername = memberService.getProfile(comment.getMemberId()).getUsername();
+            String replyUsername = profileService.getProfile(comment.getMemberId()).getUsername();
             List<ImageDto.ImageResponse> replyImages = imageService.getImages(DomainName.COMMENT, reply.getId());
 
             CommentDto.CommentResponse commentResponse = toResponse(reply, replyImages, replyUsername);
@@ -169,7 +168,7 @@ public class CommentService implements CommentProviderService {
     public Page<ProfileDto.Response> getCommenterByPostId(Long writerId, Pageable pageable) {
          return commentRepository.findDistinctMemberIdsByPostIdAndNotInWriterId(writerId, writerId, pageable)
                 .map(memberId -> {
-                    Profile memberProfile = memberService.getProfile(memberId);
+                    Profile memberProfile = profileService.getProfile(memberId);
 
                     return ProfileConverter.toResponse(memberProfile);
                 });
