@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import com.devcourse.be04daangnmarket.image.dto.ImageDto;
+import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.post.domain.constant.PostStatus;
 import com.devcourse.be04daangnmarket.post.util.PostConverter;
 
@@ -15,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
@@ -50,7 +49,7 @@ public class PostService {
                                    int price,
                                    TransactionType transactionType,
                                    Category category,
-                                   List<MultipartFile> files) throws IOException {
+                                   List<ImageDto.ImageDetail> files) throws IOException {
         Post post = PostConverter.toEntity(
                 memberId,
                 title,
@@ -62,10 +61,10 @@ public class PostService {
 
         postRepository.save(post);
 
-        List<ImageDto.ImageResponse> images = imageService.uploadImages(files, DomainName.POST, post.getId());
+        List<String> imagePaths = imageService.save(files, DomainName.POST, post.getId());
         String username = getUsername(post.getMemberId());
 
-        return PostConverter.toResponse(post, images, username);
+        return PostConverter.toResponse(post, imagePaths, username);
     }
 
     @Transactional
@@ -77,18 +76,18 @@ public class PostService {
         }
 
 
-        List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, id);
+        List<String> imagePaths = imageService.getImages(DomainName.POST, id);
         String username = getUsername(post.getMemberId());
 
-        return PostConverter.toResponse(post, images, username);
+        return PostConverter.toResponse(post, imagePaths, username);
     }
 
     public Page<PostDto.Response> getAllPost(Pageable pageable) {
         return postRepository.findAll(pageable).map(post -> {
-            List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+            List<String> imagePaths = imageService.getImages(DomainName.POST, post.getId());
             String username = getUsername(post.getMemberId());
 
-            return PostConverter.toResponse(post, images, username);
+            return PostConverter.toResponse(post, imagePaths, username);
         });
     }
 
@@ -101,61 +100,69 @@ public class PostService {
                         request.keyword(),
                         pageable)
                 .map(post -> {
-                    List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+                    List<String> imagePaths = imageService.getImages(DomainName.POST, post.getId());
                     String username = getUsername(post.getMemberId());
 
-                    return PostConverter.toResponse(post, images, username);
+                    return PostConverter.toResponse(post, imagePaths, username);
                 });
     }
 
     public Page<PostDto.Response> getPostByCategory(Category category, Pageable pageable) {
         return postRepository.findByCategory(category, pageable).map(post -> {
-            List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+            List<String> imagePaths = imageService.getImages(DomainName.POST, post.getId());
             String username = getUsername(post.getMemberId());
 
-            return PostConverter.toResponse(post, images, username);
+            return PostConverter.toResponse(post, imagePaths, username);
         });
     }
 
     public Page<PostDto.Response> getPostByMemberId(Long memberId, Pageable pageable) {
         return postRepository.findByMemberId(memberId, pageable).map(post -> {
-            List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+            List<String> imagePaths = imageService.getImages(DomainName.POST, post.getId());
             String username = getUsername(post.getMemberId());
 
-            return PostConverter.toResponse(post, images, username);
+            return PostConverter.toResponse(post, imagePaths, username);
         });
     }
 
     public Page<PostDto.Response> getPostByKeyword(String keyword, Pageable pageable) {
         return postRepository.findByTitleContaining(keyword, pageable).map(post -> {
-            List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+            List<String> imagePaths = imageService.getImages(DomainName.POST, post.getId());
             String username = getUsername(post.getMemberId());
 
-            return PostConverter.toResponse(post, images, username);
+            return PostConverter.toResponse(post, imagePaths, username);
         });
     }
 
     public Page<PostDto.Response> getPostByBuyerId(Long buyerId, Pageable pageable) {
         return postRepository.findByBuyerId(buyerId, pageable).map(post -> {
-            List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+            List<String> imagePaths = imageService.getImages(DomainName.POST, post.getId());
             String username = getUsername(post.getMemberId());
 
-            return PostConverter.toResponse(post, images, username);
+            return PostConverter.toResponse(post, imagePaths, username);
         });
     }
 
     @Transactional
     public PostDto.Response update(Long id, String title, String description, int price,
-                                   TransactionType transactionType, Category category, List<MultipartFile> files) {
+                                   TransactionType transactionType, Category category, List<ImageDto.ImageDetail> files) {
         Post post = findPostById(id);
 
         post.update(title, description, price, transactionType, category);
-        imageService.deleteAllImages(DomainName.POST, id);
+        List<String> imagePaths = imageService.getImages(DomainName.POST, id);
 
-        List<ImageDto.ImageResponse> images = imageService.uploadImages(files, DomainName.POST, id);
+        if (isExistImages(files)) {
+            imageService.deleteAllImages(DomainName.POST, id);
+            imagePaths = imageService.save(files, DomainName.POST, id);
+        }
+
         String username = getUsername(post.getMemberId());
 
-        return PostConverter.toResponse(post, images, username);
+        return PostConverter.toResponse(post, imagePaths, username);
+    }
+
+    private boolean isExistImages(List<ImageDto.ImageDetail> files) {
+        return !files.isEmpty();
     }
 
     @Transactional
@@ -163,10 +170,10 @@ public class PostService {
         Post post = findPostById(id);
         post.updatePostStatus(postStatus);
 
-        List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+        List<String> imagePaths = imageService.getImages(DomainName.POST, post.getId());
         String username = getUsername(post.getMemberId());
 
-        return PostConverter.toResponse(post, images, username);
+        return PostConverter.toResponse(post, imagePaths, username);
     }
 
     public Post findPostById(Long id) {
@@ -187,10 +194,10 @@ public class PostService {
         Post post = findPostById(id);
         post.purchased(buyerId);
 
-        List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.POST, post.getId());
+        List<String> imagePaths = imageService.getImages(DomainName.POST, post.getId());
         String username = getUsername(post.getMemberId());
 
-        return PostConverter.toResponse(post, images, username);
+        return PostConverter.toResponse(post, imagePaths, username);
     }
 
     private String getUsername(Long memberId) {
@@ -219,5 +226,4 @@ public class PostService {
 
         return false;
     }
-
 }

@@ -75,8 +75,8 @@
     function addRow(post) {
         let item2 = '';
 
-        for (let imageKey of post.images) {
-            const urlPath = baseUrl +imageKey.path;
+        for (let imageKey of post.imagePaths) {
+            const urlPath = baseUrl +imageKey;
 
             item2 +=
                 `

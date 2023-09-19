@@ -1,4 +1,4 @@
-package com.devcourse.be04daangnmarket.image.domain.constant;
+package com.devcourse.be04daangnmarket.common.image.dto;
 
 import com.devcourse.be04daangnmarket.image.exception.ExceptionMessage;
 import com.devcourse.be04daangnmarket.image.exception.FileUploadException;
@@ -25,8 +25,8 @@ public enum Type {
         return Arrays.stream(Type.values())
                 .filter(type -> type.getFullType().equals(typeName))
                 .findFirst()
-                .orElseThrow(() -> {
-                    throw new FileUploadException(ExceptionMessage.NOT_CORRECT_IMAGE_TYPE_EXCEPTION.getMessage());
-                });
+                .orElseThrow(
+                        () -> new FileUploadException(ExceptionMessage.NOT_CORRECT_IMAGE_TYPE_EXCEPTION.getMessage())
+                );
     }
 }

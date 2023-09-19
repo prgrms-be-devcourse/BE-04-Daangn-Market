@@ -21,7 +21,7 @@
                 const profileData = res.data;
                 document.getElementById("userName").innerHTML = '사용자 : ' + profileData.username;
                 document.getElementById("temperature").innerHTML = '매너온도 : ' + profileData.temperature;
-                renderImage(res.data.images)
+                renderImage(res.data.imagePaths)
             })
             .catch(error => {
                 alert("오류가 발생했습니다. \n" + error.response.data);
@@ -29,11 +29,11 @@
             });
     });
 
-    function renderImage(images) {
+    function renderImage(imagePaths) {
 
         var imageContainer = document.getElementById("image-container");
         var img = document.createElement("img")
-        img.src = images.length == 0 ? baseUrl + defaultUrl : baseUrl + images[0].path
+        img.src = imagePaths.length == 0 ? baseUrl + defaultUrl : baseUrl + imagePaths[0]
         img.alt = "이미지"
         imageContainer.appendChild(img);
         console.log(img.src)

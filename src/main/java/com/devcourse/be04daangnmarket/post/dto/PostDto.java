@@ -3,8 +3,6 @@ package com.devcourse.be04daangnmarket.post.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.devcourse.be04daangnmarket.image.dto.ImageDto;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
@@ -100,7 +98,7 @@ public class PostDto {
 
             String status,
 
-            List<ImageDto.ImageResponse> images,
+            List<String> imagePaths,
 
             Long buyerId,
 

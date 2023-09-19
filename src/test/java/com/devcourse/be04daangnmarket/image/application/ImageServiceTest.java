@@ -3,19 +3,15 @@ package com.devcourse.be04daangnmarket.image.application;
 import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 import com.devcourse.be04daangnmarket.image.domain.Image;
-import com.devcourse.be04daangnmarket.image.domain.constant.Type;
-import com.devcourse.be04daangnmarket.image.dto.ImageDto;
+import com.devcourse.be04daangnmarket.common.image.dto.Type;
+import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.image.repository.ImageRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,87 +31,71 @@ class ImageServiceTest {
     @Test
     void 저장_성공() {
         //given
-        List<MultipartFile> multipartFiles = new ArrayList<>();
-        MockMultipartFile imageFile = new MockMultipartFile(
-                "구직_공고문",
-                "구직_공고문.jpeg",
-                MediaType.IMAGE_JPEG_VALUE,
-                "test".getBytes());
-        multipartFiles.add(imageFile);
+        ImageDto.ImageDetail imageDetail = new ImageDto.ImageDetail("test1", "uniqueName-test1.png", Type.PNG);
+        List<ImageDto.ImageDetail> imageDetails = List.of(imageDetail);
 
         DomainName domainName = DomainName.COMMENT;
         Long domainId = 1L;
 
         Image image = new Image(
-                imageFile.getOriginalFilename(),
-                Type.JPEG,
-                imageFile.getSize(),
-                "images/randomPath-" + imageFile.getOriginalFilename(),
+                "test1",
+                Type.PNG,
+                "images/uniqueName-test1.png",
                 domainName,
                 domainId);
 
         given(imageRepository.save(any())).willReturn(image);
 
         //when
-        List<ImageDto.ImageResponse> responses = imageService.uploadImages(multipartFiles, domainName, domainId);
+        List<String> responses = imageService.save(imageDetails, domainName, domainId);
 
         // then
-        assertThat(responses.get(0).name()).isEqualTo(image.getName());
-        assertThat(responses.get(0).type()).isEqualTo(image.getType());
+        assertThat(responses.get(0)).isEqualTo(image.getPath());
         verify(imageRepository, times(1)).save(any());
     }
 
     @Test
     void 조회_성공() {
         //given
-        List<MultipartFile> multipartFiles = new ArrayList<>();
-        MockMultipartFile imageFile = new MockMultipartFile("구직_공고문", "구직_공고문.png", MediaType.IMAGE_JPEG_VALUE, "test".getBytes());
-        multipartFiles.add(imageFile);
-
         DomainName domainName = DomainName.COMMENT;
         Long domainId = 1L;
 
         Image image = new Image(
-                imageFile.getOriginalFilename(),
-                Type.JPEG,
-                imageFile.getSize(),
-                "images/randomPath-" + imageFile.getOriginalFilename(),
+                "test1",
+                Type.PNG,
+                "images/uniqueName-test1.png",
                 domainName,
                 domainId);
-        List<Image> images = List.of(image);
+        List<Image> imagePaths = List.of(image);
 
         given(imageRepository.findAllByDomainNameAndDomainId(domainName, domainId))
-                .willReturn(images);
+                .willReturn(imagePaths);
 
         //when
-        List<ImageDto.ImageResponse> responses = imageService.getImages(domainName, domainId);
+        List<String> responses = imageService.getImages(domainName, domainId);
 
         // then
-        assertThat(responses.get(0).name()).isEqualTo(image.getName());
-        assertThat(responses.get(0).type()).isEqualTo(image.getType());
+        assertThat(responses.get(0)).isEqualTo(image.getPath());
         verify(imageRepository, times(1)).findAllByDomainNameAndDomainId(domainName, domainId);
     }
 
     @Test
     void 삭제시_삭제상태변경_확인() {
         //given
-        List<MultipartFile> multipartFiles = new ArrayList<>();
-        MockMultipartFile imageFile = new MockMultipartFile(
-                "구직_공고문",
-                "구직_공고문.jpeg",
-                MediaType.IMAGE_JPEG_VALUE,
-                "test".getBytes());
-        multipartFiles.add(imageFile);
-
         DomainName domainName = DomainName.COMMENT;
         Long domainId = 1L;
 
-        Image image = new Image(imageFile.getOriginalFilename(), Type.JPEG,
-                imageFile.getSize(), "images/randomPath-" + imageFile.getOriginalFilename(), domainName, domainId);
-        List<Image> images = List.of(image);
+        Image image = new Image(
+                "test1",
+                Type.PNG,
+                "images/uniqueName-test1.png",
+                domainName,
+                domainId);
+
+        List<Image> imagePaths = List.of(image);
 
         given(imageRepository.findAllByDomainNameAndDomainId(domainName, domainId))
-                .willReturn(images);
+                .willReturn(imagePaths);
 
         //when
         imageService.deleteAllImages(domainName, domainId);

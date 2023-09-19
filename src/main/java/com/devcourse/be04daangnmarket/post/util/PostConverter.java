@@ -1,6 +1,5 @@
 package com.devcourse.be04daangnmarket.post.util;
 
-import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.post.domain.Post;
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
@@ -25,7 +24,7 @@ public class PostConverter {
         );
     }
 
-    public static PostDto.Response toResponse(Post post, List<ImageDto.ImageResponse> images, String username) {
+    public static PostDto.Response toResponse(Post post, List<String> imagePaths, String username) {
         return new PostDto.Response(
                 post.getId(),
                 post.getMemberId(),
@@ -37,7 +36,7 @@ public class PostConverter {
                 post.getTransactionType().getDescription(),
                 post.getCategory().getDescription(),
                 post.getPostStatus().getDescription(),
-                images,
+                imagePaths,
                 post.getBuyerId(),
                 post.getCreatedAt()
         );
