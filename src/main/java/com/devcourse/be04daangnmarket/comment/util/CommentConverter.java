@@ -26,4 +26,20 @@ public class CommentConverter {
                 comment.getUpdatedAt()
         );
     }
+
+    public static CommentDto.PostCommentResponse toResponse(Comment comment, String commentUsername, String postTitle, List<String> imagePaths, List<CommentDto.CommentResponse> replyCommentResponses) {
+        return new CommentDto.PostCommentResponse(
+                comment.getId(),
+                comment.getMemberId(),
+                commentUsername,
+                comment.getPostId(),
+                postTitle,
+                comment.getContent(),
+                imagePaths,
+                replyCommentResponses,
+                comment.getCommentGroup(),
+                comment.getCreatedAt(),
+                comment.getUpdatedAt()
+        );
+    }
 }

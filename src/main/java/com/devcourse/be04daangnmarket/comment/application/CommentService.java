@@ -57,7 +57,7 @@ public class CommentService implements CommentProviderService {
         Comment saved = commentRepository.save(comment);
         List<String> imagePaths = imageService.save(files, DomainName.COMMENT, saved.getId());
 
-        return CommentConverter.toResponse(saved, imagePaths, username);
+        return toResponse(saved, imagePaths, username);
     }
 
     private void createCommentGroupNumber(Comment comment) {
@@ -79,7 +79,7 @@ public class CommentService implements CommentProviderService {
         Comment saved = commentRepository.save(comment);
         List<String> imagePaths = imageService.save(files, DomainName.COMMENT, saved.getId());
 
-        return CommentConverter.toResponse(saved, imagePaths, username);
+        return toResponse(saved, imagePaths, username);
     }
 
     private void addMaxSequenceToReplyComment(int commentGroup, Comment comment) {
@@ -120,7 +120,7 @@ public class CommentService implements CommentProviderService {
         String username = memberService.getMember(comment.getMemberId()).getUsername();
         List<String> imagePaths = imageService.getImages(DomainName.COMMENT, id);
 
-        return CommentConverter.toResponse(comment, imagePaths, username);
+        return toResponse(comment, imagePaths, username);
     }
 
     @Override
@@ -135,21 +135,7 @@ public class CommentService implements CommentProviderService {
 
             List<CommentDto.CommentResponse> replyCommentResponses = getReplyComments(comment);
 
-            postCommentResponses.add(
-                    new CommentDto.PostCommentResponse(
-                            comment.getId(),
-                            comment.getMemberId(),
-                            commentUsername,
-                            comment.getPostId(),
-                            postTitle,
-                            comment.getContent(),
-                            imagePaths,
-                            replyCommentResponses,
-                            comment.getCommentGroup(),
-                            comment.getCreatedAt(),
-                            comment.getUpdatedAt()
-                    )
-            );
+            postCommentResponses.add(toResponse(comment, commentUsername, postTitle, imagePaths, replyCommentResponses));
         }
 
         return new PageImpl<>(postCommentResponses, pageable, postCommentResponses.size());
@@ -163,7 +149,7 @@ public class CommentService implements CommentProviderService {
             String replyUsername = memberService.getMember(comment.getMemberId()).getUsername();
             List<String> imagePaths = imageService.getImages(DomainName.COMMENT, reply.getId());
 
-            CommentDto.CommentResponse commentResponse = CommentConverter.toResponse(reply, imagePaths, replyUsername);
+            CommentDto.CommentResponse commentResponse = toResponse(reply, imagePaths, replyUsername);
             replyCommentResponses.add(commentResponse);
         }
 
@@ -179,12 +165,10 @@ public class CommentService implements CommentProviderService {
         Comment comment = getComment(id);
         comment.update(content);
 
-        List<String> imagePaths = imageService.getImages(DomainName.COMMENT, comment.getId());
-
         imageService.deleteAllImages(DomainName.COMMENT, id);
-        imagePaths = imageService.save(files, DomainName.COMMENT, id);
+        List<String> imagePaths = imageService.save(files, DomainName.COMMENT, id);
 
-        return CommentConverter.toResponse(comment, imagePaths, username);
+        return toResponse(comment, imagePaths, username);
     }
 
     public Page<MemberDto.Response> getCommenterByPostId(Long postId, Pageable pageable) {
