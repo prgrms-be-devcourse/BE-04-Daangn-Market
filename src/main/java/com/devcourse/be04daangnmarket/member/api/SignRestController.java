@@ -55,7 +55,6 @@ public class SignRestController {
     public ResponseEntity<MemberDto.Response> kakaoLogin(@RequestParam(required = false) String code) {
         KakaoResponse kakaoInfo = kakaoService.getKakaoInfo(code);
 
-        String username = kakaoInfo.username();
         String email = kakaoInfo.email();
 
         if (memberService.isExistMember(email)) {
@@ -70,7 +69,7 @@ public class SignRestController {
                     .body(response);
         }
 
-        MemberDto.Response response = memberService.kakaoSignUp(username, email);
+        MemberDto.Response response = memberService.kakaoSignUp(email);
 
         return ResponseEntity.ok(response);
     }

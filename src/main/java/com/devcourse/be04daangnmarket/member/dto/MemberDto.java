@@ -10,9 +10,6 @@ import java.time.LocalDateTime;
 
 public class MemberDto {
     public record SignUpRequest(
-            @NotBlank(message = "닉네임은 필수로 입력하여야 합니다.")
-            String username,
-
             @NotBlank(message = "전화번호는 필수로 입력하여야 합니다.")
             @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message = "전화번호 형식에 맞게 입력해주세요.")
             String phoneNumber,
@@ -37,22 +34,12 @@ public class MemberDto {
     ) {
     }
 
-    public record UpdateProfileRequest(
-            @NotBlank(message = "닉네임은 필수로 입력하여야 합니다.")
-            String username
-    ) {
-    }
-
     public record Response(
             Long id,
-
-            String username,
 
             String phoneNumber,
 
             String email,
-
-            double temperature,
 
             Status status,
 

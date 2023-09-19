@@ -194,7 +194,7 @@ public class PostService {
     }
 
     private String getUsername(Long memberId) {
-        return memberService.getProfile(memberId).username();
+        return memberService.toProfile(memberId).username();
     }
 
     private boolean isViewed(Long id, HttpServletRequest req, HttpServletResponse res) {

@@ -2,7 +2,7 @@ package com.devcourse.be04daangnmarket.member.api;
 
 import com.devcourse.be04daangnmarket.common.auth.User;
 import com.devcourse.be04daangnmarket.member.application.MemberService;
-import com.devcourse.be04daangnmarket.member.dto.MemberDto;
+import com.devcourse.be04daangnmarket.member.dto.ProfileDto;
 import jakarta.validation.Valid;
 import com.devcourse.be04daangnmarket.post.application.PostService;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
@@ -34,18 +34,18 @@ public class MemberRestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MemberDto.Response> getProfile(@PathVariable Long id) {
-        MemberDto.Response response = memberService.getProfile(id);
+    public ResponseEntity<ProfileDto.Response> getProfile(@PathVariable Long id) {
+        ProfileDto.Response response = memberService.toProfile(id);
 
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MemberDto.Response> updateProfile(@AuthenticationPrincipal User user,
+    public ResponseEntity<ProfileDto.Response> updateProfile(@AuthenticationPrincipal User user,
                                                             @PathVariable Long id,
-                                                            @RequestBody @Valid MemberDto.UpdateProfileRequest request) {
+                                                            @RequestBody @Valid ProfileDto.UpdateRequest request) {
         memberService.validateById(id, user.getId());
-        MemberDto.Response response = memberService.updateProfile(id, request.username());
+        ProfileDto.Response response = memberService.updateProfile(id, request.username());
 
         return ResponseEntity.ok(response);
     }
