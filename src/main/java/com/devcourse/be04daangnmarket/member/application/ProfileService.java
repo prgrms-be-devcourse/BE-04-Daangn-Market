@@ -21,6 +21,12 @@ public class ProfileService {
         this.profileRepository = profileRepository;
     }
 
+    public void createProfile(Long memberId) {
+        Profile profile = new Profile(memberId);
+
+        profileRepository.save(profile);
+    }
+
     public ProfileDto.Response updateProfile(Long id, String username) {
         Profile profile = getProfile(id);
 

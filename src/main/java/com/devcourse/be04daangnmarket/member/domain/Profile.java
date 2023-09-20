@@ -18,6 +18,10 @@ public class Profile extends BaseEntity {
 
     private double temperature = 36.5;
 
+    public Profile(Long memberId) {
+        this.memberId = memberId;
+    }
+
     public Profile(Long memberId, String username, String region) {
         this.memberId = memberId;
         this.username = username;

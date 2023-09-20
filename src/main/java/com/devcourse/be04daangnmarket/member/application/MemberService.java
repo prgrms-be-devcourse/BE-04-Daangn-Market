@@ -20,17 +20,20 @@ import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.NOT_F
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProfileService profileService;
 
     public MemberService(MemberRepository memberRepository,
-                         PasswordEncoder passwordEncoder) {
+                         PasswordEncoder passwordEncoder, ProfileService profileService) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
+        this.profileService = profileService;
     }
 
     public MemberDto.Response signUp(MemberDto.SignUpRequest request) {
         Member member = MemberConverter.toEntity(request, passwordEncoder);
 
         Member savedMember = memberRepository.save(member);
+        profileService.createProfile(savedMember.getId());
 
         return MemberConverter.toResponse(savedMember);
     }
