@@ -14,4 +14,6 @@ public interface PostRepositoryCustom {
                                          String keyword,
                                          Pageable pageable
     );
+
+    Slice<Post> getPostsWithCursor(Long id, Pageable pageable);
 }

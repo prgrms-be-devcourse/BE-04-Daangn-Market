@@ -209,4 +209,61 @@ class PostRepositoryCustomImplTest {
         assertEquals(1L, selectedPost.getContent().get(0).getId());
         assertEquals(1, selectedPost.getContent().size());
     }
+
+    @Test
+    @DisplayName("정렬 조건 없는 커서 기반 페이징 첫 조회 성공")
+    void getPostsByCursor() {
+        // given
+        List<Post> posts = List.of(
+                new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "mouse~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "keyKey~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.HOUSEHOLD_KITCHEN),
+                new Post(1L, "house~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES)
+        );
+        postRepository.saveAll(posts);
+
+        // when
+        Pageable pageable = PageRequest.of(0, 2);
+        Slice<Post> selectedPost = postRepository.getPostsWithCursor(
+                null,
+                pageable
+        );
+
+        // then
+        assertEquals(4L, selectedPost.getContent().get(0).getId());
+        assertEquals(2, selectedPost.getContent().size());
+    }
+
+    @Test
+    @DisplayName("정렬 조건 없는 커서 기반 페이징 첫 번째 이후 조회 성공")
+    void getPostsByCursor2() {
+        // given
+        List<Post> posts = List.of(
+                new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "mouse~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "keyKey~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.HOUSEHOLD_KITCHEN),
+                new Post(1L, "house~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES)
+        );
+        postRepository.saveAll(posts);
+
+        // when
+        Pageable pageable = PageRequest.of(0, 2);
+        Slice<Post> selectedPost = postRepository.getPostsWithCursor(
+                2L,
+                pageable
+        );
+
+        // then
+        assertEquals(1L, selectedPost.getContent().get(0).getId());
+        assertEquals(1, selectedPost.getContent().size());
+    }
+
 }

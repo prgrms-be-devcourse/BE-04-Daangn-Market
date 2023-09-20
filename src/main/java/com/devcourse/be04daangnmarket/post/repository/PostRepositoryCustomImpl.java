@@ -5,13 +5,9 @@ import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.*;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class PostRepositoryCustomImpl implements PostRepositoryCustom {
@@ -77,9 +73,35 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         return toSlice(resultList, pageable);
     }
 
+    @Override
+    public Slice<Post> getPostsWithCursor(Long id, Pageable pageable) {
+
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<Post> query = builder.createQuery(Post.class);
+        Root<Post> post = query.from(Post.class);
+
+        Predicate cursorRestriction = Optional.ofNullable(id)
+                .map(conditionId -> builder.lessThan(post.get("id"), conditionId))
+                .orElseGet(() -> null);
+
+        Predicate[] cursorWhere = Stream.of(cursorRestriction).filter(Objects::nonNull).toArray(Predicate[]::new);
+        Order cursorOrder = builder.desc(post.get("id"));
+        query.select(post)
+                .where(cursorWhere)
+                .orderBy(cursorOrder);
+
+        TypedQuery<Post> typedQuery = em.createQuery(query);
+        typedQuery.setFirstResult(0);
+        typedQuery.setMaxResults(pageable.getPageSize() + 1);
+        List<Post> resultList = typedQuery.getResultList();
+
+        return toSlice(resultList, pageable);
+    }
+
     private SliceImpl<Post> toSlice(List<Post> posts, Pageable pageable) {
         if (posts.size() > pageable.getPageSize()) {
             posts.remove(posts.size() - 1);
+
             return new SliceImpl<>(posts, pageable, true);
         }
 
