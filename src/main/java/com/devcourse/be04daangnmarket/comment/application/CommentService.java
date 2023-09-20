@@ -37,7 +37,8 @@ public class CommentService implements CommentProviderService {
 
     public CommentService(ImageService imageService,
                           CommentRepository commentRepository,
-                          PostService postService, ProfileService profileService) {
+                          PostService postService,
+                          ProfileService profileService) {
         this.imageService = imageService;
         this.commentRepository = commentRepository;
         this.postService = postService;
