@@ -39,15 +39,15 @@ public class ProfileService {
         throw new IllegalArgumentException(DUPLICATED_USERNAME.getMessage());
     }
 
-    public Profile get(Long memberId) {
-        return profileRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_PROFILE.getMessage()));
-    }
-
     public ProfileDto.Response toProfile(Long id) {
         Profile profile = get(id);
 
         return ProfileConverter.toResponse(profile);
+    }
+
+    public Profile get(Long memberId) {
+        return profileRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_PROFILE.getMessage()));
     }
 
     private boolean isAvailableUsername(String username) {
