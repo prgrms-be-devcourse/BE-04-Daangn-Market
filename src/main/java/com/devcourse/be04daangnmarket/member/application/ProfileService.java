@@ -21,6 +21,12 @@ public class ProfileService {
         this.profileRepository = profileRepository;
     }
 
+    public void create(Long memberId, String username, String region) {
+        Profile profile = new Profile(memberId, username, region);
+
+        profileRepository.save(profile);
+    }
+
     public void create(Long memberId) {
         Profile profile = new Profile(memberId);
 

@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 
 public class MemberDto {
     public record SignUpRequest(
+            @NotBlank(message = "닉네임은 필수로 입력하여야 합니다.")
+            String username,
+
             @NotBlank(message = "전화번호는 필수로 입력하여야 합니다.")
             @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message = "전화번호 형식에 맞게 입력해주세요.")
             String phoneNumber,
@@ -20,7 +23,10 @@ public class MemberDto {
 
             @NotBlank(message = "비밀번호는 필수로 입력하여야 합니다.")
             @Size(min = 8, max = 20, message = "비밀번호는 8자 이상, 20자 이하로 작성하여야 합니다.")
-            String password
+            String password,
+
+            @NotBlank(message = "동네는 필수로 입력하여야 합니다.")
+            String region
     ) {
     }
 

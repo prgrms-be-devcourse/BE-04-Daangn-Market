@@ -34,7 +34,7 @@ public class MemberService {
         Member member = MemberConverter.toEntity(request, encodedPassword);
 
         Member savedMember = memberRepository.save(member);
-        profileService.create(savedMember.getId());
+        profileService.create(savedMember.getId(), request.username(), request.region());
 
         return MemberConverter.toResponse(savedMember);
     }
@@ -43,6 +43,7 @@ public class MemberService {
         Member member = new Member(email);
 
         Member savedMember = memberRepository.save(member);
+        profileService.create(savedMember.getId());
 
         return MemberConverter.toResponse(savedMember);
     }
