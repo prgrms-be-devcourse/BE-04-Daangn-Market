@@ -71,7 +71,7 @@ public class MemberService {
         }
     }
 
-    public Member get(Long id) {
+    public Member getOne(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_USER.getMessage()));
     }

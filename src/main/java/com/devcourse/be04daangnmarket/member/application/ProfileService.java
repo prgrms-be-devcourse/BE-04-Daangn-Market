@@ -28,7 +28,7 @@ public class ProfileService {
     }
 
     public ProfileDto.Response update(Long id, String username) {
-        Profile profile = get(id);
+        Profile profile = getOne(id);
 
         if (isAvailableUsername(username)) {
             profile.updateProfile(username);
@@ -40,12 +40,12 @@ public class ProfileService {
     }
 
     public ProfileDto.Response toProfile(Long id) {
-        Profile profile = get(id);
+        Profile profile = getOne(id);
 
         return ProfileConverter.toResponse(profile);
     }
 
-    public Profile get(Long memberId) {
+    public Profile getOne(Long memberId) {
         return profileRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_PROFILE.getMessage()));
     }
