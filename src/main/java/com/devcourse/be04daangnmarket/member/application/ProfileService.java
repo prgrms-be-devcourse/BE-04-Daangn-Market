@@ -21,14 +21,14 @@ public class ProfileService {
         this.profileRepository = profileRepository;
     }
 
-    public void createProfile(Long memberId) {
+    public void create(Long memberId) {
         Profile profile = new Profile(memberId);
 
         profileRepository.save(profile);
     }
 
-    public ProfileDto.Response updateProfile(Long id, String username) {
-        Profile profile = getProfile(id);
+    public ProfileDto.Response update(Long id, String username) {
+        Profile profile = get(id);
 
         if (isAvailableUsername(username)) {
             profile.updateProfile(username);
@@ -39,13 +39,13 @@ public class ProfileService {
         throw new IllegalArgumentException(DUPLICATED_USERNAME.getMessage());
     }
 
-    public Profile getProfile(Long memberId) {
+    public Profile get(Long memberId) {
         return profileRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_PROFILE.getMessage()));
     }
 
     public ProfileDto.Response toProfile(Long id) {
-        Profile profile = getProfile(id);
+        Profile profile = get(id);
 
         return ProfileConverter.toResponse(profile);
     }

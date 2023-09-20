@@ -122,7 +122,7 @@ public class CommentService implements CommentProviderService {
 
     public CommentDto.CommentResponse getDetail(Long id) {
         Comment comment = getComment(id);
-        String username = profileService.getProfile(comment.getMemberId()).getUsername();
+        String username = profileService.get(comment.getMemberId()).getUsername();
 
         List<ImageDto.ImageResponse> images = imageService.getImages(DomainName.COMMENT, id);
 
@@ -135,7 +135,7 @@ public class CommentService implements CommentProviderService {
         List<CommentDto.PostCommentResponse> postCommentResponses = new ArrayList<>();
 
         for (Comment comment : postComments) {
-            String commentUsername = profileService.getProfile(comment.getMemberId()).getUsername();
+            String commentUsername = profileService.get(comment.getMemberId()).getUsername();
             String postTitle = postService.findPostById(comment.getPostId()).getTitle();
             List<ImageDto.ImageResponse> commentImages = imageService.getImages(DomainName.COMMENT, comment.getId());
 
@@ -154,7 +154,7 @@ public class CommentService implements CommentProviderService {
         List<CommentDto.CommentResponse> replyCommentResponses = new ArrayList<>();
 
         for (Comment reply : replyComments) {
-            String replyUsername = profileService.getProfile(comment.getMemberId()).getUsername();
+            String replyUsername = profileService.get(comment.getMemberId()).getUsername();
             List<ImageDto.ImageResponse> replyImages = imageService.getImages(DomainName.COMMENT, reply.getId());
 
             CommentDto.CommentResponse commentResponse = toResponse(reply, replyImages, replyUsername);
@@ -168,7 +168,7 @@ public class CommentService implements CommentProviderService {
     public Page<ProfileDto.Response> getCommenterByPostId(Long writerId, Pageable pageable) {
          return commentRepository.findDistinctMemberIdsByPostIdAndNotInWriterId(writerId, writerId, pageable)
                 .map(memberId -> {
-                    Profile memberProfile = profileService.getProfile(memberId);
+                    Profile memberProfile = profileService.get(memberId);
 
                     return ProfileConverter.toResponse(memberProfile);
                 });

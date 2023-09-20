@@ -48,7 +48,7 @@ public class MemberRestController {
                                                             @PathVariable Long id,
                                                             @RequestBody @Valid ProfileDto.UpdateRequest request) {
         memberService.validateById(id, user.getId());
-        ProfileDto.Response response = profileService.updateProfile(id, request.username());
+        ProfileDto.Response response = profileService.update(id, request.username());
 
         return ResponseEntity.ok(response);
     }

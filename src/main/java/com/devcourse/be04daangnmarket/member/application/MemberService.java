@@ -33,7 +33,7 @@ public class MemberService {
         Member member = MemberConverter.toEntity(request, passwordEncoder);
 
         Member savedMember = memberRepository.save(member);
-        profileService.createProfile(savedMember.getId());
+        profileService.create(savedMember.getId());
 
         return MemberConverter.toResponse(savedMember);
     }
@@ -70,7 +70,7 @@ public class MemberService {
         }
     }
 
-    public Member getMember(Long id) {
+    public Member get(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_USER.getMessage()));
     }
