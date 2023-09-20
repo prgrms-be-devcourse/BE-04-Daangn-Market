@@ -4,13 +4,15 @@ import com.devcourse.be04daangnmarket.comment.domain.Comment;
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.common.constant.Status;
+import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
+import com.devcourse.be04daangnmarket.common.image.dto.Type;
+import com.devcourse.be04daangnmarket.member.application.MemberService;
 import com.devcourse.be04daangnmarket.member.domain.Member;
-import com.devcourse.be04daangnmarket.member.repository.MemberRepository;
+import com.devcourse.be04daangnmarket.post.application.PostService;
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
 import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
-import com.devcourse.be04daangnmarket.post.repository.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,11 +23,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -49,10 +47,10 @@ class CommentServiceTest {
     private CommentRepository commentRepository;
 
     @Mock
-    private MemberRepository memberRepository;
+    private MemberService memberService;
 
     @Mock
-    private PostRepository postRepository;
+    private PostService postService;
 
     @Test
     void 삭제시_id가_없으면_예외() {
@@ -92,10 +90,10 @@ class CommentServiceTest {
         given(commentRepository.findAllByPostIdToSeqIsZero(postId)).willReturn(comments);
 
         Member member = new Member("username", "번호", "이메일", "1234");
-        given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
+        given(memberService.getMember(memberId)).willReturn(member);
 
         Post post = new Post(memberId, "제목", "설명", 100, TransactionType.SALE, Category.DIGITAL_DEVICES);
-        given(postRepository.findById(postId)).willReturn(Optional.of(post));
+        given(postService.findPostById(postId)).willReturn(post);
 
         //when
         Page<CommentDto.PostCommentResponse> responses = commentService.getPostComments(postId, pageable);
@@ -110,18 +108,16 @@ class CommentServiceTest {
     @Test
     void 수정_성공() {
         //given
-        List<MultipartFile> images = new ArrayList<>();
-        MockMultipartFile imageFile = new MockMultipartFile("예시", "예시.png", MediaType.IMAGE_JPEG_VALUE, "예시".getBytes());
-        images.add(imageFile);
+        ImageDto.ImageDetail imageDetail = new ImageDto.ImageDetail("test1", "uniqueName-test1.png", Type.PNG);
+        List<ImageDto.ImageDetail> imageDetails = List.of(imageDetail);
 
-        CommentDto.UpdateCommentRequest request = new CommentDto.UpdateCommentRequest("변경댓글", 1L, images);
-        Comment comment = new Comment("이전댓글", 1L, 1L);
+        Comment comment = new Comment("수정한댓글", 1L, 1L);
         given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
 
         //when
-        commentService.update(comment.getId(), request, "username");
+        commentService.update(comment.getId(), comment.getPostId(), "username", comment.getContent(), imageDetails);
 
         //then
-        assertThat(comment.getContent()).isEqualTo(request.content());
+        assertThat(comment.getContent()).isEqualTo("수정한댓글");
     }
 }

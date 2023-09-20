@@ -1,13 +1,18 @@
 package com.devcourse.be04daangnmarket.post.api;
 
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
+import com.devcourse.be04daangnmarket.comment.application.CommentService;
+import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
+import com.devcourse.be04daangnmarket.common.image.LocalImageUpload;
 import com.devcourse.be04daangnmarket.post.domain.constant.PostStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -57,6 +63,12 @@ class PostRestControllerTest {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@MockBean
+	private CommentService commentService;
+
+	@MockBean
+	private LocalImageUpload imageUpload;
 
 	@BeforeEach
 	public void setup() {
@@ -348,5 +360,28 @@ class PostRestControllerTest {
 			.andExpect(status().isNoContent());
 
 		verify(postService, times(1)).delete(postId);
+	}
+
+
+	@Test
+	void 페이징_조회_성공() throws Exception {
+		//given
+		Long postId = 1L;
+		CommentDto.PostCommentResponse mockResponse1 = new CommentDto.PostCommentResponse(1L, 1L, "username", 1L, "게시글", "댓글", null, null, 1, LocalDateTime.now(), LocalDateTime.now());
+		CommentDto.PostCommentResponse mockResponse2 = new CommentDto.PostCommentResponse(2L, 1L, "username", 1L, "게시글", "댓글2", null, null, 1, LocalDateTime.now(), LocalDateTime.now());
+
+		Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+		List<CommentDto.PostCommentResponse> fakeResponses = List.of(mockResponse1, mockResponse2);
+		Page<CommentDto.PostCommentResponse> responsePage = new PageImpl<>(fakeResponses, pageable, fakeResponses.size());
+
+		given(commentService.getPostComments(1L, pageable))
+				.willReturn(responsePage);
+
+		//when & then
+		mockMvc.perform(get("/api/v1/posts/{postId}/comments", postId)
+						.param("page", "0")
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andDo(print());
 	}
 }

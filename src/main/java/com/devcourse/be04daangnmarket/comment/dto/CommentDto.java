@@ -1,6 +1,5 @@
 package com.devcourse.be04daangnmarket.comment.dto;
 
-import com.devcourse.be04daangnmarket.image.dto.ImageDto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
@@ -60,7 +59,7 @@ public class CommentDto {
 
             String content,
 
-            List<ImageDto.ImageResponse> images,
+            List<String> imagePaths,
 
             LocalDateTime createdAt,
 
@@ -81,7 +80,7 @@ public class CommentDto {
 
             String content,
 
-            List<ImageDto.ImageResponse> images,
+            List<String> imagePaths,
 
             List<CommentResponse> replyComments,
 

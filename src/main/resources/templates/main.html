@@ -52,12 +52,12 @@
     function addRow(post) {
         let item2 = '';
 
-        let image = post.images[0];
+        let image = post.imagePaths[0];
 
         item2 +=
             `
                 <div style="float: left; margin-right: 20px">
-                  <img src="${image.path}" alt="이미지" style="width: 120px; height: 120px">
+                  <img src="${image}" alt="이미지" style="width: 120px; height: 120px">
                 </div>
                 `
 
