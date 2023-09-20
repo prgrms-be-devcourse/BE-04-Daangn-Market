@@ -30,7 +30,8 @@ public class MemberService {
     }
 
     public MemberDto.Response signUp(MemberDto.SignUpRequest request) {
-        Member member = MemberConverter.toEntity(request, passwordEncoder);
+        String encodedPassword = passwordEncoder.encode(request.password());
+        Member member = MemberConverter.toEntity(request, encodedPassword);
 
         Member savedMember = memberRepository.save(member);
         profileService.create(savedMember.getId());

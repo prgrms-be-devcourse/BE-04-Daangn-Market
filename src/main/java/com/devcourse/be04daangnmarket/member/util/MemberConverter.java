@@ -2,14 +2,13 @@ package com.devcourse.be04daangnmarket.member.util;
 
 import com.devcourse.be04daangnmarket.member.domain.Member;
 import com.devcourse.be04daangnmarket.member.dto.MemberDto;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class MemberConverter {
-    public static Member toEntity(MemberDto.SignUpRequest request, PasswordEncoder passwordEncoder) {
+    public static Member toEntity(MemberDto.SignUpRequest request, String encodedPassword) {
         return new Member(
                 request.phoneNumber(),
                 request.email(),
-                passwordEncoder.encode(request.password())
+                encodedPassword
         );
     }
 
