@@ -11,6 +11,7 @@ import com.devcourse.be04daangnmarket.member.application.MemberService;
 import com.devcourse.be04daangnmarket.member.domain.Member;
 import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import com.devcourse.be04daangnmarket.post.application.PostService;
+import com.devcourse.be04daangnmarket.post.domain.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -50,7 +51,10 @@ public class CommentService implements CommentProviderService {
                                              String username,
                                              String content,
                                              List<ImageDto.ImageDetail> files) {
-        Comment comment = CommentConverter.toEntity(content, userId, postId);
+        Member member = memberService.getMember(userId);
+        Post post = postService.findPostById(postId);
+        Comment comment = CommentConverter.toEntity(content, member, post);
+        comment.addPost(post);
 
         createCommentGroupNumber(comment);
 
@@ -72,7 +76,10 @@ public class CommentService implements CommentProviderService {
                                                   int commentGroup,
                                                   String content,
                                                   List<ImageDto.ImageDetail> files) {
-        Comment comment = CommentConverter.toEntity(postId, content, commentGroup, userId);
+        Member member = memberService.getMember(userId);
+        Post post = postService.findPostById(postId);
+        Comment comment = CommentConverter.toEntity(post, content, commentGroup, member);
+        comment.addPost(post);
 
         addMaxSequenceToReplyComment(commentGroup, comment);
 
@@ -117,7 +124,7 @@ public class CommentService implements CommentProviderService {
     public CommentDto.CommentResponse getDetail(Long id) {
         Comment comment = getComment(id);
 
-        String username = memberService.getMember(comment.getMemberId()).getUsername();
+        String username = memberService.getMember(comment.getId()).getUsername();
         List<String> imagePaths = imageService.getImages(DomainName.COMMENT, id);
 
         return toResponse(comment, imagePaths, username);
@@ -129,7 +136,7 @@ public class CommentService implements CommentProviderService {
         List<CommentDto.PostCommentResponse> postCommentResponses = new ArrayList<>();
 
         for (Comment comment : postComments) {
-            String commentUsername = memberService.getMember(comment.getMemberId()).getUsername();
+            String commentUsername = memberService.getMember(comment.getId()).getUsername();
             String postTitle = postService.findPostById(comment.getPostId()).getTitle();
             List<String> imagePaths = imageService.getImages(DomainName.COMMENT, comment.getId());
 
@@ -146,7 +153,7 @@ public class CommentService implements CommentProviderService {
         List<CommentDto.CommentResponse> replyCommentResponses = new ArrayList<>();
 
         for (Comment reply : replyComments) {
-            String replyUsername = memberService.getMember(comment.getMemberId()).getUsername();
+            String replyUsername = memberService.getMember(reply.getMemberId()).getUsername();
             List<String> imagePaths = imageService.getImages(DomainName.COMMENT, reply.getId());
 
             CommentDto.CommentResponse commentResponse = toResponse(reply, imagePaths, replyUsername);
