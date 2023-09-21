@@ -5,7 +5,8 @@ import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.common.auth.User;
 import com.devcourse.be04daangnmarket.common.image.ImageUpload;
 import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
-import com.devcourse.be04daangnmarket.member.dto.MemberDto;
+import com.devcourse.be04daangnmarket.member.dto.ProfileDto;
+
 import com.devcourse.be04daangnmarket.post.application.PostService;
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
@@ -160,11 +161,11 @@ public class PostRestController {
     }
 
     @GetMapping("/{id}/communicationMembers")
-    public ResponseEntity<Page<MemberDto.Response>> getCommunicationMembers(@PathVariable Long id,
+    public ResponseEntity<Page<ProfileDto.Response>> getCommunicationMembers(@PathVariable Long id,
                                                                             @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         Long writerId = postService.findPostById(id).getMemberId();
-        Page<MemberDto.Response> responses = commentService.getCommenterByPostId(writerId, pageable);
+        Page<ProfileDto.Response> responses = commentService.getCommenterByPostId(writerId, pageable);
 
         return ResponseEntity.ok(responses);
     }

@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
+import com.devcourse.be04daangnmarket.image.dto.ImageDto;
+import com.devcourse.be04daangnmarket.member.application.ProfileService;
 import com.devcourse.be04daangnmarket.post.domain.constant.PostStatus;
 import com.devcourse.be04daangnmarket.post.util.PostConverter;
 
@@ -34,12 +35,12 @@ import jakarta.servlet.http.HttpServletResponse;
 public class PostService {
     private final PostRepository postRepository;
     private final ImageService imageService;
-    private final MemberService memberService;
+    private final ProfileService profileService;
 
-    public PostService(PostRepository postRepository, ImageService imageService, MemberService memberService) {
+    public PostService(PostRepository postRepository, ImageService imageService, ProfileService profileService) {
         this.postRepository = postRepository;
         this.imageService = imageService;
-        this.memberService = memberService;
+        this.profileService = profileService;
     }
 
     @Transactional
@@ -201,7 +202,7 @@ public class PostService {
     }
 
     private String getUsername(Long memberId) {
-        return memberService.getProfile(memberId).username();
+        return profileService.toProfile(memberId).username();
     }
 
     private boolean isViewed(Long id, HttpServletRequest req, HttpServletResponse res) {

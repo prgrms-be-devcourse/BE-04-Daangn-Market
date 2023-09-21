@@ -13,8 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Entity
 @Table(name = "members")
 public class Member extends BaseEntity {
-    @Column(unique = true, nullable = false)
-    private String username;
 
     private String phoneNumber;
 
@@ -24,8 +22,6 @@ public class Member extends BaseEntity {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    private double temperature = 36.5;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status = Status.ALIVE;
@@ -33,20 +29,14 @@ public class Member extends BaseEntity {
     protected Member() {
     }
 
-    public Member(String username, String phoneNumber, String email, String password) {
-        this.username = username;
+    public Member(String phoneNumber, String email, String password) {
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.password = password;
     }
 
-    public Member(String username, String email) {
-        this.username = username;
+    public Member(String email) {
         this.email = email;
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     public String getPhoneNumber() {
@@ -57,19 +47,11 @@ public class Member extends BaseEntity {
         return email;
     }
 
-    public double getTemperature() {
-        return temperature;
-    }
-
     public Status getStatus() {
         return status;
     }
 
     public boolean isMatchedPassword(PasswordEncoder passwordEncoder, String password) {
         return passwordEncoder.matches(password, this.password);
-    }
-
-    public void updateProfile(String username) {
-        this.username = username;
     }
 }

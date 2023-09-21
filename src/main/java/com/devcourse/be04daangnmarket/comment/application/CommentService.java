@@ -7,9 +7,10 @@ import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.comment.util.CommentConverter;
-import com.devcourse.be04daangnmarket.member.application.MemberService;
-import com.devcourse.be04daangnmarket.member.domain.Member;
-import com.devcourse.be04daangnmarket.member.dto.MemberDto;
+import com.devcourse.be04daangnmarket.member.application.ProfileService;
+import com.devcourse.be04daangnmarket.member.domain.Profile;
+import com.devcourse.be04daangnmarket.member.dto.ProfileDto;
+import com.devcourse.be04daangnmarket.member.util.ProfileConverter;
 import com.devcourse.be04daangnmarket.post.application.PostService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,17 +32,17 @@ public class CommentService implements CommentProviderService {
 
     private final ImageService imageService;
     private final CommentRepository commentRepository;
-    private final MemberService memberService;
     private final PostService postService;
+    private final ProfileService profileService;
 
     public CommentService(ImageService imageService,
                           CommentRepository commentRepository,
-                          MemberService memberService,
-                          PostService postService) {
+                          PostService postService,
+                          ProfileService profileService) {
         this.imageService = imageService;
         this.commentRepository = commentRepository;
-        this.memberService = memberService;
         this.postService = postService;
+        this.profileService = profileService;
     }
 
     @Transactional
@@ -117,7 +118,7 @@ public class CommentService implements CommentProviderService {
     public CommentDto.CommentResponse getDetail(Long id) {
         Comment comment = getComment(id);
 
-        String username = memberService.getMember(comment.getMemberId()).getUsername();
+        String username = profileService.getOne(comment.getMemberId()).getUsername();
         List<String> imagePaths = imageService.getImages(DomainName.COMMENT, id);
 
         return toResponse(comment, imagePaths, username);
@@ -129,7 +130,7 @@ public class CommentService implements CommentProviderService {
         List<CommentDto.PostCommentResponse> postCommentResponses = new ArrayList<>();
 
         for (Comment comment : postComments) {
-            String commentUsername = memberService.getMember(comment.getMemberId()).getUsername();
+            String commentUsername = profileService.getOne(comment.getMemberId()).getUsername();
             String postTitle = postService.findPostById(comment.getPostId()).getTitle();
             List<String> imagePaths = imageService.getImages(DomainName.COMMENT, comment.getId());
 
@@ -146,7 +147,7 @@ public class CommentService implements CommentProviderService {
         List<CommentDto.CommentResponse> replyCommentResponses = new ArrayList<>();
 
         for (Comment reply : replyComments) {
-            String replyUsername = memberService.getMember(comment.getMemberId()).getUsername();
+            String replyUsername = profileService.getOne(comment.getMemberId()).getUsername();
             List<String> imagePaths = imageService.getImages(DomainName.COMMENT, reply.getId());
 
             CommentDto.CommentResponse commentResponse = toResponse(reply, imagePaths, replyUsername);
@@ -176,18 +177,9 @@ public class CommentService implements CommentProviderService {
 
          return commentRepository.findDistinctMemberIdsByPostIdAndNotInWriterId(postId, writerId, pageable)
                 .map(memberId -> {
-                    Member member = memberService.getMember(memberId);
+                    Profile memberProfile = profileService.getOne(memberId);
 
-                    return new MemberDto.Response(
-                            member.getId(),
-                            member.getUsername(),
-                            member.getPhoneNumber(),
-                            member.getEmail(),
-                            member.getTemperature(),
-                            member.getStatus(),
-                            member.getCreatedAt(),
-                            member.getUpdatedAt()
-                    );
+                    return ProfileConverter.toResponse(memberProfile);
                 });
     }
 }

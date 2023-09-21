@@ -23,7 +23,10 @@ public class MemberDto {
 
             @NotBlank(message = "비밀번호는 필수로 입력하여야 합니다.")
             @Size(min = 8, max = 20, message = "비밀번호는 8자 이상, 20자 이하로 작성하여야 합니다.")
-            String password
+            String password,
+
+            @NotBlank(message = "동네는 필수로 입력하여야 합니다.")
+            String region
     ) {
     }
 
@@ -37,22 +40,12 @@ public class MemberDto {
     ) {
     }
 
-    public record UpdateProfileRequest(
-            @NotBlank(message = "닉네임은 필수로 입력하여야 합니다.")
-            String username
-    ) {
-    }
-
     public record Response(
             Long id,
-
-            String username,
 
             String phoneNumber,
 
             String email,
-
-            double temperature,
 
             Status status,
 

@@ -102,10 +102,9 @@ public class KakaoService {
             JSONObject profile = (JSONObject) account.get("profile");
 
             long id = (long) jsonObj.get("id");
-            String nickname = String.valueOf(profile.get("nickname"));
             String email = String.valueOf(account.get("email"));
 
-            return new KakaoResponse(id, nickname, email);
+            return new KakaoResponse(id, email);
 
         } catch (ParseException e) {
             throw new IllegalStateException("json parsing failed");
