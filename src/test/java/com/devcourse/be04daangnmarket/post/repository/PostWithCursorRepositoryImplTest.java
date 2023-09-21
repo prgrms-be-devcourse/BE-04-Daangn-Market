@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class PostRepositoryCustomImplTest {
+class PostWithCursorRepositoryImplTest {
     @Autowired
     private PostRepository postRepository;
 
@@ -40,7 +41,8 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 10);
-        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+        Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
+                null,
                 null,
                 Category.DIGITAL_DEVICES,
                 null,
@@ -71,7 +73,8 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 10);
-        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+        Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
+                null,
                 null,
                 null,
                 null,
@@ -102,7 +105,8 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 10);
-        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+        Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
+                null,
                 null,
                 Category.DIGITAL_DEVICES,
                 2L,
@@ -133,7 +137,8 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 10);
-        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+        Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
+                null,
                 null,
                 null,
                 null,
@@ -164,7 +169,8 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
-        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+        Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
+                null,
                 null,
                 null,
                 null,
@@ -196,8 +202,9 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
-        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+        Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
                 2L,
+                null,
                 null,
                 null,
                 null,
@@ -209,4 +216,82 @@ class PostRepositoryCustomImplTest {
         assertEquals(1L, selectedPost.getContent().get(0).getId());
         assertEquals(1, selectedPost.getContent().size());
     }
+
+    @Test
+    @DisplayName("생성 시간에 대한 커서 기반 페이징 첫 조회 성공")
+    void getPostsByCursorWithFirstTest() {
+        // given
+        List<Post> posts = List.of(
+                new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "mouse~!", "this keyboard is good", 200000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "keyKey~!", "this keyboard is good", 200000, TransactionType.SALE,
+                        Category.HOUSEHOLD_KITCHEN),
+                new Post(1L, "house~!", "this keyboard is good", 300000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES)
+        );
+        postRepository.saveAll(posts);
+
+        // when
+        PageRequest pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Slice<Post> pageResult = postRepository.findPostsWithCursor(null, null, pageable);
+
+        // then
+        assertEquals(4L, pageResult.getContent().get(0).getId());
+        assertEquals(2, pageResult.getContent().size());
+    }
+
+    @Test
+    @DisplayName("생성 시간에 대한 커서 기반 페이징 첫 번째 이후 조회 성공")
+    void getPostsByCursorTest() {
+        // given
+        List<Post> posts = List.of(
+                new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "mouse~!", "this keyboard is good", 200000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "keyKey~!", "this keyboard is good", 200000, TransactionType.SALE,
+                        Category.HOUSEHOLD_KITCHEN),
+                new Post(1L, "house~!", "this keyboard is good", 300000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES)
+        );
+        postRepository.saveAll(posts);
+
+        // when
+        Post selectedPost = postRepository.findById(3L).get();
+        PageRequest pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Slice<Post> pageResult = postRepository.findPostsWithCursor(3L, selectedPost.getCreatedAt(), pageable);
+
+        // then
+        assertEquals(2L, pageResult.getContent().get(0).getId());
+        assertEquals(2, pageResult.getContent().size());
+    }
+
+    @Test
+    @DisplayName("생성 시간에 대한 오름차순 커서 기반 페이징 조회 성공")
+    void PostRepositoryCustomImplTest() {
+        // given
+        List<Post> posts = List.of(
+                new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "mouse~!", "this keyboard is good", 200000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "keyKey~!", "this keyboard is good", 200000, TransactionType.SALE,
+                        Category.HOUSEHOLD_KITCHEN),
+                new Post(1L, "house~!", "this keyboard is good", 300000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES)
+        );
+
+        postRepository.saveAll(posts);
+
+        // when
+        PageRequest pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.ASC, "createdAt"));
+        Slice<Post> pageResult = postRepository.findPostsWithCursor(null, null, pageable);
+
+        // then
+        assertEquals(1L, pageResult.getContent().get(0).getId());
+        assertEquals(2, pageResult.getContent().size());
+    }
+
 }

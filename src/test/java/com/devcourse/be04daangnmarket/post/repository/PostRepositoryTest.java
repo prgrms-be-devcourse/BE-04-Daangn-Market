@@ -7,16 +7,16 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
 import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class PostRepositoryTest {
 	@Autowired
 	private PostRepository postRepository;
@@ -42,6 +42,6 @@ class PostRepositoryTest {
 		Page<Post> selectedPost = postRepository.findByTitleContaining("key", pageable);
 
 		// then
-		assertEquals(2, selectedPost.getTotalPages());
+		assertEquals(2, selectedPost.getNumberOfElements());
 	}
 }
