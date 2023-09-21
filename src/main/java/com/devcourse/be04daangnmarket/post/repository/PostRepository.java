@@ -9,7 +9,7 @@ import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
 
 @Repository
-public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
+public interface PostRepository extends JpaRepository<Post, Long>, PostWithCursorRepository {
     Page<Post> findByCategory(Category category, Pageable pageable);
 
     Page<Post> findByMemberId(Long memberId, Pageable pageable);

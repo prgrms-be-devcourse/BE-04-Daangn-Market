@@ -14,13 +14,12 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class PostRepositoryCustomImplTest {
+class PostWithCursorRepositoryImplTest {
     @Autowired
     private PostRepository postRepository;
 
@@ -42,7 +41,7 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 10);
-        Slice<Post> selectedPost = postRepository.getPostsWithCursorWithFilers(
+        Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
                 null,
                 null,
                 Category.DIGITAL_DEVICES,
@@ -74,7 +73,7 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 10);
-        Slice<Post> selectedPost = postRepository.getPostsWithCursorWithFilers(
+        Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
                 null,
                 null,
                 null,
@@ -106,7 +105,7 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 10);
-        Slice<Post> selectedPost = postRepository.getPostsWithCursorWithFilers(
+        Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
                 null,
                 null,
                 Category.DIGITAL_DEVICES,
@@ -138,7 +137,7 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 10);
-        Slice<Post> selectedPost = postRepository.getPostsWithCursorWithFilers(
+        Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
                 null,
                 null,
                 null,
@@ -170,7 +169,7 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
-        Slice<Post> selectedPost = postRepository.getPostsWithCursorWithFilers(
+        Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
                 null,
                 null,
                 null,
@@ -203,7 +202,7 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
-        Slice<Post> selectedPost = postRepository.getPostsWithCursorWithFilers(
+        Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
                 2L,
                 null,
                 null,
@@ -236,7 +235,7 @@ class PostRepositoryCustomImplTest {
 
         // when
         PageRequest pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Slice<Post> pageResult = postRepository.getPostsWithCursor(null, null, pageable);
+        Slice<Post> pageResult = postRepository.findPostsWithCursor(null, null, pageable);
 
         // then
         assertEquals(4L, pageResult.getContent().get(0).getId());
@@ -262,7 +261,7 @@ class PostRepositoryCustomImplTest {
         // when
         Post selectedPost = postRepository.findById(3L).get();
         PageRequest pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Slice<Post> pageResult = postRepository.getPostsWithCursor(3L, selectedPost.getCreatedAt(), pageable);
+        Slice<Post> pageResult = postRepository.findPostsWithCursor(3L, selectedPost.getCreatedAt(), pageable);
 
         // then
         assertEquals(2L, pageResult.getContent().get(0).getId());
@@ -288,7 +287,7 @@ class PostRepositoryCustomImplTest {
 
         // when
         PageRequest pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.ASC, "createdAt"));
-        Slice<Post> pageResult = postRepository.getPostsWithCursor(null, null, pageable);
+        Slice<Post> pageResult = postRepository.findPostsWithCursor(null, null, pageable);
 
         // then
         assertEquals(1L, pageResult.getContent().get(0).getId());

@@ -5,27 +5,34 @@ import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-public class PostRepositoryCustomImpl implements PostRepositoryCustom {
+public class PostWithCursorRepositoryImpl implements PostWithCursorRepository {
     private final EntityManager em;
 
-    public PostRepositoryCustomImpl(EntityManager em) {
+    public PostWithCursorRepositoryImpl(EntityManager em) {
         this.em = em;
     }
 
     @Override
-    public Slice<Post> getPostsWithCursorWithFilers(Long id,
-                                                    LocalDateTime createdAt,
-                                                    Category category,
-                                                    Long memberId,
-                                                    Long buyerId,
-                                                    String keyword,
-                                                    Pageable pageable) {
+    public Slice<Post> findPostsWithCursorWithFilters(Long id,
+                                                      LocalDateTime createdAt,
+                                                      Category category,
+                                                      Long memberId,
+                                                      Long buyerId,
+                                                      String keyword,
+                                                      Pageable pageable) {
 
         Sort createdAtSort = pageable.getSortOr(Sort.by(Sort.Direction.DESC, "createdAt"));
 
@@ -77,9 +84,9 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public Slice<Post> getPostsWithCursor(Long id,
-                                          LocalDateTime createdAt,
-                                          Pageable pageable) {
+    public Slice<Post> findPostsWithCursor(Long id,
+                                           LocalDateTime createdAt,
+                                           Pageable pageable) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Post> query = builder.createQuery(Post.class);
         Root<Post> post = query.from(Post.class);

@@ -7,9 +7,9 @@ import org.springframework.data.domain.Slice;
 
 import java.time.LocalDateTime;
 
-public interface PostRepositoryCustom {
+public interface PostWithCursorRepository {
 
-    public Slice<Post> getPostsWithCursorWithFilers(Long id,
+    public Slice<Post> findPostsWithCursorWithFilters(Long id,
                                                     LocalDateTime createdAt,
                                                     Category category,
                                                     Long memberId,
@@ -17,7 +17,7 @@ public interface PostRepositoryCustom {
                                                     String keyword,
                                                     Pageable pageable);
 
-    Slice<Post> getPostsWithCursor(Long id,
+    Slice<Post> findPostsWithCursor(Long id,
                                    LocalDateTime createdAt,
                                    Pageable pageable);
 }

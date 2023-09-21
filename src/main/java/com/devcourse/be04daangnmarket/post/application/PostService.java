@@ -92,7 +92,7 @@ public class PostService {
     }
 
     public Slice<PostDto.Response> getPostsWithCursorWithFilters(PostDto.FilterRequest request, Pageable pageable) {
-        return postRepository.getPostsWithCursorWithFilers(
+        return postRepository.findPostsWithCursorWithFilters(
                         request.id(),
                         request.createdAt(),
                         request.category(),
