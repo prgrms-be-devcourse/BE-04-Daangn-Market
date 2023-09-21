@@ -9,13 +9,13 @@ import java.time.LocalDateTime;
 
 public interface PostRepositoryCustom {
 
-    Slice<Post> getPostsWithMultiFilters(Long id,
-                                         Category category,
-                                         Long memberId,
-                                         Long buyerId,
-                                         String keyword,
-                                         Pageable pageable
-    );
+    public Slice<Post> getPostsWithCursorWithFilers(Long id,
+                                                    LocalDateTime createdAt,
+                                                    Category category,
+                                                    Long memberId,
+                                                    Long buyerId,
+                                                    String keyword,
+                                                    Pageable pageable);
 
     Slice<Post> getPostsWithCursor(Long id,
                                    LocalDateTime createdAt,

@@ -91,9 +91,10 @@ public class PostService {
         });
     }
 
-    public Slice<PostDto.Response> getPostsWithFilter(PostDto.FilterRequest request, Pageable pageable) {
-        return postRepository.getPostsWithMultiFilters(
+    public Slice<PostDto.Response> getPostsWithCursorWithFilters(PostDto.FilterRequest request, Pageable pageable) {
+        return postRepository.getPostsWithCursorWithFilers(
                         request.id(),
+                        request.createdAt(),
                         request.category(),
                         request.memberId(),
                         request.buyerId(),

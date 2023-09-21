@@ -42,7 +42,8 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 10);
-        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+        Slice<Post> selectedPost = postRepository.getPostsWithCursorWithFilers(
+                null,
                 null,
                 Category.DIGITAL_DEVICES,
                 null,
@@ -73,7 +74,8 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 10);
-        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+        Slice<Post> selectedPost = postRepository.getPostsWithCursorWithFilers(
+                null,
                 null,
                 null,
                 null,
@@ -104,7 +106,8 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 10);
-        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+        Slice<Post> selectedPost = postRepository.getPostsWithCursorWithFilers(
+                null,
                 null,
                 Category.DIGITAL_DEVICES,
                 2L,
@@ -135,7 +138,8 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 10);
-        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+        Slice<Post> selectedPost = postRepository.getPostsWithCursorWithFilers(
+                null,
                 null,
                 null,
                 null,
@@ -166,7 +170,8 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
-        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+        Slice<Post> selectedPost = postRepository.getPostsWithCursorWithFilers(
+                null,
                 null,
                 null,
                 null,
@@ -198,8 +203,9 @@ class PostRepositoryCustomImplTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 2);
-        Slice<Post> selectedPost = postRepository.getPostsWithMultiFilters(
+        Slice<Post> selectedPost = postRepository.getPostsWithCursorWithFilers(
                 2L,
+                null,
                 null,
                 null,
                 null,

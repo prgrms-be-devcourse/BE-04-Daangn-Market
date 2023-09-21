@@ -19,52 +19,54 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public Slice<Post> getPostsWithMultiFilters(Long id,
-                                                Category category,
-                                                Long memberId,
-                                                Long buyerId,
-                                                String keyword,
-                                                Pageable pageable) {
-        CriteriaBuilder builder = em.getCriteriaBuilder();
+    public Slice<Post> getPostsWithCursorWithFilers(Long id,
+                                                    LocalDateTime createdAt,
+                                                    Category category,
+                                                    Long memberId,
+                                                    Long buyerId,
+                                                    String keyword,
+                                                    Pageable pageable) {
 
+        Sort createdAtSort = pageable.getSortOr(Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Post> query = builder.createQuery(Post.class);
         Root<Post> post = query.from(Post.class);
 
-        Predicate idCondition = Optional.ofNullable(id)
-                .map(key -> builder.lessThan(post.get("id"), key))
-                .orElse(null);
+        List<Predicate> conditions = new ArrayList<>();
+        Optional.ofNullable(id)
+                .ifPresent(key -> conditions.add(builder.lessThan(post.get("id"), key)));
+        Optional.ofNullable(category)
+                .ifPresent(key -> conditions.add(builder.equal(post.get("category"), key)));
+        Optional.ofNullable(memberId)
+                .ifPresent(key -> conditions.add(builder.equal(post.get("memberId"), key)));
+        Optional.ofNullable(buyerId)
+                .ifPresent(key -> conditions.add(builder.equal(post.get("buyerId"), key)));
+        Optional.ofNullable(keyword)
+                .ifPresent(key -> conditions.add(builder.like(post.get("title"), "%" + key + "%")));
+        Optional.ofNullable(createdAt)
+                .map(key -> {
+                    Predicate createdAtEq = builder.equal(post.get("createdAt"), key);
+                    Predicate idLt = builder.lessThan(post.get("id"), id);
 
-        Predicate categoryCondition = Optional.ofNullable(category)
-                .map(key -> builder.equal(post.get("category"), key))
-                .orElse(null);
+                    Predicate and = builder.and(createdAtEq, idLt);
 
-        Predicate memberIdCondition = Optional.ofNullable(memberId)
-                .map(key -> builder.equal(post.get("memberId"), key))
-                .orElse(null);
+                    return createdAtSort.getOrderFor("createdAt").isDescending()
+                            ? builder.or(builder.lessThan(post.get("createdAt"), key), and)
+                            : builder.or(builder.greaterThan(post.get("createdAt"), key), and);
+                }).ifPresent(cursorCondition -> conditions.add(cursorCondition));
 
-        Predicate buyerIdCondition = Optional.ofNullable(buyerId)
-                .map(key -> builder.equal(post.get("buyerId"), key))
-                .orElse(null);
+        Predicate where = builder.and(conditions.toArray(Predicate[]::new));
 
-        Predicate keywordCondition = Optional.ofNullable(keyword)
-                .map(key -> builder.like(post.get("title"), "%" + key + "%"))
-                .orElse(null);
+        Order createdAtOrder = createdAtSort.getOrderFor("createdAt").isDescending()
+                ? builder.desc(post.get("createdAt"))
+                : builder.asc(post.get("createdAt"));
 
-        Predicate where = builder.and(Stream.of(
-                        idCondition,
-                        categoryCondition,
-                        memberIdCondition,
-                        buyerIdCondition,
-                        keywordCondition
-                )
-                .filter(Objects::nonNull)
-                .toArray(Predicate[]::new));
-
-        Order order = builder.desc(post.get("id"));
+        Order idOrder = builder.desc(post.get("id"));
 
         query.select(post)
                 .where(where)
-                .orderBy(order);
+                .orderBy(createdAtOrder, idOrder);
 
         TypedQuery<Post> typedQuery = em.createQuery(query);
         typedQuery.setFirstResult(0);

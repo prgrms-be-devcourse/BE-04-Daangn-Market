@@ -75,9 +75,9 @@ public class PostRestController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<Slice<PostDto.Response>> getPostsWithFilters(PostDto.FilterRequest request,
-                                                                       Pageable pageable) {
-        Slice<PostDto.Response> responses = postService.getPostsWithFilter(request, pageable);
+    public ResponseEntity<Slice<PostDto.Response>> getPostsWithCursorWithFilters(PostDto.FilterRequest request,
+                                                                                 Pageable pageable) {
+        Slice<PostDto.Response> responses = postService.getPostsWithCursorWithFilters(request, pageable);
 
         return ResponseEntity.ok(responses);
     }
