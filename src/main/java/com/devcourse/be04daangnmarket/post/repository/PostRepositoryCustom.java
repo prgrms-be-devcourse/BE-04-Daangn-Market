@@ -5,6 +5,8 @@ import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
+import java.time.LocalDateTime;
+
 public interface PostRepositoryCustom {
 
     Slice<Post> getPostsWithMultiFilters(Long id,
@@ -15,5 +17,7 @@ public interface PostRepositoryCustom {
                                          Pageable pageable
     );
 
-    Slice<Post> getPostsWithCursor(Long id, Pageable pageable);
+    Slice<Post> getPostsWithCursor(Long id,
+                                   LocalDateTime createdAt,
+                                   Pageable pageable);
 }

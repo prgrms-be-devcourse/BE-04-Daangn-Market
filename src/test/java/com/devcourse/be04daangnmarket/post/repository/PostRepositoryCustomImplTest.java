@@ -11,8 +11,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -211,59 +213,80 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    @DisplayName("정렬 조건 없는 커서 기반 페이징 첫 조회 성공")
-    void getPostsByCursor() {
+    @DisplayName("생성 시간에 대한 커서 기반 페이징 첫 조회 성공")
+    void getPostsByCursorWithFirstTest() {
         // given
         List<Post> posts = List.of(
                 new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
                         Category.DIGITAL_DEVICES),
-                new Post(1L, "mouse~!", "this keyboard is good", 100000, TransactionType.SALE,
+                new Post(1L, "mouse~!", "this keyboard is good", 200000, TransactionType.SALE,
                         Category.DIGITAL_DEVICES),
-                new Post(1L, "keyKey~!", "this keyboard is good", 100000, TransactionType.SALE,
+                new Post(1L, "keyKey~!", "this keyboard is good", 200000, TransactionType.SALE,
                         Category.HOUSEHOLD_KITCHEN),
-                new Post(1L, "house~!", "this keyboard is good", 100000, TransactionType.SALE,
+                new Post(1L, "house~!", "this keyboard is good", 300000, TransactionType.SALE,
                         Category.DIGITAL_DEVICES)
         );
         postRepository.saveAll(posts);
 
         // when
-        Pageable pageable = PageRequest.of(0, 2);
-        Slice<Post> selectedPost = postRepository.getPostsWithCursor(
-                null,
-                pageable
-        );
+        PageRequest pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Slice<Post> pageResult = postRepository.getPostsWithCursor(null, null, pageable);
 
         // then
-        assertEquals(4L, selectedPost.getContent().get(0).getId());
-        assertEquals(2, selectedPost.getContent().size());
+        assertEquals(4L, pageResult.getContent().get(0).getId());
+        assertEquals(2, pageResult.getContent().size());
     }
 
     @Test
-    @DisplayName("정렬 조건 없는 커서 기반 페이징 첫 번째 이후 조회 성공")
-    void getPostsByCursor2() {
+    @DisplayName("생성 시간에 대한 커서 기반 페이징 첫 번째 이후 조회 성공")
+    void getPostsByCursorTest() {
         // given
         List<Post> posts = List.of(
                 new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
                         Category.DIGITAL_DEVICES),
-                new Post(1L, "mouse~!", "this keyboard is good", 100000, TransactionType.SALE,
+                new Post(1L, "mouse~!", "this keyboard is good", 200000, TransactionType.SALE,
                         Category.DIGITAL_DEVICES),
-                new Post(1L, "keyKey~!", "this keyboard is good", 100000, TransactionType.SALE,
+                new Post(1L, "keyKey~!", "this keyboard is good", 200000, TransactionType.SALE,
                         Category.HOUSEHOLD_KITCHEN),
-                new Post(1L, "house~!", "this keyboard is good", 100000, TransactionType.SALE,
+                new Post(1L, "house~!", "this keyboard is good", 300000, TransactionType.SALE,
                         Category.DIGITAL_DEVICES)
         );
         postRepository.saveAll(posts);
 
         // when
-        Pageable pageable = PageRequest.of(0, 2);
-        Slice<Post> selectedPost = postRepository.getPostsWithCursor(
-                2L,
-                pageable
-        );
+        Post selectedPost = postRepository.findById(3L).get();
+        PageRequest pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Slice<Post> pageResult = postRepository.getPostsWithCursor(3L, selectedPost.getCreatedAt(), pageable);
 
         // then
-        assertEquals(1L, selectedPost.getContent().get(0).getId());
-        assertEquals(1, selectedPost.getContent().size());
+        assertEquals(2L, pageResult.getContent().get(0).getId());
+        assertEquals(2, pageResult.getContent().size());
+    }
+
+    @Test
+    @DisplayName("생성 시간에 대한 오름차순 커서 기반 페이징 조회 성공")
+    void PostRepositoryCustomImplTest() {
+        // given
+        List<Post> posts = List.of(
+                new Post(1L, "keyboard~!", "this keyboard is good", 100000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "mouse~!", "this keyboard is good", 200000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES),
+                new Post(1L, "keyKey~!", "this keyboard is good", 200000, TransactionType.SALE,
+                        Category.HOUSEHOLD_KITCHEN),
+                new Post(1L, "house~!", "this keyboard is good", 300000, TransactionType.SALE,
+                        Category.DIGITAL_DEVICES)
+        );
+
+        postRepository.saveAll(posts);
+
+        // when
+        PageRequest pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.ASC, "createdAt"));
+        Slice<Post> pageResult = postRepository.getPostsWithCursor(null, null, pageable);
+
+        // then
+        assertEquals(1L, pageResult.getContent().get(0).getId());
+        assertEquals(2, pageResult.getContent().size());
     }
 
 }

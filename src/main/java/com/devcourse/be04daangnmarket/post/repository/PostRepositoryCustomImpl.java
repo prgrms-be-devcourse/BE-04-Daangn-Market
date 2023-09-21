@@ -7,6 +7,7 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.domain.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -74,21 +75,54 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public Slice<Post> getPostsWithCursor(Long id, Pageable pageable) {
-
+    public Slice<Post> getPostsWithCursor(Long id,
+                                          LocalDateTime createdAt,
+                                          Pageable pageable) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Post> query = builder.createQuery(Post.class);
         Root<Post> post = query.from(Post.class);
 
-        Predicate cursorRestriction = Optional.ofNullable(id)
-                .map(conditionId -> builder.lessThan(post.get("id"), conditionId))
+        Sort createdAtSort = pageable.getSortOr(Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Predicate cursorRestriction = Optional.ofNullable(createdAt)
+                .map(key -> {
+                    Predicate where = switch (createdAtSort.getOrderFor("createdAt").getDirection()) {
+                        case DESC -> {
+                            Predicate createdAtLt = builder.lessThan(post.get("createdAt"), key);
+
+                            Predicate createdAtEq = builder.equal(post.get("createdAt"), key);
+                            Predicate idLt = builder.lessThan(post.get("id"), id);
+
+                            Predicate and = builder.and(createdAtEq, idLt);
+                            Predicate or = builder.or(createdAtLt, and);
+
+                            yield or;
+                        }
+                        case ASC -> {
+                            Predicate createdAtGt = builder.greaterThan(post.get("createdAt"), key);
+
+                            Predicate createdAtEq = builder.equal(post.get("createdAt"), key);
+                            Predicate idLt = builder.lessThan(post.get("id"), id);
+
+                            Predicate and = builder.and(createdAtEq, idLt);
+                            Predicate or = builder.or(createdAtGt, and);
+
+                            yield or;
+                        }
+                    };
+
+                    return where;
+                })
                 .orElseGet(() -> null);
 
-        Predicate[] cursorWhere = Stream.of(cursorRestriction).filter(Objects::nonNull).toArray(Predicate[]::new);
-        Order cursorOrder = builder.desc(post.get("id"));
+        Predicate[] where = Stream.of(cursorRestriction).filter(Objects::nonNull).toArray(Predicate[]::new);
+
+        Order createdAtOrder = createdAtSort.getOrderFor("createdAt").isDescending() ? builder.desc(post.get("createdAt")) : builder.asc(post.get("createdAt"));
+        Order idOrder = builder.desc(post.get("id"));
+
         query.select(post)
-                .where(cursorWhere)
-                .orderBy(cursorOrder);
+                .where(where)
+                .orderBy(createdAtOrder, idOrder);
 
         TypedQuery<Post> typedQuery = em.createQuery(query);
         typedQuery.setFirstResult(0);
