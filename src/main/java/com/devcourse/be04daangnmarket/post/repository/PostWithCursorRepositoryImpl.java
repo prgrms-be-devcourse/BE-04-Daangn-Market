@@ -8,7 +8,6 @@ import jakarta.persistence.criteria.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
-import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 
@@ -33,9 +32,6 @@ public class PostWithCursorRepositoryImpl implements PostWithCursorRepository {
                                                       Long buyerId,
                                                       String keyword,
                                                       Pageable pageable) {
-
-        Sort createdAtSort = pageable.getSortOr(Sort.by(Sort.Direction.DESC, "createdAt"));
-
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Post> query = builder.createQuery(Post.class);
         Root<Post> post = query.from(Post.class);
@@ -58,14 +54,14 @@ public class PostWithCursorRepositoryImpl implements PostWithCursorRepository {
 
                     Predicate and = builder.and(createdAtEq, idLt);
 
-                    return createdAtSort.getOrderFor("createdAt").isDescending()
+                    return pageable.getSort().getOrderFor("price").isDescending()
                             ? builder.or(builder.lessThan(post.get("createdAt"), key), and)
                             : builder.or(builder.greaterThan(post.get("createdAt"), key), and);
                 }).ifPresent(cursorCondition -> conditions.add(cursorCondition));
 
         Predicate where = builder.and(conditions.toArray(Predicate[]::new));
 
-        Order createdAtOrder = createdAtSort.getOrderFor("createdAt").isDescending()
+        Order createdAtOrder = pageable.getSort().getOrderFor("price").isDescending()
                 ? builder.desc(post.get("createdAt"))
                 : builder.asc(post.get("createdAt"));
 
@@ -91,8 +87,6 @@ public class PostWithCursorRepositoryImpl implements PostWithCursorRepository {
         CriteriaQuery<Post> query = builder.createQuery(Post.class);
         Root<Post> post = query.from(Post.class);
 
-        Sort createdAtSort = pageable.getSortOr(Sort.by(Sort.Direction.DESC, "createdAt"));
-
         Predicate cursorRestriction = Optional.ofNullable(createdAt)
                 .map(key -> {
                     Predicate createdAtEq = builder.equal(post.get("createdAt"), key);
@@ -100,7 +94,7 @@ public class PostWithCursorRepositoryImpl implements PostWithCursorRepository {
 
                     Predicate and = builder.and(createdAtEq, idLt);
 
-                    return createdAtSort.getOrderFor("createdAt").isDescending()
+                    return pageable.getSort().getOrderFor("createdAt").isDescending()
                             ? builder.or(builder.lessThan(post.get("createdAt"), key), and)
                             : builder.or(builder.greaterThan(post.get("createdAt"), key), and);
                 })
@@ -108,7 +102,10 @@ public class PostWithCursorRepositoryImpl implements PostWithCursorRepository {
 
         Predicate[] where = Stream.of(cursorRestriction).filter(Objects::nonNull).toArray(Predicate[]::new);
 
-        Order createdAtOrder = createdAtSort.getOrderFor("createdAt").isDescending() ? builder.desc(post.get("createdAt")) : builder.asc(post.get("createdAt"));
+        Order createdAtOrder = pageable.getSort().getOrderFor("createdAt").isDescending()
+                ? builder.desc(post.get("createdAt"))
+                : builder.asc(post.get("createdAt"));
+
         Order idOrder = builder.desc(post.get("id"));
 
         query.select(post)

@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.*;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -76,7 +77,7 @@ public class PostRestController {
 
     @GetMapping("/filter")
     public ResponseEntity<Slice<PostDto.Response>> getPostsWithCursorWithFilters(PostDto.FilterRequest request,
-                                                                                 Pageable pageable) {
+                                                                                 @PageableDefault(sort = "price", direction = Sort.Direction.DESC) Pageable pageable) {
         Slice<PostDto.Response> responses = postService.getPostsWithCursorWithFilters(request, pageable);
 
         return ResponseEntity.ok(responses);
