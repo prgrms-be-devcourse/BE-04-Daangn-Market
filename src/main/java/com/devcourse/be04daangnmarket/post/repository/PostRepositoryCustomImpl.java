@@ -86,34 +86,16 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
         Predicate cursorRestriction = Optional.ofNullable(createdAt)
                 .map(key -> {
-                    Predicate where = switch (createdAtSort.getOrderFor("createdAt").getDirection()) {
-                        case DESC -> {
-                            Predicate createdAtLt = builder.lessThan(post.get("createdAt"), key);
+                    Predicate createdAtEq = builder.equal(post.get("createdAt"), key);
+                    Predicate idLt = builder.lessThan(post.get("id"), id);
 
-                            Predicate createdAtEq = builder.equal(post.get("createdAt"), key);
-                            Predicate idLt = builder.lessThan(post.get("id"), id);
+                    Predicate and = builder.and(createdAtEq, idLt);
 
-                            Predicate and = builder.and(createdAtEq, idLt);
-                            Predicate or = builder.or(createdAtLt, and);
-
-                            yield or;
-                        }
-                        case ASC -> {
-                            Predicate createdAtGt = builder.greaterThan(post.get("createdAt"), key);
-
-                            Predicate createdAtEq = builder.equal(post.get("createdAt"), key);
-                            Predicate idLt = builder.lessThan(post.get("id"), id);
-
-                            Predicate and = builder.and(createdAtEq, idLt);
-                            Predicate or = builder.or(createdAtGt, and);
-
-                            yield or;
-                        }
-                    };
-
-                    return where;
+                    return createdAtSort.getOrderFor("createdAt").isDescending()
+                            ? builder.or(builder.lessThan(post.get("createdAt"), key), and)
+                            : builder.or(builder.greaterThan(post.get("createdAt"), key), and);
                 })
-                .orElseGet(() -> null);
+                .orElse(null);
 
         Predicate[] where = Stream.of(cursorRestriction).filter(Objects::nonNull).toArray(Predicate[]::new);
 
