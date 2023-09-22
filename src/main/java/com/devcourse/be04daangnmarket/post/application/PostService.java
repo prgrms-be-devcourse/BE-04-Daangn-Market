@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import com.devcourse.be04daangnmarket.image.dto.ImageDto;
+import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.member.application.ProfileService;
 import com.devcourse.be04daangnmarket.post.domain.constant.PostStatus;
 import com.devcourse.be04daangnmarket.post.util.PostConverter;
@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
-import com.devcourse.be04daangnmarket.member.application.MemberService;
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.domain.Post;
 import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
@@ -70,12 +69,12 @@ public class PostService {
 
     @Transactional
     public PostDto.Response getPost(Long id, HttpServletRequest req, HttpServletResponse res) {
-        Post post = findPostById(id);
+        Post post = postRepository.findByIdForUpdate(id).
+                orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
 
         if (!isViewed(id, req, res)) {
             post.updateView();
         }
-
 
         List<String> imagePaths = imageService.getImages(DomainName.POST, id);
         String username = getUsername(post.getMemberId());
