@@ -172,7 +172,7 @@ public class CommentService implements CommentProviderService {
         return toResponse(comment, imagePaths, username);
     }
 
-    public Page<MemberDto.Response> getCommenterByPostId(Long postId, Pageable pageable) {
+    public Page<ProfileDto.Response> getCommenterByPostId(Long postId, Pageable pageable) {
         Long writerId = postService.findPostById(postId).getMemberId();
 
          return commentRepository.findDistinctMemberIdsByPostIdAndNotInWriterId(postId, writerId, pageable)
