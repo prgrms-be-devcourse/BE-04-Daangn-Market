@@ -163,7 +163,7 @@ public class PostRestController {
 
     @GetMapping("/{id}/communicationMembers")
     public ResponseEntity<Page<ProfileDto.Response>> getCommunicationMembers(@PathVariable Long id,
-                                                                            @RequestParam(defaultValue = "0") int page) {
+                                                                             @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         Long writerId = postService.findPostById(id).getMemberId();
         Page<ProfileDto.Response> responses = commentService.getCommenterByPostId(writerId, pageable);
