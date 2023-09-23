@@ -135,7 +135,7 @@ public class CommentService implements CommentProviderService {
 
         List<CommentDto.PostCommentResponse> postCommentResponses = postComments.stream()
                 .map(comment -> {
-                    String commentUsername = memberService.getMember(comment.getId()).getUsername();
+                    String commentUsername = memberService.getMember(comment.getMemberId()).getUsername();
                     String postTitle = postService.findPostById(comment.getPostId()).getTitle();
                     List<String> imagePaths = imageService.getImages(DomainName.COMMENT, comment.getId());
                     List<CommentDto.CommentResponse> replyCommentResponses = getReplyComments(comment);

@@ -20,7 +20,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> findAllByCommentGroup(int commentGroup);
 
-    @Query("SELECT c FROM Comment c WHERE c.post.id=:postId AND c.seq=0")
+    @Query("SELECT c FROM Comment c JOIN fetch c.member WHERE c.post.id=:postId AND c.seq=0")
     List<Comment> findAllByPostIdToSeqIsZero(@Param("postId") Long postId);
 
     @Query("SELECT c FROM Comment c WHERE c.commentGroup=:commentGroup AND c.seq > 0 ORDER BY c.seq ASC")
