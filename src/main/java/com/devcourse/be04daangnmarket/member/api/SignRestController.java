@@ -29,7 +29,7 @@ public class SignRestController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    @PostMapping
+    @PostMapping("/sign-up")
     public ResponseEntity<MemberDto.Response> signUp(@RequestBody @Valid MemberDto.SignUpRequest request) {
         MemberDto.Response response = memberService.signUp(request);
 
