@@ -18,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -133,34 +132,32 @@ public class CommentService implements CommentProviderService {
     @Override
     public Page<CommentDto.PostCommentResponse> getPostComments(Long postId, Pageable pageable) {
         List<Comment> postComments = commentRepository.findAllByPostIdToSeqIsZero(postId);
-        List<CommentDto.PostCommentResponse> postCommentResponses = new ArrayList<>();
 
-        for (Comment comment : postComments) {
-            String commentUsername = memberService.getMember(comment.getId()).getUsername();
-            String postTitle = postService.findPostById(comment.getPostId()).getTitle();
-            List<String> imagePaths = imageService.getImages(DomainName.COMMENT, comment.getId());
+        List<CommentDto.PostCommentResponse> postCommentResponses = postComments.stream()
+                .map(comment -> {
+                    String commentUsername = memberService.getMember(comment.getId()).getUsername();
+                    String postTitle = postService.findPostById(comment.getPostId()).getTitle();
+                    List<String> imagePaths = imageService.getImages(DomainName.COMMENT, comment.getId());
+                    List<CommentDto.CommentResponse> replyCommentResponses = getReplyComments(comment);
 
-            List<CommentDto.CommentResponse> replyCommentResponses = getReplyComments(comment);
-
-            postCommentResponses.add(toResponse(comment, commentUsername, postTitle, imagePaths, replyCommentResponses));
-        }
+                    return toResponse(comment, commentUsername, postTitle, imagePaths, replyCommentResponses);
+                })
+                .toList();
 
         return new PageImpl<>(postCommentResponses, pageable, postCommentResponses.size());
     }
 
     private List<CommentDto.CommentResponse> getReplyComments(Comment comment) {
         List<Comment> replyComments = commentRepository.findRepliesByCommentGroup(comment.getCommentGroup());
-        List<CommentDto.CommentResponse> replyCommentResponses = new ArrayList<>();
 
-        for (Comment reply : replyComments) {
-            String replyUsername = memberService.getMember(reply.getMemberId()).getUsername();
-            List<String> imagePaths = imageService.getImages(DomainName.COMMENT, reply.getId());
+        return replyComments.stream()
+                .map(reply -> {
+                    String replyUsername = memberService.getMember(reply.getMemberId()).getUsername();
+                    List<String> imagePaths = imageService.getImages(DomainName.COMMENT, reply.getId());
 
-            CommentDto.CommentResponse commentResponse = toResponse(reply, imagePaths, replyUsername);
-            replyCommentResponses.add(commentResponse);
-        }
-
-        return replyCommentResponses;
+                    return toResponse(reply, imagePaths, replyUsername);
+                })
+                .toList();
     }
 
     @Transactional
@@ -178,12 +175,10 @@ public class CommentService implements CommentProviderService {
         return toResponse(comment, imagePaths, username);
     }
 
-    public Page<MemberDto.Response> getCommenterByPostId(Long postId, Pageable pageable) {
-        Long writerId = postService.findPostById(postId).getMemberId();
-
+    public Page<MemberDto.Response> getCommenterByPostId(Long postId, Long writerId, Pageable pageable) {
          return commentRepository.findDistinctMemberIdsByPostIdAndNotInWriterId(postId, writerId, pageable)
-                .map(memberId -> {
-                    Member member = memberService.getMember(memberId);
+                .map(value -> {
+                    Member member = memberService.getMember(value.getId());
 
                     return new MemberDto.Response(
                             member.getId(),
