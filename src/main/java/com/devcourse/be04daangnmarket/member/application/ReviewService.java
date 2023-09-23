@@ -1,14 +1,21 @@
 package com.devcourse.be04daangnmarket.member.application;
 
 import com.devcourse.be04daangnmarket.member.domain.Review;
+import com.devcourse.be04daangnmarket.member.domain.Review.WriterRole;
 import com.devcourse.be04daangnmarket.member.dto.ReviewDto;
 import com.devcourse.be04daangnmarket.member.repository.ReviewRepository;
 import com.devcourse.be04daangnmarket.member.util.ReviewConverter;
+import com.devcourse.be04daangnmarket.member.util.ReviewSpecification;
 import com.devcourse.be04daangnmarket.post.application.PostService;
 import com.devcourse.be04daangnmarket.post.domain.Post;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.devcourse.be04daangnmarket.member.domain.Review.WriterRole.BUYER;
+import static com.devcourse.be04daangnmarket.member.domain.Review.WriterRole.SELLER;
 import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.ILLEGAL_USER_ACCESS;
 
 @Service
@@ -31,6 +38,13 @@ public class ReviewService {
         return ReviewConverter.toResponse(savedReview);
     }
 
+    public Page<ReviewDto.Response> getAllByMember(Long ownerId, WriterRole role, Pageable pageable) {
+        Specification<Review> specification = ReviewSpecification.findWith(ownerId, role);
+
+        return reviewRepository.findAll(specification, pageable)
+                .map(ReviewConverter::toResponse);
+    }
+
     private Review getOne(Long authUserId, Post post, String content) {
         Long sellerId = post.getMemberId();
         Long buyerId = post.getBuyerId();
@@ -38,10 +52,10 @@ public class ReviewService {
         validateMember(authUserId, sellerId, buyerId);
 
         if (isEquals(authUserId, buyerId)) {
-            return new Review(sellerId, post.getId(), authUserId, content);
+            return new Review(sellerId, post.getId(), authUserId, content, BUYER);
         }
 
-        return new Review(buyerId, post.getId(), authUserId, content);
+        return new Review(buyerId, post.getId(), authUserId, content, SELLER);
     }
 
     private void validateMember(Long authUserId, Long sellerId, Long buyerId) {

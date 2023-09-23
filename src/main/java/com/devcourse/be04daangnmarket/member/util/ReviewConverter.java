@@ -10,7 +10,10 @@ public class ReviewConverter {
                 review.getOwnerId(),
                 review.getPostId(),
                 review.getWriterId(),
-                review.getContent()
+                review.getWriterRole(),
+                review.getContent(),
+                review.getCreatedAt(),
+                review.getUpdatedAt()
         );
     }
 }

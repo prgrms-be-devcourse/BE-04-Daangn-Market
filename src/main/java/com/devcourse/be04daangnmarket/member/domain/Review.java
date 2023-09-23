@@ -2,9 +2,14 @@ package com.devcourse.be04daangnmarket.member.domain;
 
 import com.devcourse.be04daangnmarket.common.entity.BaseEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 @Entity
 public class Review extends BaseEntity {
+    public enum WriterRole {
+        SELLER, BUYER
+    }
 
     private Long ownerId;
 
@@ -12,13 +17,21 @@ public class Review extends BaseEntity {
 
     private Long writerId;
 
+    @Enumerated(EnumType.STRING)
+    private WriterRole role;
+
     private String content;
 
-    public Review(Long ownerId, Long postId, Long writerId, String content) {
+    public Review(Long ownerId,
+                  Long postId,
+                  Long writerId,
+                  String content,
+                  WriterRole role) {
         this.ownerId = ownerId;
         this.postId = postId;
         this.writerId = writerId;
         this.content = content;
+        this.role = role;
     }
 
     protected Review() {
@@ -38,5 +51,9 @@ public class Review extends BaseEntity {
 
     public String getContent() {
         return content;
+    }
+
+    public WriterRole getWriterRole() {
+        return role;
     }
 }

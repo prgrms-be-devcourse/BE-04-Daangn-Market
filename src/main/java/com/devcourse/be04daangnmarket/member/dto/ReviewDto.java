@@ -1,6 +1,9 @@
 package com.devcourse.be04daangnmarket.member.dto;
 
+import com.devcourse.be04daangnmarket.member.domain.Review.WriterRole;
 import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
+
+import java.time.LocalDateTime;
 
 public class ReviewDto {
     public record CreateRequest(
@@ -18,7 +21,13 @@ public class ReviewDto {
 
             Long writerId,
 
-            String content
+            WriterRole writerRole,
+
+            String content,
+
+            LocalDateTime createdAt,
+
+            LocalDateTime updatedAt
     ) {
     }
 }
