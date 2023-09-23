@@ -177,9 +177,7 @@ public class CommentService implements CommentProviderService {
 
     public Page<MemberDto.Response> getCommenterByPostId(Long postId, Long writerId, Pageable pageable) {
          return commentRepository.findDistinctMemberIdsByPostIdAndNotInWriterId(postId, writerId, pageable)
-                .map(value -> {
-                    Member member = memberService.getMember(value.getId());
-
+                .map(member -> {
                     return new MemberDto.Response(
                             member.getId(),
                             member.getUsername(),
