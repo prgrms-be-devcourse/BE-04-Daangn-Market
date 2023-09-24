@@ -18,6 +18,7 @@ import static com.devcourse.be04daangnmarket.member.domain.Review.WriterRole.BUY
 import static com.devcourse.be04daangnmarket.member.domain.Review.WriterRole.SELLER;
 import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.DUPLICATED_REVIEW;
 import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.ILLEGAL_USER_ACCESS;
+import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.NOT_COMPLETED_TRANSACTION;
 
 @Service
 @Transactional
@@ -79,6 +80,10 @@ public class ReviewService {
     }
 
     private void validateMember(Long authUserId, Long sellerId, Long buyerId) {
+        if (buyerId == null) {
+            throw new IllegalArgumentException(NOT_COMPLETED_TRANSACTION.getMessage());
+        }
+
         if (isNotEquals(authUserId, sellerId) && isNotEquals(authUserId, buyerId)) {
             throw new IllegalArgumentException(ILLEGAL_USER_ACCESS.getMessage());
         }
