@@ -9,6 +9,7 @@ import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.comment.util.CommentConverter;
 import com.devcourse.be04daangnmarket.member.application.ProfileService;
 import com.devcourse.be04daangnmarket.member.domain.Profile;
+import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import com.devcourse.be04daangnmarket.member.dto.ProfileDto;
 import com.devcourse.be04daangnmarket.member.util.ProfileConverter;
 import com.devcourse.be04daangnmarket.post.application.PostService;
