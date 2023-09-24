@@ -1,5 +1,6 @@
 package com.devcourse.be04daangnmarket.post.application;
 
+import com.devcourse.be04daangnmarket.common.aop.lock.DistributedRock;
 import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
@@ -11,12 +12,14 @@ import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 import com.devcourse.be04daangnmarket.post.repository.PostRepository;
 import com.devcourse.be04daangnmarket.post.util.PostConverter;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -34,7 +37,10 @@ public class PostService {
     private final ProfileService profileService;
     private final RedisTemplate<String, String> redisTemplate;
 
-    public PostService(PostRepository postRepository, ImageService imageService, ProfileService profileService, RedisTemplate<String, String> redisTemplate) {
+    public PostService(PostRepository postRepository,
+                       ImageService imageService,
+                       ProfileService profileService,
+                       RedisTemplate<String, String> redisTemplate) {
         this.postRepository = postRepository;
         this.imageService = imageService;
         this.profileService = profileService;
@@ -66,7 +72,7 @@ public class PostService {
         return PostConverter.toResponse(post, imagePaths, username);
     }
 
-    @Transactional
+    @DistributedRock
     public PostDto.Response getPost(Long postId, Long userId) {
         Post post = findPostById(postId);
 
