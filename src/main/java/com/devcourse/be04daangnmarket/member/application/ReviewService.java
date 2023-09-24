@@ -54,10 +54,22 @@ public class ReviewService {
         validateMember(authUserId, sellerId, buyerId);
 
         if (isEquals(authUserId, buyerId)) {
-            return new Review(sellerId, post.getId(), authUserId, content, BUYER);
+            return Review.builder()
+                    .ownerId(sellerId)
+                    .postId(post.getId())
+                    .writerId(authUserId)
+                    .writerRole(BUYER)
+                    .content(content)
+                    .build();
         }
 
-        return new Review(buyerId, post.getId(), authUserId, content, SELLER);
+        return Review.builder()
+                .ownerId(buyerId)
+                .postId(post.getId())
+                .writerId(authUserId)
+                .writerRole(SELLER)
+                .content(content)
+                .build();
     }
 
     private void checkDuplication(Long writerId, Long postId) {

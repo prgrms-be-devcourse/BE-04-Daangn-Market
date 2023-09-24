@@ -4,6 +4,7 @@ import com.devcourse.be04daangnmarket.common.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import lombok.Builder;
 
 @Entity
 public class Review extends BaseEntity {
@@ -22,16 +23,17 @@ public class Review extends BaseEntity {
 
     private String content;
 
+    @Builder
     public Review(Long ownerId,
                   Long postId,
                   Long writerId,
                   String content,
-                  WriterRole role) {
+                  WriterRole writerRole) {
         this.ownerId = ownerId;
         this.postId = postId;
         this.writerId = writerId;
         this.content = content;
-        this.role = role;
+        this.role = writerRole;
     }
 
     protected Review() {
