@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.devcourse.be04daangnmarket.member.domain.Review.WriterRole.BUYER;
 import static com.devcourse.be04daangnmarket.member.domain.Review.WriterRole.SELLER;
+import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.DUPLICATED_REVIEW;
 import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.ILLEGAL_USER_ACCESS;
 
 @Service
@@ -30,8 +31,9 @@ public class ReviewService {
     }
 
     public ReviewDto.Response create(Long authUserId, Long postId, String content) {
-        Post post = postService.findPostById(postId);
+        checkDuplication(authUserId, postId);
 
+        Post post = postService.findPostById(postId);
         Review review = getOne(authUserId, post, content);
         Review savedReview = reviewRepository.save(review);
 
@@ -56,6 +58,12 @@ public class ReviewService {
         }
 
         return new Review(buyerId, post.getId(), authUserId, content, SELLER);
+    }
+
+    private void checkDuplication(Long writerId, Long postId) {
+        if (reviewRepository.findByWriterIdAndPostId(writerId, postId).isPresent()) {
+            throw new IllegalArgumentException(DUPLICATED_REVIEW.getMessage());
+        }
     }
 
     private void validateMember(Long authUserId, Long sellerId, Long buyerId) {
