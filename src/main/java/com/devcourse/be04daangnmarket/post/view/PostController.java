@@ -1,10 +1,12 @@
 package com.devcourse.be04daangnmarket.post.view;
 
+import com.devcourse.be04daangnmarket.common.auth.User;
 import com.devcourse.be04daangnmarket.post.application.PostService;
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 import com.devcourse.be04daangnmarket.post.dto.PostDto;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,8 +44,10 @@ public class PostController {
     }
 
     @GetMapping(value = "/posts/update/{id}")
-    public String updatePost(@PathVariable Long id, Model model, HttpServletRequest req, HttpServletResponse res) {
-        PostDto.Response post = postService.getPost(id, req, res);
+    public String updatePost(@PathVariable Long id,
+                             @AuthenticationPrincipal User user,
+                             Model model) {
+        PostDto.Response post = postService.getPost(id, user.getId());
 
         model.addAttribute("post", post);
         model.addAttribute("categories", Category.values());

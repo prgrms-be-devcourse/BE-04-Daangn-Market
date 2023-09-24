@@ -75,7 +75,6 @@ class PostRestControllerTest {
 		SecurityContextHolder.getContext().setAuthentication(
 			new UsernamePasswordAuthenticationToken(
 				new User(new Member(
-					"username",
 					"phone",
 					"email",
 					"1234")),
@@ -140,6 +139,7 @@ class PostRestControllerTest {
 	public void getPostTest() throws Exception {
 		// given
 		Long postId = 1L;
+		Long memberId = 1L;
 		PostDto.Response mockResponse = new PostDto.Response(
 			1L,
 			1L,
@@ -156,16 +156,12 @@ class PostRestControllerTest {
 			LocalDateTime.now()
 		);
 
-		MockHttpServletRequest req = new MockHttpServletRequest();
-		MockHttpServletResponse res = new MockHttpServletResponse();
-		when(postService.getPost(1L, req, res)).thenReturn(mockResponse);
+		when(postService.getPost(1L, 1L)).thenReturn(mockResponse);
 
 		// when then
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/posts/" + postId)
 				.contentType(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON)
-				.requestAttr("req", new MockHttpServletRequest()) // HttpServletRequest 모의 객체 추가
-				.requestAttr("res", new MockHttpServletResponse()))
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk());
 	}
 

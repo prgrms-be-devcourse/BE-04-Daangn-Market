@@ -61,9 +61,8 @@ public class PostRestController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PostDto.Response> getPost(@PathVariable @NotNull Long id,
-                                                    HttpServletRequest req,
-                                                    HttpServletResponse res) {
-        PostDto.Response response = postService.getPost(id, req, res);
+                                                    @AuthenticationPrincipal User user) {
+        PostDto.Response response = postService.getPost(id, user.getId());
 
         return ResponseEntity.ok(response);
     }
