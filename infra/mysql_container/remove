@@ -5,3 +5,6 @@ docker rmi mysql:latest
 
 docker volume rm mysql_container_config
 docker volume rm mysql_container_data
+
+docker rm redis
+docker rmi redis:latest
