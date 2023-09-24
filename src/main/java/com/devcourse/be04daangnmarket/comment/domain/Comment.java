@@ -12,13 +12,11 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import org.hibernate.annotations.DynamicInsert;
 
 import java.util.Objects;
 
 @Entity
 @Table(name = "comments")
-@DynamicInsert
 public class Comment extends BaseEntity {
     @Column(length = 500, nullable = false)
     private String content;
@@ -46,6 +44,7 @@ public class Comment extends BaseEntity {
 
     public Comment(String content, Member member, Post post) {
         this.content = content;
+        this.status = Status.ALIVE;
         this.member = member;
         this.post = post;
         this.seq = 0;
@@ -53,6 +52,7 @@ public class Comment extends BaseEntity {
 
     public Comment(String content, Member member, Post post, int commentGroup) {
         this.content = content;
+        this.status = Status.ALIVE;
         this.member = member;
         this.post = post;
         this.commentGroup = commentGroup;
