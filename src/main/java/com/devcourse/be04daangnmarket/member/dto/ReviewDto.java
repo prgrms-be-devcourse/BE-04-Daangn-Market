@@ -9,7 +9,7 @@ public class ReviewDto {
     public record CreateRequest(
             @NotBlank(message = "내용은 필수로 입력하여야 합니다.")
             String content
-    ){
+    ) {
     }
 
     public record Response(
