@@ -4,7 +4,14 @@ import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.common.entity.BaseEntity;
 import com.devcourse.be04daangnmarket.member.domain.Member;
 import com.devcourse.be04daangnmarket.post.domain.Post;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import org.hibernate.annotations.DynamicInsert;
 
 import java.util.Objects;
@@ -22,17 +29,17 @@ public class Comment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member member;//작성자 Id
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
-    private Post post;//댓글이 작성된 게시글 Id
+    private Post post;
 
     @Column(nullable = false)
-    private int commentGroup;//그룹 Id 댓글을 작성할 때 마다 증가
+    private int commentGroup;
 
     @Column(nullable = false)
-    private int seq;//댓글의 순서 1번이 댓글 주인, 뒤로 대댓글
+    private int seq;
 
     protected Comment() {
     }
