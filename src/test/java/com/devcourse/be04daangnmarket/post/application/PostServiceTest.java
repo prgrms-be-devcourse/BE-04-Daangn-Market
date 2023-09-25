@@ -1,17 +1,19 @@
 package com.devcourse.be04daangnmarket.post.application;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-
 import com.devcourse.be04daangnmarket.common.image.LocalImageUpload;
 import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.common.image.dto.Type;
+import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
+import com.devcourse.be04daangnmarket.image.application.ImageService;
+import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
+import com.devcourse.be04daangnmarket.member.application.ProfileService;
+import com.devcourse.be04daangnmarket.member.dto.ProfileDto;
+import com.devcourse.be04daangnmarket.post.domain.Post;
+import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.domain.constant.PostStatus;
+import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
+import com.devcourse.be04daangnmarket.post.dto.PostDto;
+import com.devcourse.be04daangnmarket.post.repository.PostRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -22,21 +24,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
+import org.springframework.test.context.TestPropertySource;
 
-import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
-import com.devcourse.be04daangnmarket.image.application.ImageService;
-import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
-import com.devcourse.be04daangnmarket.post.domain.constant.Category;
-import com.devcourse.be04daangnmarket.post.domain.Post;
-import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
-import com.devcourse.be04daangnmarket.post.dto.PostDto;
-import com.devcourse.be04daangnmarket.post.repository.PostRepository;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.*;
 
-import jakarta.servlet.http.Cookie;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
+@TestPropertySource(locations = "file:./.env")
 class PostServiceTest {
     @InjectMocks
     private PostService postService;
@@ -48,7 +48,16 @@ class PostServiceTest {
     private ImageService imageService;
 
     @Mock
+    private ProfileService profileService;
+
+    @Mock
     private LocalImageUpload imageUpload;
+
+    @Mock
+    RedisTemplate<String, String> redisTemplate;
+
+    @Mock
+    private SetOperations<String, String> setOperations;
 
     @MockBean
     private JwtTokenProvider jwtTokenProvider;
@@ -69,12 +78,13 @@ class PostServiceTest {
         List<String> pathLists = List.of("images/uniqueName-test1.png");
         when(imageService.save(anyList(), eq(DomainName.POST), eq(null))).thenReturn(pathLists);
 
-        // when
         ImageDto.ImageDetail imageDetail = new ImageDto.ImageDetail("test1", "uniqueName-test1.png", Type.PNG);
         List<ImageDto.ImageDetail> imageDetails = List.of(imageDetail);
+        when(imageUpload.uploadImages(any())).thenReturn(imageDetails);
 
-        given(imageUpload.uploadImages(any())).willReturn(imageDetails);
+        when(profileService.toProfile(post.getMemberId())).thenReturn(new ProfileDto.Response(1L, "user", "region", 26.5, LocalDateTime.now()));
 
+        // when
         PostDto.Response response = postService.create(
                 1L,
                 "keyboard~!",
@@ -104,7 +114,7 @@ class PostServiceTest {
     void getPostTest() {
         // given
         Long postId = 1L;
-        Long memberId =1L;
+        Long memberId = 1L;
 
         Post post = new Post(
                 1L,
@@ -115,6 +125,8 @@ class PostServiceTest {
         );
 
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(redisTemplate.opsForSet()).thenReturn(setOperations);
+        when(profileService.toProfile(post.getMemberId())).thenReturn(new ProfileDto.Response(1L, "user", "region", 26.5, LocalDateTime.now()));
 
         // when
         PostDto.Response response = postService.getPost(postId, memberId);
@@ -129,7 +141,7 @@ class PostServiceTest {
     void viewUpdateSuccessTest() {
         // given
         Long postId = 1L;
-        Long memberId =1L;
+        Long memberId = 1L;
 
         Post post = new Post(
                 1L,
@@ -140,6 +152,9 @@ class PostServiceTest {
         );
 
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(redisTemplate.opsForSet()).thenReturn(setOperations);
+        when(setOperations.members("1")).thenReturn(new HashSet<>());
+        when(profileService.toProfile(post.getMemberId())).thenReturn(new ProfileDto.Response(1L, "user", "region", 26.5, LocalDateTime.now()));
 
         // when
         PostDto.Response response = postService.getPost(postId, memberId);
@@ -154,7 +169,7 @@ class PostServiceTest {
     void viewUpdateFailTest() {
         // given
         Long postId = 1L;
-        Long memberId =1L;
+        Long memberId = 1L;
 
         Post post = new Post(
                 1L,
@@ -165,6 +180,9 @@ class PostServiceTest {
         );
 
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(redisTemplate.opsForSet()).thenReturn(setOperations);
+        when(setOperations.members("1")).thenReturn(new HashSet<>(Arrays.asList("1")));
+        when(profileService.toProfile(post.getMemberId())).thenReturn(new ProfileDto.Response(1L, "user", "region", 26.5, LocalDateTime.now()));
 
         // when
         PostDto.Response response = postService.getPost(postId, memberId);
@@ -197,6 +215,7 @@ class PostServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Post> page = new PageImpl<>(posts, pageable, posts.size());
         when(postRepository.findAll(pageable)).thenReturn(page);
+        when(profileService.toProfile(post.getMemberId())).thenReturn(new ProfileDto.Response(1L, "user", "region", 26.5, LocalDateTime.now()));
 
         // when
         Page<PostDto.Response> response = postService.getAllPost(pageable);
@@ -225,6 +244,7 @@ class PostServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Post> page = new PageImpl<>(posts);
         when(postRepository.findByCategory(category, pageable)).thenReturn(page);
+        when(profileService.toProfile(post.getMemberId())).thenReturn(new ProfileDto.Response(1L, "user", "region", 26.5, LocalDateTime.now()));
 
         // when
         Page<PostDto.Response> response = postService.getPostByCategory(category, pageable);
@@ -253,6 +273,7 @@ class PostServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Post> page = new PageImpl<>(posts);
         when(postRepository.findByMemberId(memberId, pageable)).thenReturn(page);
+        when(profileService.toProfile(post.getMemberId())).thenReturn(new ProfileDto.Response(1L, "user", "region", 26.5, LocalDateTime.now()));
 
         // when
         Page<PostDto.Response> response = postService.getPostByMemberId(memberId, pageable);
@@ -281,8 +302,8 @@ class PostServiceTest {
                 50000, TransactionType.SALE,
                 Category.DIGITAL_DEVICES
         );
-
         when(postRepository.findById(id)).thenReturn(Optional.of(post));
+        when(profileService.toProfile(post.getMemberId())).thenReturn(new ProfileDto.Response(1L, "user", "region", 26.5, LocalDateTime.now()));
 
         // when
         PostDto.Response response = postService.update(
@@ -292,7 +313,7 @@ class PostServiceTest {
                 price,
                 transactionType,
                 category,
-                null
+                Collections.emptyList()
         );
 
         // then
@@ -321,6 +342,7 @@ class PostServiceTest {
         );
 
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(profileService.toProfile(post.getMemberId())).thenReturn(new ProfileDto.Response(1L, "user", "region", 26.5, LocalDateTime.now()));
 
         // when
         PostDto.Response response = postService.updatePostStatus(postId, updateStatus);
@@ -337,10 +359,12 @@ class PostServiceTest {
         Long postId = 1L;
 
         // when
-        postService.delete(postId);
+        Throwable exception = assertThrows(NoSuchElementException.class, () -> {
+            postService.delete(postId);
+        });
 
         // then
-        verify(postRepository, times(1)).deleteById(postId);
+        assertEquals("존재하지 않는 게시물 입니다.", exception.getMessage());
     }
 
     @Test
@@ -358,6 +382,7 @@ class PostServiceTest {
         );
 
         when(postRepository.findById(1L)).thenReturn(Optional.of(post));
+        when(profileService.toProfile(post.getMemberId())).thenReturn(new ProfileDto.Response(1L, "user", "region", 26.5, LocalDateTime.now()));
 
         // when
         PostDto.Response response = postService.purchaseProduct(postId, buyerId);
