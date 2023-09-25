@@ -52,6 +52,9 @@ class CommentServiceTest {
     @Mock
     private PostService postService;
 
+    private Member member = new Member("username", "010-1111-1111", "sunil13@naver.com", "11111111");
+    private Post post = new Post(1L, "제목", "내용", 100, TransactionType.SALE, Category.DIGITAL_DEVICES);
+
     @Test
     void 삭제시_id가_없으면_예외() {
         //given
@@ -66,7 +69,7 @@ class CommentServiceTest {
     @Test
     void 삭제시_삭제상태변경_확인() {
         //given
-        Comment comment = new Comment("댓글", 1L, 1L);
+        Comment comment = new Comment("댓글", member, post);
         given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
 
         //when
@@ -81,8 +84,8 @@ class CommentServiceTest {
         //given
         Long memberId = 1L;
         Long postId = 1L;
-        Comment comment1 = new Comment("댓글", memberId, postId, 1);
-        Comment comment2 = new Comment("댓글", memberId, postId, 2);
+        Comment comment1 = new Comment("댓글", member, post, 1);
+        Comment comment2 = new Comment("댓글", member, post, 2);
 
         List<Comment> comments = List.of(comment1, comment2);
         Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -111,7 +114,7 @@ class CommentServiceTest {
         ImageDto.ImageDetail imageDetail = new ImageDto.ImageDetail("test1", "uniqueName-test1.png", Type.PNG);
         List<ImageDto.ImageDetail> imageDetails = List.of(imageDetail);
 
-        Comment comment = new Comment("수정한댓글", 1L, 1L);
+        Comment comment = new Comment("수정한댓글", member, post);
         given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
 
         //when

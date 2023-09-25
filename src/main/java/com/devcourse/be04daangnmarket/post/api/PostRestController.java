@@ -226,7 +226,7 @@ public class PostRestController {
                                                                              @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
         Long writerId = postService.findPostById(id).getMemberId();
-        Page<ProfileDto.Response> responses = commentService.getCommenterByPostId(writerId, pageable);
+        Page<ProfileDto.Response> responses = commentService.getCommenterByPostId(id, writerId, pageable);
 
         return ResponseEntity.ok(responses);
     }
