@@ -36,10 +36,10 @@ public class DistributedLockAspect {
             if (isLocked) {
                 return aopForTransaction.proceed(joinPoint);
             } else {
-                throw new RuntimeException(ErrorMessage.LOCK_ACQUISITION_FAILURE.getMessage());
+                throw new LockAcquisitionFailureException(ErrorMessage.LOCK_ACQUISITION_FAILURE.getMessage());
             }
         } catch (InterruptedException e) {
-            throw new RuntimeException(ErrorMessage.LOCK_DURING_ACQUISITION_FAILURE.getMessage());
+            throw new LockAcquisitionFailureException(ErrorMessage.LOCK_DURING_ACQUISITION_FAILURE.getMessage());
         } finally {
             lock.unlock();
         }
