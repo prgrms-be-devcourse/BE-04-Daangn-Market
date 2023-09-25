@@ -13,10 +13,10 @@
 
 ## 🥕 팀원들(Team Members)
 
-|                                Product Owner                                 |                                 Scrum Master                                 |                                  Developer                                   |                                    Mentor                                    |                                    Mentor                                    |
-|:----------------------------------------------------------------------------:|:----------------------------------------------------------------------------:|:----------------------------------------------------------------------------:|:----------------------------------------------------------------------------:|:----------------------------------------------------------------------------:|
-|                      [김예슬](https://github.com/kys0411)                       |                       [신범철](https://github.com/beombu)                       |                     [김주웅](https://github.com/JuwoongKim)                     |                    [조규현](https://github.com/Jo-GyuHyeon)                     |                   [김형욱](https://github.com/HyoungUkJJang)                    |
-| <img src="https://avatars.githubusercontent.com/u/62236238?v=4" width="280"> | <img src="https://avatars.githubusercontent.com/u/84673536?v=4" width="300"> | <img src="https://avatars.githubusercontent.com/u/62009283?v=4" width="290"> | <img src="https://avatars.githubusercontent.com/u/20269425?v=4" width="300"> | <img src="https://avatars.githubusercontent.com/u/50834204?v=4" width="300"> |
+|                                Product Owner                                 |                                 Scrum Master                                 |                                  Developer                                   |                                
+|:----------------------------------------------------------------------------:|:----------------------------------------------------------------------------:|:----------------------------------------------------------------------------:|
+|                      [김예슬](https://github.com/kys0411)                       |                       [신범철](https://github.com/beombu)                       |                     [김주웅](https://github.com/JuwoongKim)                     |                                  |
+| <img src="https://avatars.githubusercontent.com/u/62236238?v=4" width="280"> | <img src="https://avatars.githubusercontent.com/u/84673536?v=4" width="300"> | <img src="https://avatars.githubusercontent.com/u/62009283?v=4" width="290"> | 
 
 ## 🥕 기술 스택(Tech)
 
@@ -25,7 +25,7 @@
   <img src="https://img.shields.io/badge/Java20-007396?style=flat-square&logo=openJDK&logoColor=white&style=flat"/></a>
 <img src="https://img.shields.io/badge/Spring Boot 3.1.3-6DB33F?style=flat-square&logo=Springboot&logoColor=white&style=flat"/></a>
 <img src="https://img.shields.io/badge/SpringSecurity-6DB33F?style=flat-&logo=springsecurity&logoColor=white&style=flat"/></a>
-<img src="https://img.shields.io/badge/Hibernate-gray?style=flat-square&logo=Hibernate&logoColor=white&style=flat"/></a>
+<img src="https://img.shields.io/badge/Spring Data JPA-ECD53F?style=flat-square&logo=JPA&logoColor=white"/></img>
 <img src="https://img.shields.io/badge/MySQL 8-4479A1?style=flat-square&logo=MySQL&logoColor=white&style=flat"/></a>
 <img src="https://img.shields.io/badge/Junit-25A162?style=flat-&logo=JUnit5&logoColor=white&style=flat"/></a>
 <img src="https://img.shields.io/badge/Gradle-4429A1?style=flat-square&logo=gradle&logoColor=white&style=flat"/></a>
