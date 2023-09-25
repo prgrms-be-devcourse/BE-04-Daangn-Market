@@ -2,3 +2,4 @@
 
 docker start mysql
 docker start redis
+docker start sonarqube

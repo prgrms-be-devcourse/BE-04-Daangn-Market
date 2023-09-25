@@ -2,3 +2,4 @@
 
 docker stop mysql
 docker stop redis
+docker stop sonarqube

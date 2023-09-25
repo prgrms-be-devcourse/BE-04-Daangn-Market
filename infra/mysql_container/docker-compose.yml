@@ -35,3 +35,11 @@ services:
       - data:/data
     restart: always
     platform: linux/arm64/v8
+
+  sonarqube:
+    image: sonarqube
+    container_name: sonarqube
+    ports:
+      - 9000:9000
+    platform: linux/arm64/v8
+    restart: always
