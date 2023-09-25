@@ -282,7 +282,6 @@ class PostWithCursorRepositoryImplTest {
                 new Post(1L, "house~!", "this keyboard is good", 300000, TransactionType.SALE,
                         Category.DIGITAL_DEVICES)
         );
-
         postRepository.saveAll(posts);
 
         // when
@@ -293,5 +292,4 @@ class PostWithCursorRepositoryImplTest {
         assertEquals(1L, pageResult.getContent().get(0).getId());
         assertEquals(2, pageResult.getContent().size());
     }
-
 }
