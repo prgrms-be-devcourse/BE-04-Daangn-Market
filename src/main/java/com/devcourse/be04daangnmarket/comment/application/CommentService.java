@@ -7,9 +7,10 @@ import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
 import com.devcourse.be04daangnmarket.comment.repository.CommentRepository;
 import com.devcourse.be04daangnmarket.comment.util.CommentConverter;
+import com.devcourse.be04daangnmarket.member.application.MemberService;
 import com.devcourse.be04daangnmarket.member.application.ProfileService;
+import com.devcourse.be04daangnmarket.member.domain.Member;
 import com.devcourse.be04daangnmarket.member.domain.Profile;
-import com.devcourse.be04daangnmarket.member.dto.MemberDto;
 import com.devcourse.be04daangnmarket.member.dto.ProfileDto;
 import com.devcourse.be04daangnmarket.member.util.ProfileConverter;
 import com.devcourse.be04daangnmarket.post.application.PostService;
@@ -34,15 +35,17 @@ public class CommentService implements CommentProviderService {
     private final ImageService imageService;
     private final CommentRepository commentRepository;
     private final PostService postService;
+    private final MemberService memberService;
     private final ProfileService profileService;
 
     public CommentService(ImageService imageService,
                           CommentRepository commentRepository,
                           PostService postService,
-                          ProfileService profileService) {
+                          MemberService memberService, ProfileService profileService) {
         this.imageService = imageService;
         this.commentRepository = commentRepository;
         this.postService = postService;
+        this.memberService = memberService;
         this.profileService = profileService;
     }
 
@@ -52,7 +55,7 @@ public class CommentService implements CommentProviderService {
                                              String username,
                                              String content,
                                              List<ImageDto.ImageDetail> files) {
-        Member member = memberService.getMember(userId);
+        Member member = memberService.getOne(userId);
         Post post = postService.findPostById(postId);
         Comment comment = CommentConverter.toEntity(content, member, post);
         comment.addPost(post);
@@ -77,7 +80,7 @@ public class CommentService implements CommentProviderService {
                                                   int commentGroup,
                                                   String content,
                                                   List<ImageDto.ImageDetail> files) {
-        Member member = memberService.getMember(userId);
+        Member member = memberService.getOne(userId);
         Post post = postService.findPostById(postId);
         Comment comment = CommentConverter.toEntity(post, content, commentGroup, member);
         comment.addPost(post);
@@ -168,6 +171,7 @@ public class CommentService implements CommentProviderService {
                                              String username,
                                              String content,
                                              List<ImageDto.ImageDetail> files) {
+        postService.findPostById(postId);
         Comment comment = getComment(id);
         comment.update(content);
 

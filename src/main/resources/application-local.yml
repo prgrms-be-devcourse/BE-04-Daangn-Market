@@ -17,20 +17,6 @@ spring:
         highlight_sql: true
         use_sql_comments: true
 
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: debug
-        type:
-          descriptor:
-            sql: trace
-
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 15MB
-
   cache:
     type: redis
     redis:
@@ -38,6 +24,12 @@ logging:
       cache-null-values: true
       host: localhost
       port: 6379
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 15MB
+
 
 jasypt:
   encryptor:
@@ -47,3 +39,12 @@ jasypt:
 custom:
   base-path:
     image: ${IMAGE_PATH}
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        type:
+          descriptor:
+            sql: trace

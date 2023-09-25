@@ -28,8 +28,8 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/sign-up").permitAll()
-                                .requestMatchers("/login").permitAll()
+                                .requestMatchers("/api/v1/sign-up").permitAll()
+                                .requestMatchers("/api/v1/login").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/members/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/comments/**").permitAll()
                                 .anyRequest().authenticated())
