@@ -40,7 +40,7 @@ class PostWithCursorRepositoryImplTest {
         postRepository.saveAll(posts);
 
         // when
-        Pageable pageable = PageRequest.of(0, 10);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "price"));
         Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
                 null,
                 null,
@@ -72,7 +72,7 @@ class PostWithCursorRepositoryImplTest {
         postRepository.saveAll(posts);
 
         // when
-        Pageable pageable = PageRequest.of(0, 10);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "price"));
         Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
                 null,
                 null,
@@ -104,7 +104,7 @@ class PostWithCursorRepositoryImplTest {
         postRepository.saveAll(posts);
 
         // when
-        Pageable pageable = PageRequest.of(0, 10);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "price"));
         Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
                 null,
                 null,
@@ -136,7 +136,7 @@ class PostWithCursorRepositoryImplTest {
         postRepository.saveAll(posts);
 
         // when
-        Pageable pageable = PageRequest.of(0, 10);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "price"));
         Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
                 null,
                 null,
@@ -168,7 +168,7 @@ class PostWithCursorRepositoryImplTest {
         postRepository.saveAll(posts);
 
         // when
-        Pageable pageable = PageRequest.of(0, 2);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "price"));
         Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
                 null,
                 null,
@@ -201,7 +201,7 @@ class PostWithCursorRepositoryImplTest {
         postRepository.saveAll(posts);
 
         // when
-        Pageable pageable = PageRequest.of(0, 2);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "price"));
         Slice<Post> selectedPost = postRepository.findPostsWithCursorWithFilters(
                 2L,
                 null,
