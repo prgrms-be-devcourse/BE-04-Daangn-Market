@@ -1,33 +1,30 @@
 package com.devcourse.be04daangnmarket.post.application;
 
-import static com.devcourse.be04daangnmarket.post.exception.ErrorMessage.*;
+import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
+import com.devcourse.be04daangnmarket.image.application.ImageService;
+import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
+import com.devcourse.be04daangnmarket.member.application.ProfileService;
+import com.devcourse.be04daangnmarket.post.domain.Post;
+import com.devcourse.be04daangnmarket.post.domain.constant.Category;
+import com.devcourse.be04daangnmarket.post.domain.constant.PostStatus;
+import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
+import com.devcourse.be04daangnmarket.post.dto.PostDto;
+import com.devcourse.be04daangnmarket.post.repository.PostRepository;
+import com.devcourse.be04daangnmarket.post.util.PostConverter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
-import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
-import com.devcourse.be04daangnmarket.member.application.ProfileService;
-import com.devcourse.be04daangnmarket.post.domain.constant.PostStatus;
-import com.devcourse.be04daangnmarket.post.util.PostConverter;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.devcourse.be04daangnmarket.image.application.ImageService;
-import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
-import com.devcourse.be04daangnmarket.post.domain.constant.Category;
-import com.devcourse.be04daangnmarket.post.domain.Post;
-import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
-import com.devcourse.be04daangnmarket.post.dto.PostDto;
-import com.devcourse.be04daangnmarket.post.repository.PostRepository;
-
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import static com.devcourse.be04daangnmarket.post.exception.ErrorMessage.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -35,11 +32,13 @@ public class PostService {
     private final PostRepository postRepository;
     private final ImageService imageService;
     private final ProfileService profileService;
+    private final RedisTemplate<String, String> redisTemplate;
 
-    public PostService(PostRepository postRepository, ImageService imageService, ProfileService profileService) {
+    public PostService(PostRepository postRepository, ImageService imageService, ProfileService profileService, RedisTemplate<String, String> redisTemplate) {
         this.postRepository = postRepository;
         this.imageService = imageService;
         this.profileService = profileService;
+        this.redisTemplate = redisTemplate;
     }
 
     @Transactional
@@ -68,15 +67,14 @@ public class PostService {
     }
 
     @Transactional
-    public PostDto.Response getPost(Long id, HttpServletRequest req, HttpServletResponse res) {
-        Post post = postRepository.findByIdForUpdate(id).
-                orElseThrow(() -> new NoSuchElementException(NOT_FOUND_POST.getMessage()));
+    public PostDto.Response getPost(Long postId, Long userId) {
+        Post post = findPostById(postId);
 
-        if (!isViewed(id, req, res)) {
+        if (!isViewed(postId, userId)) {
             post.updateView();
         }
 
-        List<String> imagePaths = imageService.getImages(DomainName.POST, id);
+        List<String> imagePaths = imageService.getImages(DomainName.POST, postId);
         String username = getUsername(post.getMemberId());
 
         return PostConverter.toResponse(post, imagePaths, username);
@@ -205,26 +203,20 @@ public class PostService {
         return profileService.toProfile(memberId).username();
     }
 
-    private boolean isViewed(Long id, HttpServletRequest req, HttpServletResponse res) {
-        String cookieName = Long.toString(id);
-        String cookieValue = Long.toString(id);
-        Cookie[] cookies = req.getCookies();
+    private boolean isViewed(Long postId, Long userId) {
+        SetOperations<String, String> setOperations = redisTemplate.opsForSet();
+        String key = userId.toString();
+        String value = postId.toString();
 
-        if (cookies == null) {
-            return false;
+        Set<String> viewedPosts = setOperations.members(key);
+
+        if (viewedPosts.contains(value)) {
+            return true;
         }
 
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().contains(cookieName)) {
-                return true;
-            }
-        }
-
-        Cookie cookie = new Cookie(cookieName, cookieValue);
-        cookie.setPath("/");
-        cookie.setMaxAge(60);
-        res.addCookie(cookie);
+        setOperations.add(key, value);
 
         return false;
     }
+
 }

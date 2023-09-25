@@ -25,3 +25,13 @@ services:
       - MYSQL_PASSWORD=password
     platform: linux/arm64/v8
     restart: always
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - data:/data
+    restart: always
+    platform: linux/arm64/v8

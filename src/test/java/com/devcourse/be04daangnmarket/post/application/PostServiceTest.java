@@ -104,6 +104,7 @@ class PostServiceTest {
     void getPostTest() {
         // given
         Long postId = 1L;
+        Long memberId =1L;
 
         Post post = new Post(
                 1L,
@@ -116,9 +117,7 @@ class PostServiceTest {
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
         // when
-        MockHttpServletRequest req = new MockHttpServletRequest();
-        MockHttpServletResponse res = new MockHttpServletResponse();
-        PostDto.Response response = postService.getPost(postId, req, res);
+        PostDto.Response response = postService.getPost(postId, memberId);
 
         // then
         assertEquals(post.getId(), response.id());
@@ -130,6 +129,7 @@ class PostServiceTest {
     void viewUpdateSuccessTest() {
         // given
         Long postId = 1L;
+        Long memberId =1L;
 
         Post post = new Post(
                 1L,
@@ -142,9 +142,7 @@ class PostServiceTest {
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
         // when
-        MockHttpServletRequest req = new MockHttpServletRequest();
-        MockHttpServletResponse res = new MockHttpServletResponse();
-        PostDto.Response response = postService.getPost(postId, req, res);
+        PostDto.Response response = postService.getPost(postId, memberId);
 
         // then
         assertEquals(1, response.views());
@@ -156,6 +154,7 @@ class PostServiceTest {
     void viewUpdateFailTest() {
         // given
         Long postId = 1L;
+        Long memberId =1L;
 
         Post post = new Post(
                 1L,
@@ -168,10 +167,7 @@ class PostServiceTest {
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
         // when
-        MockHttpServletRequest req = new MockHttpServletRequest();
-        MockHttpServletResponse res = new MockHttpServletResponse();
-        req.setCookies(new Cookie(postId.toString(), postId.toString()));
-        PostDto.Response response = postService.getPost(postId, req, res);
+        PostDto.Response response = postService.getPost(postId, memberId);
 
         // then
         assertEquals(0, response.views());
