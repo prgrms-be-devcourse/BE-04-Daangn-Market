@@ -1,12 +1,17 @@
 package com.devcourse.be04daangnmarket.post.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.devcourse.be04daangnmarket.comment.domain.Comment;
 import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.post.domain.constant.Category;
 import com.devcourse.be04daangnmarket.post.domain.constant.PostStatus;
 import com.devcourse.be04daangnmarket.post.domain.constant.TransactionType;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToMany;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
@@ -61,6 +66,9 @@ public class Post extends BaseEntity {
 
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime pullUpAt;
+
+    @OneToMany(mappedBy = "post")
+    private List<Comment> comments = new ArrayList<>();
 
     protected Post() {
     }
@@ -146,6 +154,10 @@ public class Post extends BaseEntity {
 
     public LocalDateTime getPullUpAt() {
         return pullUpAt;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
     }
 
     public void update(String title,

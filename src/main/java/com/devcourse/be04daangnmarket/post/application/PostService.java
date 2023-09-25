@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import static com.devcourse.be04daangnmarket.post.exception.ErrorMessage.NOT_FOUND_POST;
+import static com.devcourse.be04daangnmarket.post.exception.ErrorMessage.*;
 
 @Service
 @Transactional(readOnly = true)
