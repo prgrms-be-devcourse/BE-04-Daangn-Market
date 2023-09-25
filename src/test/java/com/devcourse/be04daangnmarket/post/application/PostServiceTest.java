@@ -313,7 +313,7 @@ class PostServiceTest {
                 price,
                 transactionType,
                 category,
-                null
+                Collections.emptyList()
         );
 
         // then

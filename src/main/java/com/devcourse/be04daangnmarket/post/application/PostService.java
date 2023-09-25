@@ -165,7 +165,7 @@ public class PostService {
     }
 
     private boolean isExistImages(List<ImageDto.ImageDetail> files) {
-        return (files == null || !files.isEmpty()) ? false : null;
+        return !files.isEmpty();
     }
 
     @Transactional
