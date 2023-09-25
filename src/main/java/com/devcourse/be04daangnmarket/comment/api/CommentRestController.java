@@ -3,7 +3,6 @@ package com.devcourse.be04daangnmarket.comment.api;
 import com.devcourse.be04daangnmarket.comment.application.CommentService;
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.common.auth.User;
-import com.devcourse.be04daangnmarket.post.exception.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

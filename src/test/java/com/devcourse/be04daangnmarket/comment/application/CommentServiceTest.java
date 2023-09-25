@@ -52,7 +52,7 @@ class CommentServiceTest {
     @Mock
     private PostService postService;
 
-    private Member member = new Member("username", "010-1111-1111", "sunil13@naver.com", "11111111");
+    private Member member = new Member("010-1111-1111", "sunil13@naver.com", "11111111");
     private Post post = new Post(1L, "제목", "내용", 100, TransactionType.SALE, Category.DIGITAL_DEVICES);
 
     @Test
@@ -92,8 +92,8 @@ class CommentServiceTest {
         Page<Comment> commentPage = new PageImpl<>(comments);
         given(commentRepository.findAllByPostIdToSeqIsZero(postId)).willReturn(comments);
 
-        Member member = new Member("username", "번호", "이메일", "1234");
-        given(memberService.getMember(memberId)).willReturn(member);
+        Member member = new Member("번호", "이메일", "1234");
+        given(memberService.getOne(memberId)).willReturn(member);
 
         Post post = new Post(memberId, "제목", "설명", 100, TransactionType.SALE, Category.DIGITAL_DEVICES);
         given(postService.findPostById(postId)).willReturn(post);

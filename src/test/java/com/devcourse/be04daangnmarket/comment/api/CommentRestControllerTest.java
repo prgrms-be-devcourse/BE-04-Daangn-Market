@@ -1,5 +1,6 @@
 package com.devcourse.be04daangnmarket.comment.api;
 
+import com.devcourse.be04daangnmarket.comment.domain.Comment;
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.common.auth.User;
 import com.devcourse.be04daangnmarket.common.image.LocalImageUpload;
@@ -10,6 +11,7 @@ import com.devcourse.be04daangnmarket.comment.application.CommentService;
 import com.devcourse.be04daangnmarket.common.config.SecurityConfig;
 import com.devcourse.be04daangnmarket.common.image.dto.Type;
 import com.devcourse.be04daangnmarket.member.domain.Member;
+import com.devcourse.be04daangnmarket.post.domain.Post;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +31,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -39,6 +43,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CommentRestController.class)
@@ -60,9 +65,13 @@ class CommentRestControllerTest {
     @MockBean
     private LocalImageUpload imageUpload;
 
+    private Member member;
+    private Post post;
+
     @BeforeEach
     public void setup() {
-        Member member = new Member("username", "0107209675", "email@naver.com", "1234");
+        //new Post(1L, "제목", "내용", )
+        member = new Member("01011111111", "email@naver.com", "1234");
         User user = new User(member);
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
 
@@ -73,24 +82,27 @@ class CommentRestControllerTest {
     @WithMockUser
     void 댓글_저장_성공() throws Exception {
         //given
+        byte[] bytes = "test1".getBytes(StandardCharsets.UTF_8);
+        MockMultipartFile imageFile = new MockMultipartFile("test1", "test1.png", MediaType.TEXT_PLAIN_VALUE, bytes);
+
         List<MultipartFile> multipartFiles = new ArrayList<>();
-        MockMultipartFile imageFile = new MockMultipartFile("test1", "test1.png", "image/png", "test1".getBytes(StandardCharsets.UTF_8));
         multipartFiles.add(imageFile);
 
-        ImageDto.ImageDetail imageDetail = new ImageDto.ImageDetail("test1", "uniqueName-test1.png", Type.PNG);
+        String uniqueName = UUID.randomUUID() + ".png";
+        ImageDto.ImageDetail imageDetail = new ImageDto.ImageDetail("test1", uniqueName, Type.PNG);
         List<ImageDto.ImageDetail> imageDetails = List.of(imageDetail);
 
-        List<String> pathLists = List.of("images/uniqueName-test1.png");
+        List<String> pathLists = List.of(uniqueName);
         CommentDto.CommentResponse mockResponse = new CommentDto.CommentResponse(1L, 1L, "username", 1L, "댓글", pathLists, LocalDateTime.now(), LocalDateTime.now());
 
-        given(imageUpload.uploadImages(any())).willReturn(imageDetails);
+        given(imageUpload.uploadImages(multipartFiles)).willReturn(imageDetails);
 
         given(commentService.create(
-                eq(1L),
-                eq(1L),
-                eq("username"),
-                eq("댓글"),
-                eq(imageDetails)
+                1L,
+                1L,
+                "username",
+                "댓글",
+                imageDetails
         )).willReturn(mockResponse);
 
         //when & then
