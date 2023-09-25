@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping
+@RequestMapping("/api/v1")
 @RestController
 public class SignRestController {
     private final KakaoService kakaoService;
