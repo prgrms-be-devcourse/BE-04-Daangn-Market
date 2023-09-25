@@ -1,6 +1,7 @@
 package com.devcourse.be04daangnmarket.comment.repository;
 
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
+import com.devcourse.be04daangnmarket.member.domain.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,12 +20,12 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> findAllByCommentGroup(int commentGroup);
 
-    @Query("SELECT c FROM Comment c WHERE c.postId=:postId AND c.seq=0")
+    @Query("SELECT c FROM Comment c JOIN fetch c.member WHERE c.post.id=:postId AND c.seq=0")
     List<Comment> findAllByPostIdToSeqIsZero(@Param("postId") Long postId);
 
     @Query("SELECT c FROM Comment c WHERE c.commentGroup=:commentGroup AND c.seq > 0 ORDER BY c.seq ASC")
     List<Comment> findRepliesByCommentGroup(@Param("commentGroup") int commentGroup);
 
-    @Query("SELECT DISTINCT c.memberId FROM Comment c WHERE c.postId=:postId AND c.memberId <> :writerId")
-    Page<Long> findDistinctMemberIdsByPostIdAndNotInWriterId(@Param("postId") Long postId, @Param("writerId") Long writerId, Pageable pageable);
+    @Query("SELECT DISTINCT m FROM Comment c JOIN c.member m WHERE c.post.id=:postId AND c.member.id <> :writerId")
+    Page<Member> findDistinctMemberIdsByPostIdAndNotInWriterId(@Param("postId") Long postId, @Param("writerId") Long writerId, Pageable pageable);
 }

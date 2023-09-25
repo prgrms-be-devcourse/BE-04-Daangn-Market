@@ -2,16 +2,21 @@ package com.devcourse.be04daangnmarket.comment.domain;
 
 import com.devcourse.be04daangnmarket.common.constant.Status;
 import com.devcourse.be04daangnmarket.common.entity.BaseEntity;
+import com.devcourse.be04daangnmarket.member.domain.Member;
+import com.devcourse.be04daangnmarket.post.domain.Post;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import org.hibernate.annotations.DynamicInsert;
+
+import java.util.Objects;
 
 @Entity
 @Table(name = "comments")
-@DynamicInsert
 public class Comment extends BaseEntity {
     @Column(length = 500, nullable = false)
     private String content;
@@ -20,32 +25,36 @@ public class Comment extends BaseEntity {
     @Column(nullable = false)
     private Status status;
 
-    @Column(nullable = false)
-    private Long memberId;//작성자 Id
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 
     @Column(nullable = false)
-    private Long postId;//댓글이 작성된 게시글 Id
+    private int commentGroup;
 
     @Column(nullable = false)
-    private int commentGroup;//그룹 Id 댓글을 작성할 때 마다 증가
-
-    @Column(nullable = false)
-    private int seq;//댓글의 순서 1번이 댓글 주인, 뒤로 대댓글
+    private int seq;
 
     protected Comment() {
     }
 
-    public Comment(String content, Long memberId, Long postId) {
+    public Comment(String content, Member member, Post post) {
         this.content = content;
-        this.memberId = memberId;
-        this.postId = postId;
+        this.status = Status.ALIVE;
+        this.member = member;
+        this.post = post;
         this.seq = 0;
     }
 
-    public Comment(String content, Long memberId, Long postId, int commentGroup) {
+    public Comment(String content, Member member, Post post, int commentGroup) {
         this.content = content;
-        this.memberId = memberId;
-        this.postId = postId;
+        this.status = Status.ALIVE;
+        this.member = member;
+        this.post = post;
         this.commentGroup = commentGroup;
     }
 
@@ -57,12 +66,12 @@ public class Comment extends BaseEntity {
         return status;
     }
 
-    public Long getMemberId() {
-        return memberId;
+    public Member getMember() {
+        return member;
     }
 
-    public Long getPostId() {
-        return postId;
+    public Post getPost() {
+        return post;
     }
 
     public int getCommentGroup() {
@@ -71,6 +80,23 @@ public class Comment extends BaseEntity {
 
     public int getSeq() {
         return seq;
+    }
+
+    public Long getMemberId() {
+        return member.getId();
+    }
+
+    public Long getPostId() {
+        return post.getId();
+    }
+
+    public void addPost(Post post) {
+        if (Objects.nonNull(this.post)) {
+            this.post.getComments().remove(this);
+        }
+
+        this.post = post;
+        post.getComments().add(this);
     }
 
     public void addGroup(int groupNumber) {

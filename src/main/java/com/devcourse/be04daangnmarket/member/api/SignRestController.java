@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping
+@RequestMapping("/api/v1")
 @RestController
 public class SignRestController {
     private final KakaoService kakaoService;
@@ -29,7 +29,7 @@ public class SignRestController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    @PostMapping
+    @PostMapping("/sign-up")
     public ResponseEntity<MemberDto.Response> signUp(@RequestBody @Valid MemberDto.SignUpRequest request) {
         MemberDto.Response response = memberService.signUp(request);
 

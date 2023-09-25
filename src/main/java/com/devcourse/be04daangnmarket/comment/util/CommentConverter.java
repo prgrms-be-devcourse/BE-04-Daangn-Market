@@ -2,16 +2,18 @@ package com.devcourse.be04daangnmarket.comment.util;
 
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.comment.domain.Comment;
+import com.devcourse.be04daangnmarket.member.domain.Member;
+import com.devcourse.be04daangnmarket.post.domain.Post;
 
 import java.util.List;
 
 public class CommentConverter {
-    public static Comment toEntity(String content, Long userId, Long postId) {
-        return new Comment(content, userId, postId);
+    public static Comment toEntity(String content, Member member, Post post) {
+        return new Comment(content, member, post);
     }
 
-    public static Comment toEntity(Long postId, String content, int commentGroup, Long userId) {
-        return new Comment(content, userId, postId, commentGroup);
+    public static Comment toEntity(Post post, String content, int commentGroup, Member member) {
+        return new Comment(content, member, post, commentGroup);
     }
 
     public static CommentDto.CommentResponse toResponse(Comment comment, List<String> imagePaths, String username) {
