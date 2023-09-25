@@ -67,6 +67,8 @@ public class PostDto {
     public record FilterRequest(
             Long id,
 
+            LocalDateTime createdAt,
+
             Category category,
 
             Long memberId,

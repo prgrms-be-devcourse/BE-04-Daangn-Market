@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 
-import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.DUPLICATED_USERNAME;
 import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.FAIL_LOGIN;
 import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.ILLEGAL_USER_ACCESS;
 import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.NOT_FOUND_USER;
@@ -21,24 +20,30 @@ import static com.devcourse.be04daangnmarket.member.exception.ErrorMessage.NOT_F
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProfileService profileService;
 
-    public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
+    public MemberService(MemberRepository memberRepository,
+                         PasswordEncoder passwordEncoder, ProfileService profileService) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
+        this.profileService = profileService;
     }
 
     public MemberDto.Response signUp(MemberDto.SignUpRequest request) {
-        Member member = MemberConverter.toEntity(request, passwordEncoder);
+        String encodedPassword = passwordEncoder.encode(request.password());
+        Member member = MemberConverter.toEntity(request, encodedPassword);
 
         Member savedMember = memberRepository.save(member);
+        profileService.create(savedMember.getId(), request.username(), request.region());
 
         return MemberConverter.toResponse(savedMember);
     }
 
-    public MemberDto.Response kakaoSignUp(String username, String email) {
-        Member member = new Member(username, email);
+    public MemberDto.Response kakaoSignUp(String email) {
+        Member member = new Member(email);
 
         Member savedMember = memberRepository.save(member);
+        profileService.create(savedMember.getId());
 
         return MemberConverter.toResponse(savedMember);
     }
@@ -61,40 +66,18 @@ public class MemberService {
         return MemberConverter.toResponse(member);
     }
 
-    public MemberDto.Response updateProfile(Long id, String username) {
-        Member member = getMember(id);
-
-        if (isAvailableUsername(username)) {
-            member.updateProfile(username);
-
-            return MemberConverter.toResponse(member);
-        }
-
-        throw new IllegalArgumentException(DUPLICATED_USERNAME.getMessage());
-    }
-
-    public MemberDto.Response getProfile(Long id) {
-        Member member = getMember(id);
-
-        return MemberConverter.toResponse(member);
-    }
-
     public void validateById(Long pathId, Long authUserId) {
-        if (pathId != authUserId) {
+        if (!pathId.equals(authUserId)) {
             throw new IllegalArgumentException(ILLEGAL_USER_ACCESS.getMessage());
         }
     }
 
-    public Member getMember(Long id) {
+    public Member getOne(Long id) {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_USER.getMessage()));
     }
 
     public boolean isExistMember(String email) {
         return memberRepository.findByEmail(email).isPresent();
-    }
-
-    private boolean isAvailableUsername(String username) {
-        return memberRepository.findByUsername(username).isEmpty();
     }
 }
