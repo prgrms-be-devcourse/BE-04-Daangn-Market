@@ -5,6 +5,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-public interface ImageUpload {
+public interface ImageIOService {
     List<ImageDto.ImageDetail> uploadImages(List<MultipartFile> multipartFiles);
+
+    void delete(String path);
 }
