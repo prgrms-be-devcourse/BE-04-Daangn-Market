@@ -1,6 +1,7 @@
 package com.devcourse.be04daangnmarket.comment.application;
 
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
+import com.devcourse.be04daangnmarket.common.image.ImageIOService;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.image.domain.constant.DomainName;
 import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -32,16 +34,21 @@ import static com.devcourse.be04daangnmarket.comment.util.CommentConverter.toRes
 public class CommentService implements CommentProviderService {
     private static final int START_NUMBER = 0;
 
+    private final ImageIOService imageIOService;
     private final ImageService imageService;
     private final CommentRepository commentRepository;
     private final PostService postService;
     private final MemberService memberService;
     private final ProfileService profileService;
 
-    public CommentService(ImageService imageService,
+
+    public CommentService(ImageIOService imageIOService,
+                          ImageService imageService,
                           CommentRepository commentRepository,
                           PostService postService,
-                          MemberService memberService, ProfileService profileService) {
+                          MemberService memberService,
+                          ProfileService profileService) {
+        this.imageIOService = imageIOService;
         this.imageService = imageService;
         this.commentRepository = commentRepository;
         this.postService = postService;
@@ -54,7 +61,9 @@ public class CommentService implements CommentProviderService {
                                              Long userId,
                                              String username,
                                              String content,
-                                             List<ImageDto.ImageDetail> files) {
+                                             List<MultipartFile> files) {
+        List<ImageDto.ImageDetail> imageDetails = imageIOService.uploadImages(files);
+
         Member member = memberService.getOne(userId);
         Post post = postService.findPostById(postId);
         Comment comment = CommentConverter.toEntity(content, member, post);
@@ -63,7 +72,7 @@ public class CommentService implements CommentProviderService {
         createCommentGroupNumber(comment);
 
         Comment saved = commentRepository.save(comment);
-        List<String> imagePaths = imageService.save(files, DomainName.COMMENT, saved.getId());
+        List<String> imagePaths = imageService.save(imageDetails, DomainName.COMMENT, saved.getId());
 
         return toResponse(saved, imagePaths, username);
     }
@@ -79,7 +88,9 @@ public class CommentService implements CommentProviderService {
                                                   String username,
                                                   int commentGroup,
                                                   String content,
-                                                  List<ImageDto.ImageDetail> files) {
+                                                  List<MultipartFile> files) {
+        List<ImageDto.ImageDetail> imageDetails = imageIOService.uploadImages(files);
+
         Member member = memberService.getOne(userId);
         Post post = postService.findPostById(postId);
         Comment comment = CommentConverter.toEntity(post, content, commentGroup, member);
@@ -88,7 +99,7 @@ public class CommentService implements CommentProviderService {
         addMaxSequenceToReplyComment(commentGroup, comment);
 
         Comment saved = commentRepository.save(comment);
-        List<String> imagePaths = imageService.save(files, DomainName.COMMENT, saved.getId());
+        List<String> imagePaths = imageService.save(imageDetails, DomainName.COMMENT, saved.getId());
 
         return toResponse(saved, imagePaths, username);
     }
@@ -170,13 +181,15 @@ public class CommentService implements CommentProviderService {
                                              Long postId,
                                              String username,
                                              String content,
-                                             List<ImageDto.ImageDetail> files) {
+                                             List<MultipartFile> files) {
+        List<ImageDto.ImageDetail> imageDetails = imageIOService.uploadImages(files);
+
         postService.findPostById(postId);
         Comment comment = getComment(id);
         comment.update(content);
 
         imageService.deleteAllImages(DomainName.COMMENT, id);
-        List<String> imagePaths = imageService.save(files, DomainName.COMMENT, id);
+        List<String> imagePaths = imageService.save(imageDetails, DomainName.COMMENT, id);
 
         return toResponse(comment, imagePaths, username);
     }

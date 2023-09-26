@@ -3,7 +3,7 @@ package com.devcourse.be04daangnmarket.post.api;
 import com.devcourse.be04daangnmarket.comment.application.CommentProviderService;
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.common.auth.User;
-import com.devcourse.be04daangnmarket.common.image.ImageUpload;
+import com.devcourse.be04daangnmarket.common.image.ImageIOService;
 import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.member.dto.ProfileDto;
 
@@ -14,8 +14,6 @@ import com.devcourse.be04daangnmarket.post.dto.PostDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -38,12 +36,12 @@ public class PostRestController {
 
     private final PostService postService;
     private final CommentProviderService commentService;
-    private final ImageUpload imageUpload;
+    private final ImageIOService imageIOService;
 
-    public PostRestController(PostService postService, CommentProviderService commentService, ImageUpload imageUpload) {
+    public PostRestController(PostService postService, CommentProviderService commentService, ImageIOService imageIOService) {
         this.postService = postService;
         this.commentService = commentService;
-        this.imageUpload = imageUpload;
+        this.imageIOService = imageIOService;
     }
 
     @Tag(name = "post")
@@ -54,7 +52,7 @@ public class PostRestController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostDto.Response> createPost(@Valid PostDto.CreateRequest request,
                                                        @AuthenticationPrincipal User user) throws IOException {
-        List<ImageDto.ImageDetail> imageDetails = imageUpload.uploadImages(request.files());
+        List<ImageDto.ImageDetail> imageDetails = imageIOService.uploadImages(request.files());
 
         PostDto.Response response = postService.create(
                 user.getId(),
@@ -154,7 +152,7 @@ public class PostRestController {
     @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostDto.Response> updatePost(@PathVariable @NotNull Long id,
                                                        @Valid PostDto.UpdateRequest request) {
-        List<ImageDto.ImageDetail> imageDetails = imageUpload.uploadImages(request.files());
+        List<ImageDto.ImageDetail> imageDetails = imageIOService.uploadImages(request.files());
         PostDto.Response response = postService.update(
                 id,
                 request.title(),

@@ -4,7 +4,8 @@ import com.devcourse.be04daangnmarket.comment.application.CommentService;
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.common.auth.User;
 import com.devcourse.be04daangnmarket.common.config.SecurityConfig;
-import com.devcourse.be04daangnmarket.common.image.LocalImageUpload;
+import com.devcourse.be04daangnmarket.common.image.ImageIOService;
+import com.devcourse.be04daangnmarket.common.image.LocalImageIOService;
 import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
 import com.devcourse.be04daangnmarket.member.domain.Member;
 import com.devcourse.be04daangnmarket.post.application.PostService;
@@ -64,7 +65,7 @@ class PostRestControllerTest {
     private CommentService commentService;
 
     @MockBean
-    private LocalImageUpload imageUpload;
+    private ImageIOService imageUpload;
 
     @BeforeEach
     public void setup() {
