@@ -1,5 +1,6 @@
 package com.devcourse.be04daangnmarket.common.image;
 
+import com.devcourse.be04daangnmarket.common.image.dto.ImageSavedEvent;
 import com.devcourse.be04daangnmarket.common.image.dto.Type;
 import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.image.exception.FileDeleteException;
@@ -37,11 +38,17 @@ public class LocalImageIOService implements ImageIOService {
 
 	@Override
     public List<ImageDto.ImageDetail> uploadImages(List<MultipartFile> multipartFiles) {
-		return isEmptyImages(multipartFiles)
+		List<ImageDto.ImageDetail> imageDetails = isEmptyImages(multipartFiles)
 				? Collections.emptyList()
 				: multipartFiles.stream()
-								.map(this::uploadImage)
-								.toList();
+				.map(this::uploadImage)
+				.toList();
+
+		for (ImageDto.ImageDetail imageDetail : imageDetails) {
+			ImageEvents.raise(new ImageSavedEvent(imageDetail.uniqueName()));
+		}
+
+		return imageDetails;
     }
 
 	private boolean isEmptyImages(List<MultipartFile> multipartFiles) {
@@ -80,8 +87,8 @@ public class LocalImageIOService implements ImageIOService {
    	}
 
 	@Override
-	public void delete(String path) {
-		Path fullPath = Paths.get(FOLDER_PATH + path);
+	public void delete(String fileName) {
+		Path fullPath = Paths.get(FOLDER_PATH + "/" + fileName);
 
 		try {
 			Files.delete(fullPath);

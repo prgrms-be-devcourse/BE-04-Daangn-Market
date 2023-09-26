@@ -11,7 +11,6 @@ import javax.sql.DataSource;
 
 @Configuration
 public class DataSourceConfig {
-
     @Bean
     @Primary
     public DataSource lazyDataSource(DataSourceProperties properties) {
@@ -20,7 +19,7 @@ public class DataSourceConfig {
         dataSource.setUsername(properties.getUsername());
         dataSource.setPassword(properties.getPassword());
         dataSource.setDriverClassName(properties.getDriverClassName());
+
         return new LazyConnectionDataSourceProxy(dataSource);
     }
-
 }
