@@ -1,6 +1,6 @@
 package com.devcourse.be04daangnmarket.post.application;
 
-import com.devcourse.be04daangnmarket.common.image.LocalImageUpload;
+import com.devcourse.be04daangnmarket.common.image.LocalImageIOService;
 import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
 import com.devcourse.be04daangnmarket.common.image.dto.Type;
 import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
@@ -51,7 +51,7 @@ class PostServiceTest {
     private ProfileService profileService;
 
     @Mock
-    private LocalImageUpload imageUpload;
+    private LocalImageIOService imageUpload;
 
     @Mock
     RedisTemplate<String, String> redisTemplate;

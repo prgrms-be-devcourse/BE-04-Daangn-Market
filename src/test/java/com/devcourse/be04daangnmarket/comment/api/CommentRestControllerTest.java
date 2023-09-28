@@ -1,9 +1,8 @@
 package com.devcourse.be04daangnmarket.comment.api;
 
-import com.devcourse.be04daangnmarket.comment.domain.Comment;
 import com.devcourse.be04daangnmarket.comment.dto.CommentDto;
 import com.devcourse.be04daangnmarket.common.auth.User;
-import com.devcourse.be04daangnmarket.common.image.LocalImageUpload;
+import com.devcourse.be04daangnmarket.common.image.LocalImageIOService;
 import com.devcourse.be04daangnmarket.common.jwt.JwtTokenProvider;
 import com.devcourse.be04daangnmarket.image.application.ImageService;
 import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
@@ -31,7 +30,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -63,7 +61,7 @@ class CommentRestControllerTest {
     private JwtTokenProvider jwtTokenProvider;
 
     @MockBean
-    private LocalImageUpload imageUpload;
+    private LocalImageIOService imageUpload;
 
     private Member member;
     private Post post;
@@ -102,7 +100,7 @@ class CommentRestControllerTest {
                 1L,
                 "username",
                 "댓글",
-                imageDetails
+                multipartFiles
         )).willReturn(mockResponse);
 
         //when & then
@@ -136,7 +134,7 @@ class CommentRestControllerTest {
                 eq("username"),
                 eq(1),
                 eq("댓글"),
-                eq(imageDetails)
+                eq(imagePaths)
         )).willReturn(mockResponse);
 
         //when & then

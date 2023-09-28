@@ -1,7 +1,9 @@
 package com.devcourse.be04daangnmarket.common.image;
 
+import com.devcourse.be04daangnmarket.common.image.dto.ImageSavedEvent;
 import com.devcourse.be04daangnmarket.common.image.dto.Type;
 import com.devcourse.be04daangnmarket.common.image.dto.ImageDto;
+import com.devcourse.be04daangnmarket.image.exception.FileDeleteException;
 import com.devcourse.be04daangnmarket.image.exception.FileUploadException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,14 +12,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static com.devcourse.be04daangnmarket.image.exception.ExceptionMessage.FILE_DELETE_EXCEPTION;
 import static com.devcourse.be04daangnmarket.image.exception.ExceptionMessage.FILE_UPLOAD_EXCEPTION;
 
 @Component
-public class LocalImageUpload implements ImageUpload {
+public class LocalImageIOService implements ImageIOService {
     @Value("${custom.base-path.image}")
    	private String FOLDER_PATH;
 
@@ -32,11 +38,17 @@ public class LocalImageUpload implements ImageUpload {
 
 	@Override
     public List<ImageDto.ImageDetail> uploadImages(List<MultipartFile> multipartFiles) {
-		return isEmptyImages(multipartFiles)
+		List<ImageDto.ImageDetail> imageDetails = isEmptyImages(multipartFiles)
 				? Collections.emptyList()
 				: multipartFiles.stream()
-								.map(this::uploadImage)
-								.toList();
+				.map(this::uploadImage)
+				.toList();
+
+		for (ImageDto.ImageDetail imageDetail : imageDetails) {
+			ImageEvents.raise(new ImageSavedEvent(imageDetail.uniqueName()));
+		}
+
+		return imageDetails;
     }
 
 	private boolean isEmptyImages(List<MultipartFile> multipartFiles) {
@@ -73,4 +85,15 @@ public class LocalImageUpload implements ImageUpload {
     private String getFullPath(String uniqueName) {
    		return FOLDER_PATH + "/" + uniqueName;
    	}
+
+	@Override
+	public void delete(String fileName) {
+		Path fullPath = Paths.get(FOLDER_PATH + "/" + fileName);
+
+		try {
+			Files.delete(fullPath);
+		} catch (IOException e) {
+			throw new FileDeleteException(FILE_DELETE_EXCEPTION.getMessage());
+		}
+	}
 }
