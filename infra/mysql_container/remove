@@ -8,3 +8,6 @@ docker volume rm mysql_container_data
 
 docker rm redis
 docker rmi redis:latest
+
+docker rm sonarqube
+docker rmi sonarqube:4.3.1.3277

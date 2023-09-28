@@ -2,6 +2,8 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.1.3'
     id 'io.spring.dependency-management' version '1.1.3'
+    id 'jacoco'
+    id "org.sonarqube" version '4.3.1.3277'
 }
 
 group = 'com.devcourse'
@@ -76,4 +78,36 @@ configurations {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacoco {
+    toolVersion = '0.8.10'
+    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        xml.outputLocation = file("${buildDir}/reports/jacoco/xml/jacoco.xml")
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+    dependsOn test
+}
+
+sonar {
+    properties {
+        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.token", project.findProperty("sonar.token")
+        property "sonar.sources", "src"
+        property "sonar.language", "java"
+        property "sonar.sourceEncoding", "UTF-8"
+        property "sonar.profile", "Sonar way"
+        property "sonar.test.inclusions", "**/*Test.java"
+        property 'sonar.coverage.jacoco.xmlReportPaths', "${buildDir}/reports/jacoco/xml/jacoco.xml"
+    }
 }
